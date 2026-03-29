@@ -361,12 +361,28 @@ confirmDelete.addEventListener('click', async ()=>{
       await deleteArticleFromDB(articles[deleteIndex].id);
     } else {
       articles.splice(deleteIndex,1);
-      renderArticles();
+
+
     }
     deleteModal.style.display='none';
     deleteModal.classList.remove('show');
   }
 });
+
+async function loadArticles(){
+  const querySnapshot = await getDocs(collection(db, "Юридична допомога"));
+  const loaded = [];
+
+  querySnapshot.forEach((docItem)=>{
+    loaded.push({ id: docItem.id, ...docItem.data() });
+  });
+
+  if(loaded.length > 0){
+    articles = loaded;
+  }
+
+  renderArticles();
+}
 
 // Ініціалізація
 await seedArticlesIfEmpty();
