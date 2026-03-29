@@ -27,7 +27,7 @@ header {
   z-index:1000; 
   display:flex; 
   justify-content:space-between; 
-  align-items:center; 
+  align-items:center;   
   font-weight:500;
 }
 header h1 { 
@@ -188,27 +188,11 @@ let articles = [
 let editIndex = null;
 let deleteIndex = null;
 
-// Firebase функции
-async function loadArticles(){
-  const querySnapshot = await getDocs(collection(db, "articles"));
-  const loadedArticles = [];
-
-  querySnapshot.forEach((docItem) => {
-    loadedArticles.push({ id: docItem.id, ...docItem.data() });
-  });
-
-  if (loadedArticles.length > 0) {
-    articles = loadedArticles;
-  }
-
-  renderArticles();
-}
-
 async function seedArticlesIfEmpty(){
-  const querySnapshot = await getDocs(collection(db, "articles"));
+  const querySnapshot = await getDocs(collection(db, ""Юридична допомога"
   if (querySnapshot.empty) {
     for (const article of articles) {
-      await addDoc(collection(db, "articles"), {
+      await addDoc(collection(db, ""Юридична допомога"
         law: article.law,
         short: article.short,
         details: article.details
@@ -218,7 +202,7 @@ async function seedArticlesIfEmpty(){
 }
 
 async function addArticleToDB(law, short, details){
-  await addDoc(collection(db, "articles"), {
+  await addDoc(collection(db, ""Юридична допомога"
     law,
     short,
     details
@@ -227,7 +211,7 @@ async function addArticleToDB(law, short, details){
 }
 
 async function updateArticleInDB(id, law, short, details){
-  await updateDoc(doc(db, "articles", id), {
+  await updateDoc(doc(db, ""Юридична допомога"
     law,
     short,
     details
@@ -236,7 +220,7 @@ async function updateArticleInDB(id, law, short, details){
 }
 
 async function deleteArticleFromDB(id){
-  await deleteDoc(doc(db, "articles", id));
+  await deleteDoc(doc(db, ""Юридична допомога"
   await loadArticles();
 }
 
