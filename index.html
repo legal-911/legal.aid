@@ -190,6 +190,24 @@ footer {
 
 <div style="flex:1"></div>
 
+<div id="toast" style="
+  display:none;
+  position:fixed;
+  right:20px;
+  bottom:20px;
+  padding:14px 18px;
+  border-radius:12px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.25);
+  z-index:9999;
+  font-family:'Roboto', Arial, sans-serif;
+  max-width:320px;
+  opacity:0;
+  transform:translateY(15px) scale(0.95);
+  transition:all 0.3s ease;
+  color:white;
+  font-size:14px;
+"></div>
+
 <footer>
   Інформація від Офіційний вебпортал парламенту України<br>©2026
 </footer>
@@ -336,20 +354,12 @@ searchToggle.addEventListener('click', () => {
 
 maintenanceOnBtn.addEventListener('click', async () => {
   await setMaintenanceMode(true);
+  showToast('Технічні роботи увімкнено', 'warning');
 });
 
 maintenanceOffBtn.addEventListener('click', async () => {
   await setMaintenanceMode(false);
-});
-
-maintenanceOnBtn.addEventListener('click', async () => {
-  await setMaintenanceMode(true);
-  showToast('Технічні роботи увімкнено');
-});
-
-maintenanceOffBtn.addEventListener('click', async () => {
-  await setMaintenanceMode(false);
-  showToast('Технічні роботи вимкнено');
+  showToast('Технічні роботи вимкнено', 'success');
 });
 
 // Вхід
@@ -457,13 +467,38 @@ function updateAdminUI(){
   renderArticles();
 }
 
-function showToast(message){
-  toast.textContent = message;
-  toast.style.display = 'block';
-  toast.style.opacity = '1';
+function showToast(message, type = 'info'){
+  const colors = {
+    success: '#22c55e',
+    error: '#ef4444',
+    info: '#3b82f6',
+    warning: '#f59e0b'
+  };
+
+  const icons = {
+    success: '✔',
+    error: '✖',
+    info: 'ℹ',
+    warning: '⚠'
+  };
+
+  toast.innerHTML = `
+    <span style="margin-right:8px;">${icons[type]}</span>
+    <span>${message}</span>
+  `;
+
+  toast.style.background = colors[type] || colors.info;
+  toast.style.display = 'flex';
+  toast.style.alignItems = 'center';
+
+  requestAnimationFrame(() => {
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateY(0)';
+  });
 
   setTimeout(() => {
     toast.style.opacity = '0';
+    toast.style.transform = 'translateY(15px)';
     setTimeout(() => {
       toast.style.display = 'none';
     }, 300);
@@ -472,22 +507,28 @@ function showToast(message){
 
 closeEdit.addEventListener('click',()=>{editModal.style.display='none'; editModal.classList.remove('show');});
 saveArticle.addEventListener('click', async ()=>{
-  const law=articleLaw.value.trim();
-  const short=articleShort.value.trim();
-  const details=articleDetails.value.trim();
+  const law = articleLaw.value.trim();
+  const short = articleShort.value.trim();
+  const details = articleDetails.value.trim();
+
   if(law && short){
-    if(editIndex!==null){
+    if(editIndex !== null){
       if(articles[editIndex].id){
         await updateArticleInDB(articles[editIndex].id, law, short, details);
       } else {
-        articles[editIndex]={law,short,details};
+        articles[editIndex] = {law, short, details};
         renderArticles();
       }
+      showToast('Статтю змінено', 'info');
     } else {
       await addArticleToDB(law, short, details);
+      showToast('Статтю додано', 'success');
     }
-    editModal.style.display='none';
+
+    editModal.style.display = 'none';
     editModal.classList.remove('show');
+  } else {
+    showToast('Заповніть потрібні поля', 'error');
   }
 });
 
@@ -501,14 +542,14 @@ confirmDelete.addEventListener('click', async ()=>{
       await deleteArticleFromDB(articles[deleteIndex].id);
     } else {
       articles.splice(deleteIndex,1);
-
-
+      renderArticles();
     }
+
     deleteModal.style.display='none';
     deleteModal.classList.remove('show');
+    showToast('Статтю видалено', 'error');
   }
 });
-
 async function loadArticles(){
   const querySnapshot = await getDocs(collection(db, "Юридична допомога"));
   const loaded = [];
@@ -537,23 +578,6 @@ async function initApp(){
 initApp();
 
 </script>
-
-<div id="toast" style="
-  display:none;
-  position:fixed;
-  right:20px;
-  bottom:20px;
-  background:#004080;
-  color:white;
-  padding:12px 16px;
-  border-radius:10px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.25);
-  z-index:9999;
-  font-family:'Roboto', Arial, sans-serif;
-  max-width:300px;
-  opacity:0;
-  transition:opacity 0.3s ease;
-"></div>
 
 </body> 
 </html>
