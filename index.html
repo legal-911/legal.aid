@@ -145,10 +145,10 @@ footer {
 </header>
 
 <nav id="navMenu">
-  <button id="loginBtn">Увійти</button>
-  <button id="logoutBtn" style="display:none;">Вийти</button>
-  <button id="maintenanceOnBtn" style="display:none;">Увімкнути технічні роботи</button>
-  <button id="maintenanceOffBtn" style="display:none;">Вимкнути технічні роботи</button>
+   <button id="loginBtn">Увійти</button>
+ <button id="logoutBtn" style="display:none;">Вийти</button>
+<button id="maintenanceOnBtn" style="display:none;">Увімкнути технічні роботи</button>
+<button id="maintenanceOffBtn" style="display:none;">Вимкнути технічні роботи</button>
 </nav>
 
 <div class="articles" id="articles"></div>
@@ -309,7 +309,7 @@ async function checkMaintenanceMode(){
     maintenance = settingsSnap.data().maintenance === true;
   }
 
- if(maintenance && !isAdmin){
+  if(maintenance && !isAdmin){
     articlesDiv.style.display = 'none';
     maintenanceScreen.style.display = 'block';
   } else {
@@ -332,7 +332,6 @@ searchToggle.addEventListener('click', () => {
   }
 });
 
-// 👉 ВСТАВЬ ВОТ СЮДА 👇
 maintenanceOnBtn.addEventListener('click', async () => {
   await setMaintenanceMode(true);
 });
@@ -360,15 +359,11 @@ submitLogin.addEventListener('click', () => {
   }
 });
 
-
-logoutBtn.addEventListener('click',()=>{
+logoutBtn.addEventListener('click', async ()=>{
   isAdmin = false;
-  localStorage.removeItem('isAdmin'); // ← ЭТО ВАЖНО (добавили)
-
-  logoutBtn.style.display='none';
-  loginBtn.style.display='block';
-  renderArticles();
-  document.getElementById('addBtn')?.remove();
+  localStorage.removeItem('isAdmin');
+  updateAdminUI();
+  await checkMaintenanceMode();
 });
 
 // Рендер статей
@@ -514,6 +509,7 @@ async function initApp(){
 }
 
 initApp();
+
 </script>
 
 </body>
