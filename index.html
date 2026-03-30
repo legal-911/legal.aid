@@ -239,6 +239,9 @@ const maintenanceOnBtn = document.getElementById('maintenanceOnBtn');
 const maintenanceOffBtn = document.getElementById('maintenanceOffBtn');
 const maintenanceScreen = document.getElementById('maintenanceScreen');
 
+const searchToggle = document.getElementById('searchToggle');
+const searchBox = document.querySelector('.search-box');
+
 let articles = [
   {law:"Мова спілкування державного службовця – українська", short:"Це передбачає Закон про державну службу Стаття 2", details:"Витяг з статті: державна мова є українська мова, якій Конституцією України надано статус мови офіційного спілкування посадових осіб державних органів та органів місцевого самоврядування під час виконання посадових обов'язків, а також мови діловодства і документації цих органів та посадових осіб."},
   {law:"Працівник поліції є державним службовцем", short:"Згідно з Закону про державну службу та Закону про поліцію", details:"Стаття 2 Закону про державну службу поширюється на працівників поліції."},
@@ -318,6 +321,17 @@ async function checkMaintenanceMode(){
 // Меню
 menu.addEventListener('click', () => nav.style.display = nav.style.display === 'block'? 'none':'block');
 
+searchToggle.addEventListener('click', () => {
+  searchBox.classList.toggle('active');
+
+  if (searchBox.classList.contains('active')) {
+    searchInput.focus();
+  } else {
+    searchInput.value = '';
+    renderArticles();
+  }
+});
+
 // 👉 ВСТАВЬ ВОТ СЮДА 👇
 maintenanceOnBtn.addEventListener('click', async () => {
   await setMaintenanceMode(true);
@@ -349,13 +363,14 @@ submitLogin.addEventListener('click', () => {
 
 logoutBtn.addEventListener('click',()=>{
   isAdmin = false;
-  localStorage.removeItem('isAdmin'); // ← ВОТ СЮДА
+  localStorage.removeItem('isAdmin'); // ← ЭТО ВАЖНО (добавили)
 
   logoutBtn.style.display='none';
   loginBtn.style.display='block';
   renderArticles();
   document.getElementById('addBtn')?.remove();
 });
+
 // Рендер статей
 function renderArticles(){
   articlesDiv.innerHTML = "";
