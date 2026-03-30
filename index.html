@@ -154,7 +154,6 @@ footer {
 </nav>
 
 <div class="articles" id="articles"></div>
-
 <div id="maintenanceScreen" style="display:none; padding:40px; text-align:center;">
   <h2>Сайт тимчасово недоступний</h2>
   <p>Проводяться технічні роботи. Спробуйте пізніше.</p>
@@ -485,10 +484,14 @@ async function loadArticles(){
 
 
 // Ініціалізаці
-updateAdminUI();
-await seedArticlesIfEmpty();
-await loadArticles();
-await checkMaintenanceMode();
+async function initApp(){
+  updateAdminUI();
+  await seedArticlesIfEmpty();
+  await loadArticles();
+  await checkMaintenanceMode();
+}
+
+initApp();
 </script>
 
 </body>
