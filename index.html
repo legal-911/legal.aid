@@ -36,7 +36,57 @@ header h1 {
   font-weight:700;
 }
 .menu { font-size:24px; cursor:pointer; }
-#searchInput { padding:5px 10px; border-radius:4px; border:none; width:300px; font-family: 'Roboto', sans-serif; }
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.search-btn {
+  background: white;
+  border: none;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#searchInput {
+  width: 0;
+  opacity: 0;
+  padding: 8px 0;
+  border: none;
+  border-radius: 20px;
+  outline: none;
+  transition: all 0.3s ease;
+  font-family: 'Roboto', sans-serif;
+}
+
+.search-box.active #searchInput {
+  width: 260px;
+  opacity: 1;
+  padding: 8px 12px;
+}
+
+@media (max-width: 700px) {
+  header {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .search-box.active #searchInput {
+    width: 180px;
+  }
+
+  header h1 {
+    font-size: 18px;
+  }
+}
 
 nav {
   display: none;
@@ -87,15 +137,28 @@ footer {
 <header>
   <div class="menu">&#9776;</div>
   <h1>Юридична допомога</h1>
-  <input type="text" id="searchInput" placeholder="Пошук статей...">
+
+  <div class="search-box">
+    <button id="searchToggle" class="search-btn">&#128269;</button>
+    <input type="text" id="searchInput" placeholder="Опишіть ситуацію...">
+  </div>
 </header>
 
 <nav id="navMenu">
   <button id="loginBtn">Увійти</button>
   <button id="logoutBtn" style="display:none;">Вийти</button>
+  <button id="maintenanceOnBtn" style="display:none;">Увімкнути технічні роботи</button>
+  <button id="maintenanceOffBtn" style="display:none;">Вимкнути технічні роботи</button>
+<button id="maintenanceOnBtn" style="display:none;">Увімкнути техроботи</button>
+<button id="maintenanceOffBtn" style="display:none;">Вимкнути техроботи</button>
 </nav>
 
 <div class="articles" id="articles"></div>
+
+<div id="maintenanceScreen" style="display:none; padding:40px; text-align:center;">
+  <h2>Сайт тимчасово недоступний</h2>
+  <p>Проводяться технічні роботи. Спробуйте пізніше.</p>
+</div>
 
 <!-- Модальні вікна -->
 <div class="modal" id="loginModal">
@@ -136,7 +199,7 @@ footer {
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC1eGjYHzLhZOMp-FTw19lWb0FehZa_dg",
@@ -151,7 +214,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-let isAdmin = false;
+let isAdmin = localStorage.getItem('isAdmin') === 'true';
 const menu = document.querySelector('.menu');
 const nav = document.getElementById('navMenu');
 const loginBtn = document.getElementById('loginBtn');
@@ -174,6 +237,10 @@ const cancelDelete = document.getElementById('cancelDelete');
 
 const searchInput = document.getElementById('searchInput');
 const articlesDiv = document.getElementById('articles');
+
+const maintenanceOnBtn = document.getElementById('maintenanceOnBtn');
+const maintenanceOffBtn = document.getElementById('maintenanceOffBtn');
+const maintenanceScreen = document.getElementById('maintenanceScreen');
 
 let articles = [
   {law:"Мова спілкування державного службовця – українська", short:"Це передбачає Закон про державну службу Стаття 2", details:"Витяг з статті: державна мова є українська мова, якій Конституцією України надано статус мови офіційного спілкування посадових осіб державних органів та органів місцевого самоврядування під час виконання посадових обов'язків, а також мови діловодства і документації цих органів та посадових осіб."},
@@ -224,6 +291,33 @@ async function deleteArticleFromDB(id){
   await loadArticles();
 }
 
+async function setMaintenanceMode(value){
+  await setDoc(doc(db, "siteSettings", "main"), {
+    maintenance: value
+  }, { merge: true });
+
+  await checkMaintenanceMode();
+}
+
+async function checkMaintenanceMode(){
+  const settingsRef = doc(db, "siteSettings", "main");
+  const settingsSnap = await getDoc(settingsRef);
+
+  let maintenance = false;
+
+  if(settingsSnap.exists()){
+    maintenance = settingsSnap.data().maintenance === true;
+  }
+
+  if(maintenance && !isAdmin){
+    articlesDiv.style.display = 'none';
+    maintenanceScreen.style.display = 'block';
+  } else {
+    articlesDiv.style.display = 'block';
+    maintenanceScreen.style.display = 'none';
+  }
+}
+
 // Меню
 menu.addEventListener('click', () => nav.style.display = nav.style.display === 'block'? 'none':'block');
 
@@ -234,26 +328,28 @@ closeLogin.addEventListener('click', () => { loginModal.style.display='none'; lo
 submitLogin.addEventListener('click', () => {
   const login = document.getElementById('loginField').value;
   const password = document.getElementById('passwordField').value;
+
   if(login==="1" && password==="1"){
     isAdmin = true;
+    localStorage.setItem('isAdmin', 'true');
     loginModal.style.display='none';
     loginModal.classList.remove('show');
-    logoutBtn.style.display='block';
-    loginBtn.style.display='none';
-    renderArticles();
-    showAddButton();
-  }else alert("Невірний логін або пароль!");
+    updateAdminUI();
+  } else {
+    alert("Невірний логін або пароль!");
+  }
 });
 
-// Вихід
+
 logoutBtn.addEventListener('click',()=>{
-  isAdmin=false;
+  isAdmin = false;
+  localStorage.removeItem('isAdmin'); // ← ВОТ СЮДА
+
   logoutBtn.style.display='none';
   loginBtn.style.display='block';
   renderArticles();
   document.getElementById('addBtn')?.remove();
 });
-
 // Рендер статей
 function renderArticles(){
   articlesDiv.innerHTML = "";
@@ -314,6 +410,24 @@ function openEditModal(index){
   editModal.style.display='flex';
   editModal.classList.add('show');
 }
+
+function updateAdminUI(){
+  if(isAdmin){
+    loginBtn.style.display = 'none';
+    logoutBtn.style.display = 'block';
+    maintenanceOnBtn.style.display = 'block';
+    maintenanceOffBtn.style.display = 'block';
+    showAddButton();
+  } else {
+    loginBtn.style.display = 'block';
+    logoutBtn.style.display = 'none';
+    maintenanceOnBtn.style.display = 'none';
+    maintenanceOffBtn.style.display = 'none';
+    document.getElementById('addBtn')?.remove();
+  }
+
+  renderArticles();
+}
 closeEdit.addEventListener('click',()=>{editModal.style.display='none'; editModal.classList.remove('show');});
 saveArticle.addEventListener('click', async ()=>{
   const law=articleLaw.value.trim();
@@ -366,11 +480,15 @@ async function loadArticles(){
   }
 
   renderArticles();
+  await checkMaintenanceMode();
 }
 
-// Ініціалізація
+
+// Ініціалізаці
+updateAdminUI();
 await seedArticlesIfEmpty();
 await loadArticles();
+await checkMaintenanceMode();
 </script>
 
 </body>
