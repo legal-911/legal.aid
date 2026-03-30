@@ -242,6 +242,8 @@ const maintenanceScreen = document.getElementById('maintenanceScreen');
 const searchToggle = document.getElementById('searchToggle');
 const searchBox = document.querySelector('.search-box');
 
+const toast = document.getElementById('toast');
+
 let articles = [
   {law:"Мова спілкування державного службовця – українська", short:"Це передбачає Закон про державну службу Стаття 2", details:"Витяг з статті: державна мова є українська мова, якій Конституцією України надано статус мови офіційного спілкування посадових осіб державних органів та органів місцевого самоврядування під час виконання посадових обов'язків, а також мови діловодства і документації цих органів та посадових осіб."},
   {law:"Працівник поліції є державним службовцем", short:"Згідно з Закону про державну службу та Закону про поліцію", details:"Стаття 2 Закону про державну службу поширюється на працівників поліції."},
@@ -338,6 +340,16 @@ maintenanceOnBtn.addEventListener('click', async () => {
 
 maintenanceOffBtn.addEventListener('click', async () => {
   await setMaintenanceMode(false);
+});
+
+maintenanceOnBtn.addEventListener('click', async () => {
+  await setMaintenanceMode(true);
+  showToast('Технічні роботи увімкнено');
+});
+
+maintenanceOffBtn.addEventListener('click', async () => {
+  await setMaintenanceMode(false);
+  showToast('Технічні роботи вимкнено');
 });
 
 // Вхід
@@ -444,6 +456,20 @@ function updateAdminUI(){
 
   renderArticles();
 }
+
+function showToast(message){
+  toast.textContent = message;
+  toast.style.display = 'block';
+  toast.style.opacity = '1';
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    setTimeout(() => {
+      toast.style.display = 'none';
+    }, 300);
+  }, 2500);
+}
+
 closeEdit.addEventListener('click',()=>{editModal.style.display='none'; editModal.classList.remove('show');});
 saveArticle.addEventListener('click', async ()=>{
   const law=articleLaw.value.trim();
@@ -512,5 +538,22 @@ initApp();
 
 </script>
 
-</body>
+<div id="toast" style="
+  display:none;
+  position:fixed;
+  right:20px;
+  bottom:20px;
+  background:#004080;
+  color:white;
+  padding:12px 16px;
+  border-radius:10px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.25);
+  z-index:9999;
+  font-family:'Roboto', Arial, sans-serif;
+  max-width:300px;
+  opacity:0;
+  transition:opacity 0.3s ease;
+"></div>
+
+</body> 
 </html>
