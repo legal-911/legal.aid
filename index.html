@@ -149,8 +149,6 @@ footer {
   <button id="logoutBtn" style="display:none;">Вийти</button>
   <button id="maintenanceOnBtn" style="display:none;">Увімкнути технічні роботи</button>
   <button id="maintenanceOffBtn" style="display:none;">Вимкнути технічні роботи</button>
-<button id="maintenanceOnBtn" style="display:none;">Увімкнути техроботи</button>
-<button id="maintenanceOffBtn" style="display:none;">Вимкнути техроботи</button>
 </nav>
 
 <div class="articles" id="articles"></div>
@@ -308,7 +306,7 @@ async function checkMaintenanceMode(){
     maintenance = settingsSnap.data().maintenance === true;
   }
 
-  if(maintenance && !isAdmin){
+ if(maintenance && !isAdmin){
     articlesDiv.style.display = 'none';
     maintenanceScreen.style.display = 'block';
   } else {
@@ -319,6 +317,15 @@ async function checkMaintenanceMode(){
 
 // Меню
 menu.addEventListener('click', () => nav.style.display = nav.style.display === 'block'? 'none':'block');
+
+// 👉 ВСТАВЬ ВОТ СЮДА 👇
+maintenanceOnBtn.addEventListener('click', async () => {
+  await setMaintenanceMode(true);
+});
+
+maintenanceOffBtn.addEventListener('click', async () => {
+  await setMaintenanceMode(false);
+});
 
 // Вхід
 loginBtn.addEventListener('click', () => { loginModal.style.display='flex'; loginModal.classList.add('show'); });
