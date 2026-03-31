@@ -408,6 +408,14 @@ logoutBtn.addEventListener('click', async ()=>{
   await checkMaintenanceMode();
 });
 
+function formatText(text){
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')      // жирный
+    .replace(/\*(.*?)\*/g, '<i>$1</i>')          // курсив
+    .replace(/_(.*?)_/g, '<s>$1</s>')            // зачеркнутый
+    .replace(/\n/g, '<br>');                     // перенос строки
+}
+
 // Рендер статей
 function renderArticles(){
   articlesDiv.innerHTML = "";
@@ -419,9 +427,9 @@ function renderArticles(){
       div.innerHTML=`<h2>${a.law}</h2><p>${a.short}</p>`;
       const detailsDiv = document.createElement('div');
       detailsDiv.className='details';
-     detailsDiv.innerHTML = `
-  <div style="white-space: pre-line; line-height:1.6;">${a.details}</div>
-  ${a.link ? `<a href="${a.link}" target="_blank" style="display:block; margin-top:10px; color:#004080; font-weight:500;">Посилання на статтю</a>` : ''}
+      detailsDiv.innerHTML = `
+       <div style="line-height:1.6;">${formatText(a.details)}</div>
+  ${a.link ? `<a href="${a.link}" target="_blank" style="display:block; margin-top:10px; color:#004080;">Посилання на статтю</a>` : ''}
 `;
       div.appendChild(detailsDiv);
       const moreBtn = document.createElement('button');
