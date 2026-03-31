@@ -228,23 +228,26 @@ footer {
 <div class="modal" id="generatorModal">
   <div class="modal-content generator-modal-content">
     <span class="close" id="closeGenerator">&times;</span>
-    <h2 id="generatorTitle">Генератор статті</h2>
+    <h2 id="generatorTitle">Генератор статей</h2>
 
     <div id="generatorStepInput">
-      <textarea id="generatorInput" rows="10" placeholder="Встав сюди текст статті або закону"></textarea>
+      <label style="margin-bottom:6px; font-weight:500;">Оберіть закон або кодекс</label>
+      <select id="generatorLawSelect" style="margin-bottom:10px; padding:10px; border-radius:6px; border:1px solid #ccc; font-size:14px; width:100%;">
+      </select>
+
+      <textarea id="generatorInput" rows="12" placeholder="Встав сюди весь текст закону або кодексу, де є Стаття 1..., Стаття 2..., Стаття 3..."></textarea>
       <button id="startGenerateBtn">Згенерувати</button>
     </div>
 
     <div id="generatorStepLoading" style="display:none; text-align:center;">
       <div class="spinner"></div>
-      <p style="margin-top:12px;">Йде генерація...</p>
+      <p style="margin-top:12px;">Йде генерація всіх статей...</p>
     </div>
 
     <div id="generatorStepResult" style="display:none;">
-      <textarea id="generatorOutput" rows="14" readonly placeholder="Тут буде результат"></textarea>
+      <textarea id="generatorOutput" rows="16" readonly placeholder="Тут буде результат"></textarea>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
         <button id="editGeneratedBtn">Редагувати текст</button>
-        <button id="useGeneratedBtn">Вставити в статтю</button>
         <button id="regenerateBtn">Генерувати повторно</button>
         <button id="cancelGeneratorBtn">Відміна</button>
       </div>
@@ -341,6 +344,7 @@ const editGeneratedBtn = document.getElementById('editGeneratedBtn');
 const regenerateBtn = document.getElementById('regenerateBtn');
 const cancelGeneratorBtn = document.getElementById('cancelGeneratorBtn');
 const useGeneratedBtn = document.getElementById('useGeneratedBtn');
+const generatorLawSelect = document.getElementById('generatorLawSelect');
 
 let articles = [
   {law:"Мова спілкування державного службовця – українська", short:"Це передбачає Закон про державну службу Стаття 2", details:"Витяг з статті: державна мова є українська мова, якій Конституцією України надано статус мови офіційного спілкування посадових осіб державних органів та органів місцевого самоврядування під час виконання посадових обов'язків, а також мови діловодства і документації цих органів та посадових осіб.", link:""},
@@ -355,6 +359,104 @@ let articles = [
 let editIndex = null;
 let deleteIndex = null;
 let generatedArticleData = null;
+
+const LAW_LIBRARY = [
+  {
+    key: "police",
+    name: "Закон України «Про Національну поліцію»",
+    link: "https://zakon.rada.gov.ua/laws/show/580-19#Text"
+  },
+  {
+    key: "kpk",
+    name: "Кримінальний процесуальний кодекс України",
+    link: "https://zakon.rada.gov.ua/laws/show/4651-17#Text"
+  },
+  {
+    key: "kk",
+    name: "Кримінальний кодекс України",
+    link: "https://zakon.rada.gov.ua/laws/show/2341-14#Text"
+  },
+  {
+    key: "ck",
+    name: "Цивільний кодекс України",
+    link: "https://zakon.rada.gov.ua/laws/show/435-15#Text"
+  },
+  {
+    key: "kupap",
+    name: "Кодекс України про адміністративні правопорушення",
+    link: "https://zakon.rada.gov.ua/laws/show/80731-10#Text"
+  },
+  {
+    key: "constitution",
+    name: "Конституція України",
+    link: "https://zakon.rada.gov.ua/laws/show/254%D0%BA/96-%D0%B2%D1%80#Text"
+  },
+  {
+    key: "civil-proc",
+    name: "Цивільний процесуальний кодекс України",
+    link: "https://zakon.rada.gov.ua/laws/show/1618-15#Text"
+  },
+  {
+    key: "economic-proc",
+    name: "Господарський процесуальний кодекс України",
+    link: "https://zakon.rada.gov.ua/laws/show/1798-12#Text"
+  },
+  {
+    key: "cas",
+    name: "Кодекс адміністративного судочинства України",
+    link: "https://zakon.rada.gov.ua/laws/show/2747-15#Text"
+  },
+  {
+    key: "labor",
+    name: "Кодекс законів про працю України",
+    link: "https://zakon.rada.gov.ua/laws/show/322-08#Text"
+  },
+  {
+    key: "family",
+    name: "Сімейний кодекс України",
+    link: "https://zakon.rada.gov.ua/laws/show/2947-14#Text"
+  },
+  {
+    key: "land",
+    name: "Земельний кодекс України",
+    link: "https://zakon.rada.gov.ua/laws/show/2768-14#Text"
+  },
+  {
+    key: "consumer",
+    name: "Закон України «Про захист прав споживачів»",
+    link: "https://zakon.rada.gov.ua/laws/show/1023-12#Text"
+  },
+  {
+    key: "appeals",
+    name: "Закон України «Про звернення громадян»",
+    link: "https://zakon.rada.gov.ua/laws/show/393/96-%D0%B2%D1%80#Text"
+  },
+  {
+    key: "lawyer",
+    name: "Закон України «Про адвокатуру та адвокатську діяльність»",
+    link: "https://zakon.rada.gov.ua/laws/show/5076-17#Text"
+  },
+  {
+    key: "court",
+    name: "Закон України «Про судоустрій і статус суддів»",
+    link: "https://zakon.rada.gov.ua/laws/show/1402-19#Text"
+  }
+];
+
+function fillLawSelect(){
+  generatorLawSelect.innerHTML = '';
+
+  LAW_LIBRARY.forEach(item => {
+    const option = document.createElement('option');
+    option.value = item.key;
+    option.textContent = item.name;
+    generatorLawSelect.appendChild(option);
+  });
+}
+
+function getSelectedLaw(){
+  return LAW_LIBRARY.find(item => item.key === generatorLawSelect.value) || LAW_LIBRARY[0];
+}
 
 async function seedArticlesIfEmpty(){
   const querySnapshot = await getDocs(collection(db, "Юридична допомога"));
@@ -456,6 +558,7 @@ regenerateBtn.addEventListener('click', () => {
   generatorStepResult.style.display = 'none';
   generatorStepLoading.style.display = 'none';
   generatorStepInput.style.display = 'block';
+  generatorOutput.value = '';
   generatedArticleData = null;
 });
 
@@ -535,48 +638,6 @@ function formatText(text){
     .replace(/\n/g, '<br>');                     // перенос строки
 }
 
-function detectLawName(text){
-  const lower = text.toLowerCase();
-
-  if(lower.includes('національну поліцію') || lower.includes('поліцей')){
-    return 'Закон України «Про Національну поліцію»';
-  }
-  if(lower.includes('кримінальний процесуальний кодекс') || lower.includes('кпк')){
-    return 'Кримінальний процесуальний кодекс України';
-  }
-  if(lower.includes('цивільний кодекс') || lower.includes('цк')){
-    return 'Цивільний кодекс України';
-  }
-  if(lower.includes('кодекс україни про адміністративні правопорушення') || lower.includes('купап')){
-    return 'Кодекс України про адміністративні правопорушення';
-  }
-  if(lower.includes('кримінальний кодекс') || lower.includes('кк')){
-    return 'Кримінальний кодекс України';
-  }
-
-  return 'Назву закону треба дописати вручну';
-}
-
-function detectLawLink(lawName){
-  if(lawName === 'Закон України «Про Національну поліцію»'){
-    return 'https://zakon.rada.gov.ua/laws/show/580-19#Text';
-  }
-  if(lawName === 'Кримінальний процесуальний кодекс України'){
-    return 'https://zakon.rada.gov.ua/laws/show/4651-17#Text';
-  }
-  if(lawName === 'Цивільний кодекс України'){
-    return 'https://zakon.rada.gov.ua/laws/show/435-15#Text';
-  }
-  if(lawName === 'Кодекс України про адміністративні правопорушення'){
-    return 'https://zakon.rada.gov.ua/laws/show/80731-10#Text';
-  }
-  if(lawName === 'Кримінальний кодекс України'){
-    return 'https://zakon.rada.gov.ua/laws/show/2341-14#Text';
-  }
-
-  return 'Встав посилання вручну';
-}
-
 function cleanGeneratedText(text){
   return text
     .replace(/\r/g, '')
@@ -586,51 +647,55 @@ function cleanGeneratedText(text){
 }
 
 function generateArticleBlocks(rawText){
+  const selectedLaw = getSelectedLaw();
   const cleaned = cleanGeneratedText(rawText);
-  if(!cleaned) throw new Error('Немає тексту для генерації');
 
-  const lines = cleaned.split('\n').map(x => x.trim()).filter(Boolean);
-  const firstLine = lines[0];
+  if(!cleaned){
+    throw new Error('Немає тексту для генерації');
+  }
 
-  const match = firstLine.match(/^Стаття\s+(\d+(?:-\d+)?)\.\s*(.+)$/i);
-  if(!match) throw new Error('Перший рядок має бути у форматі: Стаття 32. Назва');
+  const regex = /Стаття\s+(\d+(?:-\d+)?)\.\s*([^\n]+)\n?([\s\S]*?)(?=Стаття\s+\d+(?:-\d+)?\.|$)/g;
+  const articles = [];
 
-  const articleNumber = match[1];
-  const shortInfo = match[2].trim();
-  const lawName = detectLawName(cleaned);
-  const lawLine = `Стаття ${articleNumber} ${lawName}`;
-  const link = detectLawLink(lawName);
+  let match;
 
-  let detailsText = cleaned.replace(firstLine, '').trim();
+  while((match = regex.exec(cleaned)) !== null){
+    const articleNumber = match[1].trim();
+    const shortInfo = match[2].trim();
+    let detailsText = match[3].trim();
 
-  detailsText = detailsText
-    .replace(/(^|\n)ВАЖЛИВО:?/g, '$1**ВАЖЛИВО**')
-    .replace(/(^|\n)ВИКЛЮЧЕННЯ:?/g, '$1*ВИКЛЮЧЕННЯ*');
+    detailsText = detailsText
+      .replace(/(^|\n)ВАЖЛИВО:?/g, '$1**ВАЖЛИВО**')
+      .replace(/(^|\n)ВИКЛЮЧЕННЯ:?/g, '$1*ВИКЛЮЧЕННЯ*')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
 
-  const details = `*${shortInfo}*\n\n${detailsText}`;
+    const article = {
+      law: `Стаття ${articleNumber} ${selectedLaw.name}`,
+      short: shortInfo,
+      details: `*${shortInfo}*\n\n${detailsText}`,
+      link: selectedLaw.link
+    };
 
-  const output = `\`\`\`
-${lawLine}
-\`\`\`
+    articles.push(article);
+  }
 
-\`\`\`
-${shortInfo}
-\`\`\`
+  if(!articles.length){
+    throw new Error('Не знайдено жодної статті. Перевір, чи є в тексті "Стаття 1.", "Стаття 2." і так далі');
+  }
 
-\`\`\`
-${details}
-\`\`\`
-
-\`\`\`
-${link}
-\`\`\``;
+  const output = articles.map(item => {
+    return `{
+  law: ${JSON.stringify(item.law)},
+  short: ${JSON.stringify(item.short)},
+  details: ${JSON.stringify(item.details)},
+  link: ${JSON.stringify(item.link)}
+}`;
+  }).join(',\n\n');
 
   return {
-    law: lawLine,
-    short: shortInfo,
-    details,
-    link,
-    output
+    items: articles,
+    output: `let articles = [\n${output}\n];`
   };
 }
 
@@ -642,8 +707,11 @@ function openGeneratorModal(){
   generatorStepLoading.style.display = 'none';
   generatorStepResult.style.display = 'none';
 
+  generatorInput.value = '';
   generatorOutput.value = '';
   generatedArticleData = null;
+
+  fillLawSelect();
 }
 
 function closeGeneratorModal(){
@@ -682,7 +750,7 @@ function runGeneration(){
       generatorStepLoading.style.display = 'none';
       generatorStepResult.style.display = 'block';
 
-      showToast('Генерацію завершено', 'success');
+      showToast(`Згенеровано статей: ${result.items.length}`, 'success');
     }catch(error){
       generatorStepLoading.style.display = 'none';
       generatorStepInput.style.display = 'block';
@@ -690,6 +758,7 @@ function runGeneration(){
     }
   }, 900);
 }
+
 // Рендер статей
 function renderArticles(){
   articlesDiv.innerHTML = "";
