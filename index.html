@@ -649,6 +649,14 @@ function openGeneratorModal(){
 function closeGeneratorModal(){
   generatorModal.style.display = 'none';
   generatorModal.classList.remove('show');
+
+  generatorInput.value = '';
+  generatorOutput.value = '';
+  generatedArticleData = null;
+
+  generatorStepInput.style.display = 'block';
+  generatorStepLoading.style.display = 'none';
+  generatorStepResult.style.display = 'none';
 }
 
 function runGeneration(){
@@ -669,6 +677,7 @@ function runGeneration(){
       generatedArticleData = result;
       generatorOutput.value = result.output;
       generatorOutput.setAttribute('readonly', 'readonly');
+      generatorInput.value = '';
 
       generatorStepLoading.style.display = 'none';
       generatorStepResult.style.display = 'block';
