@@ -246,7 +246,6 @@ const articleLaw = document.getElementById('articleLaw');
 const articleShort = document.getElementById('articleShort');
 const articleDetails = document.getElementById('articleDetails');
 const articleLink = document.getElementById('articleLink');
-const link = articleLink.value.trim();
 
 const deleteModal = document.getElementById('deleteModal');
 const closeDelete = document.getElementById('closeDelete');
@@ -272,7 +271,7 @@ let articles = [
   {law:"Право мовчати", short:"Ви маєте право відмовитися давати свідчення", details:"Витяг з статті: Особа не несе відповідальності за відмову давати показання щодо себе, членів сім'ї чи близьких родичів.\nПоправка: Відмова свідчити можлива, коли йде обвинувачення вас, членів сім'ї або ваших близьких родичів.", link:""},
   {law:"Пред’явлення документів та ідентифікація поліцейського", short:"Це передбачає Стаття 18 Закону про Національну поліцію", details:"Витяг з статті: поліцейський повинен назвати своє прізвище, посаду, спеціальне звання та пред’явити службове посвідчення.\nПоправка: Поліцейський зобов'язаний мати нагрудний знак (жетон) і не може його приховувати.", link:""},
   {law:"Підстави для перевірки документів", short:"Регулює Стаття 32 Закону про Національну поліцію", details:"Поліцейський має право вимагати пред’явлення документів, якщо є підстави вважати, що особа вчинила або має намір вчинити правопорушення.\nПоправка: Поліцейський не може перевіряти документи без причини.", link:""},
-  {law:"Дрібне хуліганство", short:"Стаття 173 КУпАП", details:"Витяг з статті: Дрібне хуліганство тягне за собою накладення штрафу, громадські роботи або виправні роботи, або адміністративний арешт."}
+  {law:"Дрібне хуліганство", short:"Стаття 173 КУпАП", details:"Витяг з статті: Дрібне хуліганство тягне за собою накладення штрафу, громадські роботи або виправні роботи, або адміністративний арешт.", link:""}
 ];
 
 let editIndex = null;
@@ -285,7 +284,8 @@ async function seedArticlesIfEmpty(){
       await addDoc(collection(db, "Юридична допомога"), {
         law: article.law,
         short: article.short,
-        details: article.details
+        details: article.details,
+        link: article.link || ""
       });
     }
   }
@@ -298,6 +298,7 @@ async function addArticleToDB(law, short, details, link){
     details,
     link
   });
+  await loadArticles();
 }
 
 async function updateArticleInDB(id, law, short, details, link){
@@ -307,6 +308,7 @@ async function updateArticleInDB(id, law, short, details, link){
     details,
     link
   });
+  await loadArticles();
 }
 
 async function deleteArticleFromDB(id){
