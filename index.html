@@ -171,8 +171,12 @@ footer {
   line-height:1.5;
 }
 
-.modal input, .modal textarea, .modal button
-#bulkImportText{
+.modal input, .modal textarea, .modal button {
+  margin-bottom: 10px;
+  font-family: 'Roboto', sans-serif;
+}
+
+#bulkImportText {
   min-height: 260px;
   resize: vertical;
   line-height: 1.5;
@@ -321,10 +325,15 @@ const logoutBtn = document.getElementById('logoutBtn');
 const loginModal = document.getElementById('loginModal');
 const closeLogin = document.getElementById('closeLogin');
 const submitLogin = document.getElementById('submitLogin');
-
 const editModal = document.getElementById('editModal');
 const closeEdit = document.getElementById('closeEdit');
 const saveArticle = document.getElementById('saveArticle');
+
+closeEdit.addEventListener('click', () => {
+  editModal.style.display = 'none';
+  editModal.classList.remove('show');
+});
+
 const articleLaw = document.getElementById('articleLaw');
 const articleShort = document.getElementById('articleShort');
 const articleDetails = document.getElementById('articleDetails');
@@ -390,6 +399,7 @@ async function seedArticlesIfEmpty(){
   if (querySnapshot.empty) {
     for (const article of articles) {
       await addDoc(collection(db, "Юридична допомога"), {
+        section: article.section || "",
         law: article.law,
         short: article.short,
         details: article.details,
@@ -666,18 +676,6 @@ filteredArticles.forEach((a) => {
 
 // Пошук
 searchInput.addEventListener('input', renderArticles);
-
-// Додавання/редагування
-function showAddButton(){
-  if(!document.getElementById('addBtn')){
-    const addBtn=document.createElement('button');
-    addBtn.id='addBtn';
-    addBtn.textContent='Додати статтю';
-    addBtn.style.margin='0px';
-    addBtn.onclick=()=> openEditModal(null);
-    nav.appendChild(addBtn);
-  }
-}
 
 function openEditModal(index){
   editIndex=index;
