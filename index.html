@@ -120,6 +120,16 @@ nav button {
 .modal input, .modal textarea { display:block; width:100%; padding:8px; border-radius:4px; border:1px solid #ccc; font-size:14px; }
 .modal button { padding:10px; background:#004080; color:white; border:none; cursor:pointer; border-radius:4px; width:100%; font-weight:500; }
 .modal .close { position:absolute; top:5px; right:10px; font-size:18px; cursor:pointer; color:#333; }
+.modal select {
+  display:block;
+  width:100%;
+  padding:8px;
+  border-radius:4px;
+  border:1px solid #ccc;
+  font-size:14px;
+  margin-bottom:10px;
+  font-family:'Roboto', sans-serif;
+}
 
 footer { 
   text-align:center; 
@@ -130,39 +140,6 @@ footer {
   font-weight:500;
   line-height:1.5;
 }
-
-.generator-modal-content{
-  width:700px;
-  max-width:95%;
-}
-
-#generatorInput,
-#generatorOutput{
-  width:100%;
-  padding:10px;
-  border-radius:6px;
-  border:1px solid #ccc;
-  font-size:14px;
-  font-family:'Roboto', sans-serif;
-  resize:vertical;
-  box-sizing:border-box;
-}
-
-.spinner{
-  width:42px;
-  height:42px;
-  border:4px solid #dbeafe;
-  border-top:4px solid #004080;
-  border-radius:50%;
-  margin:20px auto 0;
-  animation:spin 0.8s linear infinite;
-}
-
-@keyframes spin{
-  from{ transform:rotate(0deg); }
-  to{ transform:rotate(360deg); }
-}
-
 </style>
 </head>
 <body>
@@ -182,14 +159,12 @@ footer {
  <button id="logoutBtn" style="display:none;">Вийти</button>
 <button id="maintenanceOnBtn" style="display:none;">Увімкнути технічні роботи</button>
 <button id="maintenanceOffBtn" style="display:none;">Вимкнути технічні роботи</button>
-<button id="openGeneratorBtn" style="display:none;">Згенерувати статтю</button>
-<button id="useGeneratedBtn">Використати</button>
 </nav>
 
 <div class="articles" id="articles"></div>
 <div id="maintenanceScreen" style="display:none; padding:40px; text-align:center;">
-  <h2>⚠ Сайт тимчасово недоступний ⚠</h2>
-  <p>Проводяться технічні роботи. Спробуйте пізніше.</p>
+  <h2>Сайт тимчасово недоступний</h2>
+  <p>⚠Проводяться технічні роботи. Спробуйте пізніше⚠</p>
 </div>
 
 <!-- Модальні вікна -->
@@ -208,6 +183,24 @@ footer {
     <span class="close" id="closeEdit">&times;</span>
     <h2 id="editTitle">Додати/Редагувати статтю</h2>
     <input type="text" id="articleLaw" placeholder="Стаття / Закон">
+    <select id="articleSection">
+  <option value="Закон України «Про Національну поліцію»">Закон України «Про Національну поліцію»</option>
+  <option value="Кримінальний процесуальний кодекс України">Кримінальний процесуальний кодекс України</option>
+  <option value="Кримінальний кодекс України">Кримінальний кодекс України</option>
+  <option value="Цивільний кодекс України">Цивільний кодекс України</option>
+  <option value="Кодекс України про адміністративні правопорушення">Кодекс України про адміністративні правопорушення</option>
+  <option value="Конституція України">Конституція України</option>
+  <option value="Цивільний процесуальний кодекс України">Цивільний процесуальний кодекс України</option>
+  <option value="Господарський процесуальний кодекс України">Господарський процесуальний кодекс України</option>
+  <option value="Кодекс адміністративного судочинства України">Кодекс адміністративного судочинства України</option>
+  <option value="Кодекс законів про працю України">Кодекс законів про працю України</option>
+  <option value="Сімейний кодекс України">Сімейний кодекс України</option>
+  <option value="Земельний кодекс України">Земельний кодекс України</option>
+  <option value="Закон України «Про захист прав споживачів»">Закон України «Про захист прав споживачів»</option>
+  <option value="Закон України «Про звернення громадян»">Закон України «Про звернення громадян»</option>
+  <option value="Закон України «Про адвокатуру та адвокатську діяльність»">Закон України «Про адвокатуру та адвокатську діяльність»</option>
+  <option value="Закон України «Про судоустрій і статус суддів»">Закон України «Про судоустрій і статус суддів»</option>
+</select>
     <input type="text" id="articleShort" placeholder="Малий опис">
     <textarea id="articleDetails" placeholder="Додаткова інформація" rows="5"></textarea>
     <input type="text" id="articleLink" placeholder="Посилання (https://...)">
@@ -225,36 +218,6 @@ footer {
 </div>
 
 <div style="flex:1"></div>
-
-<div class="modal" id="generatorModal">
-  <div class="modal-content generator-modal-content">
-    <span class="close" id="closeGenerator">&times;</span>
-    <h2 id="generatorTitle">Генератор статей</h2>
-
-    <div id="generatorStepInput">
-      <label style="margin-bottom:6px; font-weight:500;">Оберіть закон або кодекс</label>
-      <select id="generatorLawSelect" style="margin-bottom:10px; padding:10px; border-radius:6px; border:1px solid #ccc; font-size:14px; width:100%;">
-      </select>
-
-      <textarea id="generatorInput" rows="12" placeholder="Встав сюди весь текст закону або кодексу, де є Стаття 1..., Стаття 2..., Стаття 3..."></textarea>
-      <button id="startGenerateBtn">Згенерувати</button>
-    </div>
-
-    <div id="generatorStepLoading" style="display:none; text-align:center;">
-      <div class="spinner"></div>
-      <p style="margin-top:12px;">Йде генерація всіх статей...</p>
-    </div>
-
-    <div id="generatorStepResult" style="display:none;">
-      <textarea id="generatorOutput" rows="16" readonly placeholder="Тут буде результат"></textarea>
-      <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button id="editGeneratedBtn">Редагувати текст</button>
-        <button id="regenerateBtn">Генерувати повторно</button>
-        <button id="cancelGeneratorBtn">Відміна</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <div id="toast" style="
   display:none;
@@ -329,135 +292,39 @@ const searchBox = document.querySelector('.search-box');
 
 const toast = document.getElementById('toast');
 
-const openGeneratorBtn = document.getElementById('openGeneratorBtn');
-const generatorModal = document.getElementById('generatorModal');
-const closeGenerator = document.getElementById('closeGenerator');
+const lawSections = [
+  "Закон України «Про Національну поліцію»",
+  "Кримінальний процесуальний кодекс України",
+  "Кримінальний кодекс України",
+  "Цивільний кодекс України",
+  "Кодекс України про адміністративні правопорушення",
+  "Конституція України",
+  "Цивільний процесуальний кодекс України",
+  "Господарський процесуальний кодекс України",
+  "Кодекс адміністративного судочинства України",
+  "Кодекс законів про працю України",
+  "Сімейний кодекс України",
+  "Земельний кодекс України",
+  "Закон України «Про захист прав споживачів»",
+  "Закон України «Про звернення громадян»",
+  "Закон України «Про адвокатуру та адвокатську діяльність»",
+  "Закон України «Про судоустрій і статус суддів»"
+];
 
-const generatorStepInput = document.getElementById('generatorStepInput');
-const generatorStepLoading = document.getElementById('generatorStepLoading');
-const generatorStepResult = document.getElementById('generatorStepResult');
-
-const generatorInput = document.getElementById('generatorInput');
-const generatorOutput = document.getElementById('generatorOutput');
-
-const startGenerateBtn = document.getElementById('startGenerateBtn');
-const editGeneratedBtn = document.getElementById('editGeneratedBtn');
-const regenerateBtn = document.getElementById('regenerateBtn');
-const cancelGeneratorBtn = document.getElementById('cancelGeneratorBtn');
-const useGeneratedBtn = document.getElementById('useGeneratedBtn');
-const generatorLawSelect = document.getElementById('generatorLawSelect');
+let currentSection = null;
 
 let articles = [
-  {law:"Мова спілкування державного службовця – українська", short:"Це передбачає Закон про державну службу Стаття 2", details:"Витяг з статті: державна мова є українська мова, якій Конституцією України надано статус мови офіційного спілкування посадових осіб державних органів та органів місцевого самоврядування під час виконання посадових обов'язків, а також мови діловодства і документації цих органів та посадових осіб.", link:""},
-  {law:"Працівник поліції є державним службовцем", short:"Згідно з Закону про державну службу та Закону про поліцію", details:"Стаття 2 Закону про державну службу поширюється на працівників поліції.", link:""},
-  {law:"Право на свободу особистої думки", short:"Це передбачає Стаття 34 Конституції України", details:"Кожному гарантується право на свободу думки і слова, на вільне вираження своїх поглядів і переконань", link:""},
-  {law:"Право мовчати", short:"Ви маєте право відмовитися давати свідчення", details:"Витяг з статті: Особа не несе відповідальності за відмову давати показання щодо себе, членів сім'ї чи близьких родичів.\nПоправка: Відмова свідчити можлива, коли йде обвинувачення вас, членів сім'ї або ваших близьких родичів.", link:""},
-  {law:"Пред’явлення документів та ідентифікація поліцейського", short:"Це передбачає Стаття 18 Закону про Національну поліцію", details:"Витяг з статті: поліцейський повинен назвати своє прізвище, посаду, спеціальне звання та пред’явити службове посвідчення.\nПоправка: Поліцейський зобов'язаний мати нагрудний знак (жетон) і не може його приховувати.", link:""},
-  {law:"Підстави для перевірки документів", short:"Регулює Стаття 32 Закону про Національну поліцію", details:"Поліцейський має право вимагати пред’явлення документів, якщо є підстави вважати, що особа вчинила або має намір вчинити правопорушення.\nПоправка: Поліцейський не може перевіряти документи без причини.", link:""},
-  {law:"Дрібне хуліганство", short:"Стаття 173 КУпАП", details:"Витяг з статті: Дрібне хуліганство тягне за собою накладення штрафу, громадські роботи або виправні роботи, або адміністративний арешт.", link:""}
+  {section:"Закон про державну службу", law: "Мова спілкування державного службовця – українська", short:"Це передбачає Закон про державну службу Стаття 2", details:"Витяг з статті: державна мова є українська мова, якій Конституцією України надано статус мови офіційного спілкування посадових осіб державних органів та органів місцевого самоврядування під час виконання посадових обов'язків, а також мови діловодства і документації цих органів та посадових осіб.", link:""},
+  {section:"Закон України «Про Національну поліцію»", law:"Працівник поліції є державним службовцем", short:"Згідно з Закону про державну службу та Закону про поліцію", details:"Стаття 2 Закону про державну службу поширюється на працівників поліції.", link:""},
+  {section:"Конституція України", law:"Право на свободу особистої думки", short:"Це передбачає Стаття 34 Конституції України", details:"Кожному гарантується право на свободу думки і слова, на вільне вираження своїх поглядів і переконань", link:""},
+  {section:"Конституція України", law:"Право мовчати", short:"Ви маєте право відмовитися давати свідчення", details:"Витяг з статті: Особа не несе відповІдальностІ за вІдмову давати показання щодо себе, членIв сIм'Ї чи близьких родичIв.\nПоправка: ВІдмова свIдчити можлива, коли йде обвинувачення вас, членIв сIм'Ї або ваших близьких родичIв.", link:""},
+  {section:"Закон України «Про НацІональну полIцIю»", law:"Пред’явлення документIв та ідентифІкацIя полIцейського", short:"Це передбачає Стаття 18 Закону про НацІональну полIцIю", details:"Витяг з статтI: полIцейський повинен назвати своє прІзвище, посаду, спецIальне звання та пред’явити службове посвIdчення.\nПоправка: ПолIцейський зобов'язаний мати нагрудний знак (жетон) і не може його приховувати.", link:""},
+  {section:"Закон України «Про НацІональну полIcIю»", law:"ПІdстави для перевІрки документIв", short:"Регулює Стаття 32 Закону про НацІональну полIcIю", details:"ПолIcейський має право вимагати пред’явлення документIв, якщо є пІdстави вважати, що особа вчинила або має намІр вчинити правопорушеннЯ.\nПоправка: ПолIcейський не може перевІряти документи без причини.", link:""},
+  {section:"Кодекс УкраЇни про адмІnISTRATивнИ правопорушеннЯ", law:"ДрĪbне хулĪганство", short:"Стаття 173 КУpАП", details:"Витяг з статтī: ДрĪbне хулĪганство тягне за собою накладення штрафу, громадські роботи або вiправні роботи, або адмΙnISTRATивний арешт.", link:""}
 ];
 
 let editIndex = null;
 let deleteIndex = null;
-let generatedArticleData = null;
-
-const LAW_LIBRARY = [
-  {
-    key: "police",
-    name: "Закон України «Про Національну поліцію»",
-    link: "https://zakon.rada.gov.ua/laws/show/580-19#Text"
-  },
-  {
-    key: "kpk",
-    name: "Кримінальний процесуальний кодекс України",
-    link: "https://zakon.rada.gov.ua/laws/show/4651-17#Text"
-  },
-  {
-    key: "kk",
-    name: "Кримінальний кодекс України",
-    link: "https://zakon.rada.gov.ua/laws/show/2341-14#Text"
-  },
-  {
-    key: "ck",
-    name: "Цивільний кодекс України",
-    link: "https://zakon.rada.gov.ua/laws/show/435-15#Text"
-  },
-  {
-    key: "kupap",
-    name: "Кодекс України про адміністративні правопорушення",
-    link: "https://zakon.rada.gov.ua/laws/show/80731-10#Text"
-  },
-  {
-    key: "constitution",
-    name: "Конституція України",
-    link: "https://zakon.rada.gov.ua/laws/show/254%D0%BA/96-%D0%B2%D1%80#Text"
-  },
-  {
-    key: "civil-proc",
-    name: "Цивільний процесуальний кодекс України",
-    link: "https://zakon.rada.gov.ua/laws/show/1618-15#Text"
-  },
-  {
-    key: "economic-proc",
-    name: "Господарський процесуальний кодекс України",
-    link: "https://zakon.rada.gov.ua/laws/show/1798-12#Text"
-  },
-  {
-    key: "cas",
-    name: "Кодекс адміністративного судочинства України",
-    link: "https://zakon.rada.gov.ua/laws/show/2747-15#Text"
-  },
-  {
-    key: "labor",
-    name: "Кодекс законів про працю України",
-    link: "https://zakon.rada.gov.ua/laws/show/322-08#Text"
-  },
-  {
-    key: "family",
-    name: "Сімейний кодекс України",
-    link: "https://zakon.rada.gov.ua/laws/show/2947-14#Text"
-  },
-  {
-    key: "land",
-    name: "Земельний кодекс України",
-    link: "https://zakon.rada.gov.ua/laws/show/2768-14#Text"
-  },
-  {
-    key: "consumer",
-    name: "Закон України «Про захист прав споживачів»",
-    link: "https://zakon.rada.gov.ua/laws/show/1023-12#Text"
-  },
-  {
-    key: "appeals",
-    name: "Закон України «Про звернення громадян»",
-    link: "https://zakon.rada.gov.ua/laws/show/393/96-%D0%B2%D1%80#Text"
-  },
-  {
-    key: "lawyer",
-    name: "Закон України «Про адвокатуру та адвокатську діяльність»",
-    link: "https://zakon.rada.gov.ua/laws/show/5076-17#Text"
-  },
-  {
-    key: "court",
-    name: "Закон України «Про судоустрій і статус суддів»",
-    link: "https://zakon.rada.gov.ua/laws/show/1402-19#Text"
-  }
-];
-
-function fillLawSelect(){
-  generatorLawSelect.innerHTML = '';
-
-  LAW_LIBRARY.forEach(item => {
-    const option = document.createElement('option');
-    option.value = item.key;
-    option.textContent = item.name;
-    generatorLawSelect.appendChild(option);
-  });
-}
-
-function getSelectedLaw(){
-  return LAW_LIBRARY.find(item => item.key === generatorLawSelect.value) || LAW_LIBRARY[0];
-}
 
 async function seedArticlesIfEmpty(){
   const querySnapshot = await getDocs(collection(db, "Юридична допомога"));
@@ -473,8 +340,9 @@ async function seedArticlesIfEmpty(){
   }
 }
 
-async function addArticleToDB(law, short, details, link){
+async function addArticleToDB(section, law, short, details, link){
   await addDoc(collection(db, "Юридична допомога"), {
+    section,
     law,
     short,
     details,
@@ -483,8 +351,9 @@ async function addArticleToDB(law, short, details, link){
   await loadArticles();
 }
 
-async function updateArticleInDB(id, law, short, details, link){
+async function updateArticleInDB(id, section, law, short, details, link){
   await updateDoc(doc(db, "Юридична допомога", id), {
+    section,
     law,
     short,
     details,
@@ -549,47 +418,6 @@ maintenanceOffBtn.addEventListener('click', async () => {
   showToast('Технічні роботи вимкнено', 'success');
 });
 
-openGeneratorBtn.addEventListener('click', openGeneratorModal);
-closeGenerator.addEventListener('click', closeGeneratorModal);
-cancelGeneratorBtn.addEventListener('click', closeGeneratorModal);
-
-startGenerateBtn.addEventListener('click', runGeneration);
-
-regenerateBtn.addEventListener('click', () => {
-  generatorStepResult.style.display = 'none';
-  generatorStepLoading.style.display = 'none';
-  generatorStepInput.style.display = 'block';
-  generatorOutput.value = '';
-  generatedArticleData = null;
-});
-
-editGeneratedBtn.addEventListener('click', () => {
-  generatorOutput.removeAttribute('readonly');
-  generatorOutput.focus();
-  showToast('Тепер можна редагувати текст', 'info');
-});
-
-useGeneratedBtn.addEventListener('click', () => {
-  if(!generatedArticleData){
-    showToast('Немає згенерованих даних', 'error');
-    return;
-  }
-
-  articleLaw.value = generatedArticleData.law;
-  articleShort.value = generatedArticleData.short;
-  articleDetails.value = generatedArticleData.details;
-  articleLink.value = generatedArticleData.link;
-
-  editIndex = null;
-
-  closeGeneratorModal();
-
-  editModal.style.display = 'flex';
-  editModal.classList.add('show');
-
-  showToast('Дані вставлено у форму статті', 'success');
-});
-
 // Вхід
 loginBtn.addEventListener('click', () => { loginModal.style.display='flex'; loginModal.classList.add('show'); });
 closeLogin.addEventListener('click', () => { loginModal.style.display='none'; loginModal.classList.remove('show'); });
@@ -631,165 +459,86 @@ logoutBtn.addEventListener('click', async ()=>{
   await checkMaintenanceMode();
 });
 
-function formatText(text){
-  return text
-    .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')      // жирный
-    .replace(/\*(.*?)\*/g, '<i>$1</i>')          // курсив
-    .replace(/_(.*?)_/g, '<s>$1</s>')            // зачеркнутый
-    .replace(/\n/g, '<br>');                     // перенос строки
-}
-
-function cleanGeneratedText(text){
-  return text
-    .replace(/\r/g, '')
-    .replace(/\{[^{}]*\}/g, '')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
-}
-
-function generateArticleBlocks(rawText){
-  const selectedLaw = getSelectedLaw();
-  const cleaned = cleanGeneratedText(rawText);
-
-  if(!cleaned){
-    throw new Error('Немає тексту для генерації');
-  }
-
-  const regex = /Стаття\s+(\d+(?:-\d+)?)\.\s*([^\n]+)\n?([\s\S]*?)(?=Стаття\s+\d+(?:-\d+)?\.|$)/g;
-  const articles = [];
-
-  let match;
-
-  while((match = regex.exec(cleaned)) !== null){
-    const articleNumber = match[1].trim();
-    const shortInfo = match[2].trim();
-    let detailsText = match[3].trim();
-
-    detailsText = detailsText
-      .replace(/(^|\n)ВАЖЛИВО:?/g, '$1**ВАЖЛИВО**')
-      .replace(/(^|\n)ВИКЛЮЧЕННЯ:?/g, '$1*ВИКЛЮЧЕННЯ*')
-      .replace(/\n{3,}/g, '\n\n')
-      .trim();
-
-    const article = {
-      law: `Стаття ${articleNumber} ${selectedLaw.name}`,
-      short: shortInfo,
-      details: `*${shortInfo}*\n\n${detailsText}`,
-      link: selectedLaw.link
-    };
-
-    articles.push(article);
-  }
-
-  if(!articles.length){
-    throw new Error('Не знайдено жодної статті. Перевір, чи є в тексті "Стаття 1.", "Стаття 2." і так далі');
-  }
-
-  const output = articles.map(item => {
-    return `{
-  law: ${JSON.stringify(item.law)},
-  short: ${JSON.stringify(item.short)},
-  details: ${JSON.stringify(item.details)},
-  link: ${JSON.stringify(item.link)}
-}`;
-  }).join(',\n\n');
-
-  return {
-    items: articles,
-    output: `let articles = [\n${output}\n];`
-  };
-}
-
-function openGeneratorModal(){
-  generatorModal.style.display = 'flex';
-  generatorModal.classList.add('show');
-
-  generatorStepInput.style.display = 'block';
-  generatorStepLoading.style.display = 'none';
-  generatorStepResult.style.display = 'none';
-
-  generatorInput.value = '';
-  generatorOutput.value = '';
-  generatedArticleData = null;
-
-  fillLawSelect();
-}
-
-function closeGeneratorModal(){
-  generatorModal.style.display = 'none';
-  generatorModal.classList.remove('show');
-
-  generatorInput.value = '';
-  generatorOutput.value = '';
-  generatedArticleData = null;
-
-  generatorStepInput.style.display = 'block';
-  generatorStepLoading.style.display = 'none';
-  generatorStepResult.style.display = 'none';
-}
-
-function runGeneration(){
-  const raw = generatorInput.value.trim();
-
-  if(!raw){
-    showToast('Встав текст для генерації', 'error');
-    return;
-  }
-
-  generatorStepInput.style.display = 'none';
-  generatorStepResult.style.display = 'none';
-  generatorStepLoading.style.display = 'block';
-
-  setTimeout(() => {
-    try{
-      const result = generateArticleBlocks(raw);
-      generatedArticleData = result;
-      generatorOutput.value = result.output;
-      generatorOutput.setAttribute('readonly', 'readonly');
-      generatorInput.value = '';
-
-      generatorStepLoading.style.display = 'none';
-      generatorStepResult.style.display = 'block';
-
-      showToast(`Згенеровано статей: ${result.items.length}`, 'success');
-    }catch(error){
-      generatorStepLoading.style.display = 'none';
-      generatorStepInput.style.display = 'block';
-      showToast(error.message || 'Помилка генерації', 'error');
-    }
-  }, 900);
-}
-
 // Рендер статей
 function renderArticles(){
   articlesDiv.innerHTML = "";
   const query = searchInput.value.toLowerCase();
-  articles.forEach((a,index)=>{
-    if(a.law.toLowerCase().includes(query) || a.short.toLowerCase().includes(query) || a.details.toLowerCase().includes(query)){
+
+  if(currentSection === null){
+    lawSections.forEach(section => {
+      if(section.toLowerCase().includes(query)){
+        const div = document.createElement('div');
+        div.className = 'article';
+        div.innerHTML = `<h2>${section}</h2><p>Перейти до статей розділу</p>`;
+
+        const openBtn = document.createElement('button');
+        openBtn.textContent = 'Відкрити';
+        openBtn.onclick = () => {
+          currentSection = section;
+          renderArticles();
+        };
+
+        div.appendChild(openBtn);
+        articlesDiv.appendChild(div);
+      }
+    });
+    return;
+  }
+
+  const backDiv = document.createElement('div');
+  backDiv.className = 'article';
+  backDiv.innerHTML = `<h2>${currentSection}</h2><p>Список статей розділу</p>`;
+
+  const backBtn = document.createElement('button');
+  backBtn.textContent = 'Назад до розділів';
+  backBtn.onclick = () => {
+    currentSection = null;
+    renderArticles();
+  };
+
+  backDiv.appendChild(backBtn);
+  articlesDiv.appendChild(backDiv);
+
+  articles.forEach((a, index) => {
+    if(
+      a.section === currentSection &&
+      (
+        a.law.toLowerCase().includes(query) ||
+        a.short.toLowerCase().includes(query) ||
+        a.details.toLowerCase().includes(query)
+      )
+    ){
       const div = document.createElement('div');
       div.className='article';
       div.innerHTML=`<h2>${a.law}</h2><p>${a.short}</p>`;
+
       const detailsDiv = document.createElement('div');
       detailsDiv.className='details';
       detailsDiv.innerHTML = `
-       <div style="line-height:1.6;">${formatText(a.details)}</div>
-  ${a.link ? `<a href="${a.link}" target="_blank" style="display:block; margin-top:10px; color:#004080;">Посилання на статтю</a>` : ''}
+  <div style="line-height:1.6; white-space:pre-line;">${a.details}</div>
+  ${a.link ? `<a href="${a.link}" target="_blank" style="display:block; margin-top:10px; color:#004080; font-weight:500;">Посилання на статтю</a>` : ''}
 `;
+
       div.appendChild(detailsDiv);
+
       const moreBtn = document.createElement('button');
       moreBtn.textContent='Докладніше';
       moreBtn.onclick=()=> detailsDiv.style.display=detailsDiv.style.display==='block'?'none':'block';
       div.appendChild(moreBtn);
+
       if(isAdmin){
         const editBtn=document.createElement('button');
         editBtn.textContent='Редагувати';
         editBtn.onclick=()=> openEditModal(index);
+
         const delBtn=document.createElement('button');
         delBtn.textContent='Видалити';
         delBtn.onclick=()=> openDeleteModal(index);
+
         div.appendChild(editBtn);
         div.appendChild(delBtn);
       }
+
       articlesDiv.appendChild(div);
     }
   });
@@ -809,19 +558,25 @@ function showAddButton(){
     nav.appendChild(addBtn);
   }
 }
+
 function openEditModal(index){
   editIndex=index;
+  const articleSection = document.getElementById('articleSection');
+
   if(index!==null){
+    articleSection.value = articles[index].section || lawSections[0];
     articleLaw.value=articles[index].law;
     articleShort.value=articles[index].short;
     articleDetails.value=articles[index].details;
     articleLink.value = articles[index].link || '';
   }else{
+    articleSection.value = currentSection || lawSections[0];
     articleLaw.value='';
     articleShort.value='';
     articleDetails.value='';
     articleLink.value = '';
   }
+
   editModal.style.display='flex';
   editModal.classList.add('show');
 }
@@ -832,14 +587,12 @@ function updateAdminUI(){
     logoutBtn.style.display = 'block';
     maintenanceOnBtn.style.display = 'block';
     maintenanceOffBtn.style.display = 'block';
-    openGeneratorBtn.style.display = 'block';
     showAddButton();
   } else {
     loginBtn.style.display = 'block';
     logoutBtn.style.display = 'none';
     maintenanceOnBtn.style.display = 'none';
     maintenanceOffBtn.style.display = 'none';
-    openGeneratorBtn.style.display = 'none';
     document.getElementById('addBtn')?.remove();
   }
 
@@ -884,27 +637,28 @@ function showToast(message, type = 'info'){
   }, 2500);
 }
 
-closeEdit.addEventListener('click',()=>{editModal.style.display='none'; editModal.classList.remove('show');});
 saveArticle.addEventListener('click', async ()=>{
+  const section = document.getElementById('articleSection').value;
   const law = articleLaw.value.trim();
   const short = articleShort.value.trim();
   const details = articleDetails.value.trim();
-  const link = articleLink.value.trim(); // ← ВОТ ЭТО ДОБАВИЛИ
+  const link = articleLink.value.trim();
 
-  if(law && short){
+  if(section && law && short){
     if(editIndex !== null){
       if(articles[editIndex].id){
-        await updateArticleInDB(articles[editIndex].id, law, short, details, link);
+        await updateArticleInDB(articles[editIndex].id, section, law, short, details, link);
       } else {
-        articles[editIndex] = {law, short, details, link};
+        articles[editIndex] = {section, law, short, details, link};
         renderArticles();
       }
       showToast('Статтю змінено', 'info');
     } else {
-      await addArticleToDB(law, short, details, link);
+      await addArticleToDB(section, law, short, details, link);
       showToast('Статтю додано', 'success');
     }
 
+    currentSection = section;
     editModal.style.display = 'none';
     editModal.classList.remove('show');
   } else {
@@ -922,7 +676,7 @@ confirmDelete.addEventListener('click', async ()=>{
       await deleteArticleFromDB(articles[deleteIndex].id);
     } else {
       articles.splice(deleteIndex,1);
-      renderArticles();
+     renderArticles();
     }
 
     deleteModal.style.display='none';
