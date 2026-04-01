@@ -58,9 +58,19 @@ ${text}
 
     const data = await response.json();
 
-    return res.status(200).json({
-      result: data.choices[0].message.content,
-    });
+   const data = await response.json();
+
+if (!data.choices) {
+  console.log("OPENAI ERROR:", data);
+  return res.status(500).json({
+    error: "OpenAI не відповів",
+    details: data
+  });
+}
+
+return res.status(200).json({
+  result: data.choices[0].message.content,
+});
 
   } catch (err) {
     return res.status(500).json({ error: err.message });
