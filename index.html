@@ -834,12 +834,12 @@ function formatText(text) {
 
 function splitArticlesFromRawText(text, section, link) {
   // прибираємо службові вставки у фігурних дужках
-  text = text.replace(/\{[^}]*\}/g, '');
+  text = text.replace(/\{[^}]**\}/g, '');
 
   // нормалізуємо переноси
   text = text.replace(/\r/g, '').trim();
 
-  const regex = /Стаття\s+(\d+)\.?\s*([^\n]*)/gi;
+  const regex = /Стаття\s+(\d+)\.?\s**([^\n]**)/gi;
   const matches = [...text.matchAll(regex)];
   const result = [];
 
@@ -867,7 +867,7 @@ function splitArticlesFromRawText(text, section, link) {
       .trim();
 
     // формуємо details у твоєму стилі
-    const formattedDetails = `*${articleTitle || `Стаття ${articleNumber}`}*\n\n${articleBody}`.trim();
+    const formattedDetails = `**${articleTitle || `Стаття ${articleNumber}`}**\n\n${articleBody}`.trim();
 
     result.push({
   section: section,
