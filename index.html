@@ -901,20 +901,6 @@ async function addManyArticlesToDB(articlesArray) {
   }
 }
 
-function formatText(text) {
-  if (!text) return "";
-
-  return text
-    // жирний **текст**
-    .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")
-
-    // курсив *текст*
-    .replace(/\*(.*?)\*/g, "<i>$1</i>")
-
-    // переноси рядків
-    .replace(/\n/g, "<br>");
-}
-
   // Видалення
   function openDeleteModal(index){ deleteIndex=index; deleteModal.style.display='flex'; deleteModal.classList.add('show'); }
   closeDelete.addEventListener('click',()=>{deleteModal.style.display='none'; deleteModal.classList.remove('show');});
