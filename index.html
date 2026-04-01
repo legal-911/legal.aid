@@ -130,6 +130,36 @@ nav button {
   margin-bottom:10px;
   font-family:'Roboto', sans-serif;
 }
+.section-header{
+  background: linear-gradient(135deg, #004080, #0a5bb5);
+  color: white;
+  padding: 22px;
+  margin-bottom: 18px;
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+}
+
+.section-header h2{
+  margin: 0 0 8px 0;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.section-header p{
+  margin: 0 0 14px 0;
+  font-size: 15px;
+  opacity: 0.95;
+}
+
+.section-header button{
+  background: white;
+  color: #004080;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: pointer;
+}
 
 footer { 
   text-align:center; 
@@ -485,9 +515,9 @@ function renderArticles(){
     return;
   }
 
-  const backDiv = document.createElement('div');
-  backDiv.className = 'article';
-  backDiv.innerHTML = `<h2>${currentSection}</h2><p>Список статей розділу</p>`;
+ const backDiv = document.createElement('div');
+backDiv.className = 'section-header';
+backDiv.innerHTML = `<h2>${currentSection}</h2><p>Список статей розділу</p>`;
 
   const backBtn = document.createElement('button');
   backBtn.textContent = 'Назад до розділів';
@@ -499,15 +529,20 @@ function renderArticles(){
   backDiv.appendChild(backBtn);
   articlesDiv.appendChild(backDiv);
 
-  articles.forEach((a, index) => {
-    if(
-      a.section === currentSection &&
-      (
-        a.law.toLowerCase().includes(query) ||
-        a.short.toLowerCase().includes(query) ||
-        a.details.toLowerCase().includes(query)
-      )
-    ){
+  const filteredArticles = articles
+  .map((a, index) => ({ ...a, originalIndex: index }))
+  .filter(a =>
+    a.section === currentSection &&
+    (
+      a.law.toLowerCase().includes(query) ||
+      a.short.toLowerCase().includes(query) ||
+      a.details.toLowerCase().includes(query)
+    )
+  )
+  .sort((a, b) => getArticleNumber(a.law) - getArticleNumber(b.law));
+
+filteredArticles.forEach((a) => {
+  const index = a.originalIndex;
       const div = document.createElement('div');
       div.className='article';
       div.innerHTML=`<h2>${a.law}</h2><p>${a.short}</p>`;
@@ -539,9 +574,8 @@ function renderArticles(){
         div.appendChild(delBtn);
       }
 
-      articlesDiv.appendChild(div);
-    }
-  });
+     articlesDiv.appendChild(div);
+    });
 }
 
 // Пошук
@@ -665,6 +699,11 @@ saveArticle.addEventListener('click', async ()=>{
     showToast('Заповніть потрібні поля', 'error');
   }
 });
+
+function getArticleNumber(title){
+  const match = title.match(/Стаття\s*(\d+)/i);
+  return match ? parseInt(match[1], 10) : 999999;
+}
 
 // Видалення
 function openDeleteModal(index){ deleteIndex=index; deleteModal.style.display='flex'; deleteModal.classList.add('show'); }
