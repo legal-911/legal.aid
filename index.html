@@ -874,26 +874,20 @@ function splitArticlesFromRawText(text, section, link) {
 
 async function addManyArticlesToDB(articlesArray) {
   try {
-    const batch = db.batch();
-
-    articlesArray.forEach(article => {
-      const ref = db.collection("articles").doc();
-
-      batch.set(ref, {
+    for (const article of articlesArray) {
+      await addDoc(collection(db, "Юридична допомога"), {
         law: article.law,
         short: article.short,
         details: article.details,
         section: article.section,
         link: article.link || ""
       });
-    });
+    }
 
-    await batch.commit();
-
-    console.log("Статьи добавлены");
-    loadArticles(); // обновить список
+    console.log("Статті додано");
+    await loadArticles();
   } catch (error) {
-    console.error("Ошибка добавления:", error);
+    console.error("Помилка додавання:", error);
     throw error;
   }
 }
