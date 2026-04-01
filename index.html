@@ -799,19 +799,6 @@
       nav.appendChild(addBtn);
     }
 
-  const deleteAllBtn = document.createElement('button');
-  deleteAllBtn.textContent = 'ВИДАЛИТИ ВСЕ';
-  deleteAllBtn.style.background = 'red';
-  deleteAllBtn.style.color = 'white';
-
-  deleteAllBtn.onclick = () => {
-    if(confirm("Точно видалити ВСІ статті?")){
-      deleteAllArticles();
-    }
-  };
-
-  nav.appendChild(deleteAllBtn);
-
     if(!document.getElementById('bulkImportBtn')){
       const bulkBtn = document.createElement('button');
       bulkBtn.id = 'bulkImportBtn';
