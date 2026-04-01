@@ -495,25 +495,29 @@ function renderArticles(){
   const query = searchInput.value.toLowerCase();
 
   if(currentSection === null){
-    lawSections.forEach(section => {
-      if(section.toLowerCase().includes(query)){
-        const div = document.createElement('div');
-        div.className = 'article';
-        div.innerHTML = `<h2>${section}</h2><p>Перейти до статей розділу</p>`;
+  lawSections.forEach(section => {
+    if(section.toLowerCase().includes(query)){
+      const div = document.createElement('div');
+      div.className = 'section-header';
 
-        const openBtn = document.createElement('button');
-        openBtn.textContent = 'Відкрити';
-        openBtn.onclick = () => {
-          currentSection = section;
-          renderArticles();
-        };
+      div.innerHTML = `
+        <h2>${section}</h2>
+        <p>Перейти до статей розділу</p>
+      `;
 
-        div.appendChild(openBtn);
-        articlesDiv.appendChild(div);
-      }
-    });
-    return;
-  }
+      const openBtn = document.createElement('button');
+      openBtn.textContent = 'Відкрити';
+      openBtn.onclick = () => {
+        currentSection = section;
+        renderArticles();
+      };
+
+      div.appendChild(openBtn);
+      articlesDiv.appendChild(div);
+    }
+  });
+  return;
+}
 
  const backDiv = document.createElement('div');
 backDiv.className = 'section-header';
