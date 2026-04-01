@@ -273,6 +273,7 @@
     <textarea id="bulkImportText" rows="12" placeholder="Вставте текст закону тут..."></textarea>
 
     <input type="text" id="bulkImportLink" placeholder="Посилання на закон (https://...)">
+
     <button id="startBulkImport">Імпортувати статті</button>
   </div>
 </div>
@@ -364,6 +365,8 @@
   const bulkImportLink = document.getElementById('bulkImportLink');
  
   const lawLink = bulkImportLink.value.trim();
+
+  const link = document.getElementById('bulkImportLink').value.trim();
 
   const lawSections = [
     "Закон України «Про Національну поліцію»",
