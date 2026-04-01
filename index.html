@@ -872,6 +872,32 @@ function splitArticlesFromRawText(text, section, link) {
   return result;
 }
 
+async function addManyArticlesToDB(articlesArray) {
+  try {
+    const batch = db.batch();
+
+    articlesArray.forEach(article => {
+      const ref = db.collection("articles").doc();
+
+      batch.set(ref, {
+        law: article.law,
+        short: article.short,
+        details: article.details,
+        section: article.section,
+        link: article.link || ""
+      });
+    });
+
+    await batch.commit();
+
+    console.log("Статьи добавлены");
+    loadArticles(); // обновить список
+  } catch (error) {
+    console.error("Ошибка добавления:", error);
+    throw error;
+  }
+}
+
   // Видалення
   function openDeleteModal(index){ deleteIndex=index; deleteModal.style.display='flex'; deleteModal.classList.add('show'); }
   closeDelete.addEventListener('click',()=>{deleteModal.style.display='none'; deleteModal.classList.remove('show');});
