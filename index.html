@@ -259,22 +259,30 @@
     </div>
   </div>
 
-  <div class="modal" id="bulkImportModal">
-    <div class="modal-content">
-      <span class="close" id="closeBulkImport">&times;</span>
-      <h2>Масове додавання статей</h2>
+<div class="modal" id="bulkImportModal">
+  <div class="modal-content">
+    <span class="close" id="closeBulkImport">&times;</span>
+    <h2>Масове додавання статей</h2>
 
-      <p style="font-size:14px; margin-bottom:10px;">
-        Вставте одразу багато статей у форматі:
-        <br><b>Стаття 1. Назва</b>
-        <br>Текст статті...
-      </p>
+    <p style="font-size:14px; margin-bottom:10px;">
+      Вставте одразу багато статей у форматі:
+      <br><b>Стаття 1. Назва</b>
+      <br>Текст статті...
+    </p>
 
-      <textarea id="bulkImportText" rows="12" placeholder="Вставте текст закону тут..."></textarea>
+    <textarea id="bulkImportText" rows="12" placeholder="Вставте текст закону тут..."></textarea>
 
-      <button id="startBulkImport">Імпортувати статті</button>
-    </div>
+    <input type="text" id="bulkImportLink" placeholder="Посилання на закон (https://...)">
+    
+    <input
+      type="text"
+      id="bulkImportLink"
+      placeholder="Посилання на закон (https://...)"
+    >
+
+    <button id="startBulkImport">Імпортувати статті</button>
   </div>
+</div>
 
   <div style="flex:1"></div>
 
@@ -360,6 +368,10 @@
 
   const toast = document.getElementById('toast');
 
+  const bulkImportLink = document.getElementById('bulkImportLink');
+ 
+  const lawLink = bulkImportLink.value.trim();
+
   const lawSections = [
     "Закон України «Про Національну поліцію»",
     "Кримінальний процесуальний кодекс України",
@@ -420,58 +432,66 @@
     await loadArticles();
   }
 
-  async function addManyArticlesToDB(items){
-    for(const item of items){
-      await addDoc(collection(db, "Юридична допомога"), {
-        section: item.section,
-        law: item.law,
-        short: item.short,
-        details: item.details,
-        link: item.link || ''
+ startBulkImport.addEventListener('click', async () => {
+  const rawText = bulkImportText.value.trim();
+  const lawLink = bulkImportLink.value.trim();
+
+  if (!currentSection) {
+    showToast('Розділ не вибрано', 'error');
+    return;
+  }
+
+  if (!rawText) {
+    showToast('Вставте текст зі статтями', 'error');
+    return;
+  }
+
+  const rawArticles = splitArticlesFromRawText(rawText);
+
+  if (rawArticles.length === 0) {
+    showToast('Не знайдено жодної статті', 'error');
+    return;
+  }
+
+  try {
+    startBulkImport.disabled = true;
+    startBulkImport.textContent = 'Генерація...';
+
+    const generatedItems = [];
+
+    for (const item of rawArticles) {
+      const generated = await generateFormattedArticle({
+        section: currentSection,
+        rawText: item.rawText,
+        link: lawLink
+      });
+
+      generatedItems.push({
+        section: currentSection,
+        law: generated.law,
+        short: generated.short,
+        details: generated.details,
+        link: generated.link || lawLink || ''
       });
     }
 
-    await loadArticles();
+    await addManyArticlesToDB(generatedItems);
+
+    bulkImportModal.style.display = 'none';
+    bulkImportModal.classList.remove('show');
+
+    bulkImportText.value = '';
+    bulkImportLink.value = '';
+
+    showToast(`Додано ${generatedItems.length} статей`, 'success');
+  } catch (error) {
+    console.error(error);
+    showToast('Помилка генерації', 'error');
+  } finally {
+    startBulkImport.disabled = false;
+    startBulkImport.textContent = 'Імпортувати статті';
   }
-
-  startBulkImport.addEventListener('click', async () => {
-    const rawText = bulkImportText.value.trim();
-
-    if(!currentSection){
-      showToast('Розділ не вибрано', 'error');
-      return;
-    }
-
-    if(!rawText){
-      showToast('Вставте текст зі статтями', 'error');
-      return;
-    }
-
-    const parsedArticles = parseArticlesFromText(rawText, currentSection);
-
-    if(parsedArticles.length === 0){
-      showToast('Не знайдено жодної статті', 'error');
-      return;
-    }
-
-    try{
-      startBulkImport.disabled = true;
-      startBulkImport.textContent = 'Імпорт...';
-
-      await addManyArticlesToDB(parsedArticles);
-
-      bulkImportModal.style.display = 'none';
-      bulkImportModal.classList.remove('show');
-
-      showToast(`Додано ${parsedArticles.length} статей`, 'success');
-    } catch(error){
-      console.error(error);
-      showToast('Помилка імпорту', 'error');
-    } finally {
-      startBulkImport.disabled = false;
-      startBulkImport.textContent = 'Імпортувати статті';
-    }
-  });
+});
 
   async function updateArticleInDB(id, section, law, short, details, link){
     await updateDoc(doc(db, "Юридична допомога", id), {
@@ -825,20 +845,17 @@
     bulkImportModal.classList.remove('show');
   });
 
-function parseArticlesFromText(text, section) {
-
-  // 🔥 ІГНОРУЄМО ПРИМІТКИ В {}
+function splitArticlesFromRawText(text) {
+  // прибираємо службові вставки у фігурних дужках
   text = text.replace(/\{[^}]*\}/g, '');
 
   const regex = /Стаття\s+(\d+)\.?\s*([^\n]*)/gi;
   const matches = [...text.matchAll(regex)];
   const result = [];
 
-  if(matches.length === 0){
-    return result;
-  }
+  if (matches.length === 0) return result;
 
-  for(let i = 0; i < matches.length; i++){
+  for (let i = 0; i < matches.length; i++) {
     const start = matches[i].index;
     const end = i + 1 < matches.length ? matches[i + 1].index : text.length;
 
@@ -846,23 +863,35 @@ function parseArticlesFromText(text, section) {
     const articleNumber = matches[i][1].trim();
     const articleTitle = (matches[i][2] || '').trim();
 
-    const firstLineEnd = fullBlock.indexOf('\n');
-    let articleBody = '';
-
-    if(firstLineEnd !== -1){
-      articleBody = fullBlock.slice(firstLineEnd + 1).trim();
-    }
-
     result.push({
-      section: section,
-      law: `Стаття ${articleNumber}`,
-      short: articleTitle || `Стаття ${articleNumber}`,
-      details: articleBody,
-      link: ''
+      articleNumber,
+      articleTitle,
+      rawText: fullBlock
     });
   }
 
   return result;
+}
+
+async function generateFormattedArticle({ section, rawText, link }) {
+  const response = await fetch('/api/generate-article', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      section,
+      rawText,
+      link
+    })
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || 'Помилка генерації статті');
+  }
+
+  return await response.json();
 }
 
   // Видалення
