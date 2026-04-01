@@ -201,8 +201,6 @@
   <button id="logoutBtn" style="display:none;">Вийти</button>
   <button id="maintenanceOnBtn" style="display:none;">Увімкнути технічні роботи</button>
   <button id="maintenanceOffBtn" style="display:none;">Вимкнути технічні роботи</button>
-  <button id="deleteAllBtn" style="background:red;color:white;display:none;">
-  ВИДАЛИТИ ВСЕ </button>
   </nav>
 
   <div class="articles" id="articles"></div>
@@ -361,8 +359,6 @@
   const searchBox = document.querySelector('.search-box');
 
   const toast = document.getElementById('toast');
-
-  const deleteAllBtn = document.getElementById('deleteAllBtn');
 
   const lawSections = [
     "Закон України «Про Національну поліцію»",
@@ -793,17 +789,6 @@
     return match ? parseInt(match[1], 10) : 999999;
   }
 
-  async function deleteAllArticles(){
-    const querySnapshot = await getDocs(collection(db, "Юридична допомога"));
-
-    for(const docItem of querySnapshot.docs){
-      await deleteDoc(doc(db, "Юридична допомога", docItem.id));
-    }
-
-    showToast("Всі статті видалено", "success");
-    await loadArticles();
-  }
-
   function showAddButton(){
     if(isAdmin && !document.getElementById('deleteAllBtn')){
       const addBtn=document.createElement('button');
@@ -853,41 +838,45 @@
     bulkImportModal.classList.remove('show');
   });
 
-  function parseArticlesFromText(text, section) {
-    const regex = /Стаття\s+(\d+)\.?\s*([^\n]*)/gi;
-    const matches = [...text.matchAll(regex)];
-    const result = [];
+function parseArticlesFromText(text, section) {
 
-    if(matches.length === 0){
-      return result;
-    }
+  // 🔥 ІГНОРУЄМО ПРИМІТКИ В {}
+  text = text.replace(/\{[^}]*\}/g, '');
 
-    for(let i = 0; i < matches.length; i++){
-      const start = matches[i].index;
-      const end = i + 1 < matches.length ? matches[i + 1].index : text.length;
+  const regex = /Стаття\s+(\d+)\.?\s*([^\n]*)/gi;
+  const matches = [...text.matchAll(regex)];
+  const result = [];
 
-      const fullBlock = text.slice(start, end).trim();
-      const articleNumber = matches[i][1].trim();
-      const articleTitle = (matches[i][2] || '').trim();
-
-      const firstLineEnd = fullBlock.indexOf('\n');
-      let articleBody = '';
-
-      if(firstLineEnd !== -1){
-        articleBody = fullBlock.slice(firstLineEnd + 1).trim();
-      }
-
-      result.push({
-        section: section,
-        law: `Стаття ${articleNumber}`,
-        short: articleTitle || `Стаття ${articleNumber}`,
-        details: articleBody,
-        link: ''
-      });
-    }
-
+  if(matches.length === 0){
     return result;
   }
+
+  for(let i = 0; i < matches.length; i++){
+    const start = matches[i].index;
+    const end = i + 1 < matches.length ? matches[i + 1].index : text.length;
+
+    const fullBlock = text.slice(start, end).trim();
+    const articleNumber = matches[i][1].trim();
+    const articleTitle = (matches[i][2] || '').trim();
+
+    const firstLineEnd = fullBlock.indexOf('\n');
+    let articleBody = '';
+
+    if(firstLineEnd !== -1){
+      articleBody = fullBlock.slice(firstLineEnd + 1).trim();
+    }
+
+    result.push({
+      section: section,
+      law: `Стаття ${articleNumber}`,
+      short: articleTitle || `Стаття ${articleNumber}`,
+      details: articleBody,
+      link: ''
+    });
+  }
+
+  return result;
+}
 
   // Видалення
   function openDeleteModal(index){ deleteIndex=index; deleteModal.style.display='flex'; deleteModal.classList.add('show'); }
