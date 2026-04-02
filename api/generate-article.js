@@ -63,15 +63,15 @@ ${rawText}
     const data = await response.json();
 
     if (!response.ok) {
-      console.log("GEMINI ERROR:", data);
-      return res.status(500).json({
-        error: "Gemini API error",
+      console.log("GEMINI ERROR:", JSON.stringify(data, null, 2));
+      return res.status(response.status).json({
+        error: data?.error?.message || "Gemini API error",
         details: data
       });
     }
 
     if (!data.candidates || !data.candidates.length) {
-      console.log("BAD GEMINI RESPONSE:", data);
+      console.log("BAD GEMINI RESPONSE:", JSON.stringify(data, null, 2));
       return res.status(500).json({
         error: "Gemini не дав відповідь",
         raw: data
@@ -82,7 +82,7 @@ ${rawText}
     const text = parts.map(p => p.text || "").join("").trim();
 
     if (!text) {
-      console.log("EMPTY TEXT:", data);
+      console.log("EMPTY TEXT:", JSON.stringify(data, null, 2));
       return res.status(500).json({
         error: "Gemini повернув пустий текст",
         raw: data
