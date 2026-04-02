@@ -17,15 +17,14 @@ export default async function handler(req, res) {
 
 Твоя задача — перетворити текст закону у чітко структурований формат.
 
-❗ ВАЖЛИВО:
+ВАЖЛИВО:
 - НЕ змінюй зміст закону
 - ІГНОРУЙ службові вставки типу { ... }
 - Зберігай структуру статті
 - Додавай абзаци для читабельності
-- Виділяй важливі моменти
 - Не вигадуй нічого від себе
 
-📌 ФОРМАТ ВИХОДУ (СТРОГО JSON):
+ПОВЕРНИ СТРОГО JSON:
 {
   "law": "Стаття X ${section}",
   "short": "Назва статті",
@@ -33,11 +32,11 @@ export default async function handler(req, res) {
   "link": "${link || ""}"
 }
 
-📌 ПРАВИЛА:
-- *жирний* означає жирний
-- **курсив** означає курсив
-- не додавай зайвих коментарів
-- поверни тільки JSON
+ПРАВИЛА:
+- *текст* = жирний
+- **текст** = курсив
+- без пояснень
+- тільки JSON
 
 ТЕКСТ СТАТТІ:
 ${rawText}
@@ -54,9 +53,7 @@ ${rawText}
         body: JSON.stringify({
           contents: [
             {
-              parts: [
-                { text: prompt }
-              ]
+              parts: [{ text: prompt }]
             }
           ]
         })
@@ -65,36 +62,51 @@ ${rawText}
 
     const data = await response.json();
 
-const content = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    if (!response.ok) {
+      console.log("GEMINI ERROR:", data);
+      return res.status(500).json({
+        error: "Gemini API error",
+        details: data
+      });
+    }
 
-if (!content) {
-  console.log("BAD GEMINI RESPONSE:", data);
-  return res.status(500).json({
-    error: "Gemini не повернув текст",
-    details: data
-  });
-}
+    if (!data.candidates || !data.candidates.length) {
+      console.log("BAD GEMINI RESPONSE:", data);
+      return res.status(500).json({
+        error: "Gemini не дав відповідь",
+        raw: data
+      });
+    }
 
-// пробуємо знайти JSON навіть якщо Gemini обгорнув його в ```json
-const cleaned = content
-  .replace(/^```json\s*/i, "")
-  .replace(/^```\s*/i, "")
-  .replace(/\s*```$/i, "")
-  .trim();
+    const parts = data.candidates[0]?.content?.parts || [];
+    const text = parts.map(p => p.text || "").join("").trim();
 
-let parsed;
-try {
-  parsed = JSON.parse(cleaned);
-} catch (e) {
-  console.log("INVALID JSON FROM GEMINI:", content);
-  return res.status(500).json({
-    error: "Gemini повернув не JSON",
-    raw: content
-  });
-}
+    if (!text) {
+      console.log("EMPTY TEXT:", data);
+      return res.status(500).json({
+        error: "Gemini повернув пустий текст",
+        raw: data
+      });
+    }
 
-return res.status(200).json(parsed);
+    const cleaned = text
+      .replace(/^```json\s*/i, "")
+      .replace(/^```\s*/i, "")
+      .replace(/\s*```$/i, "")
+      .trim();
 
+    let parsed;
+    try {
+      parsed = JSON.parse(cleaned);
+    } catch (e) {
+      console.log("INVALID JSON FROM GEMINI:", text);
+      return res.status(500).json({
+        error: "Gemini повернув не JSON",
+        raw: text
+      });
+    }
+
+    return res.status(200).json(parsed);
   } catch (err) {
     console.log("SERVER ERROR:", err);
     return res.status(500).json({
