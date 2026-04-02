@@ -452,23 +452,29 @@ startBulkImport.addEventListener('click', async () => {
 
   try {
     startBulkImport.disabled = true;
-    startBulkImport.textContent = 'Генерація...';
+    startBulkImport.textContent = 'Імпорт...';
 
     const generatedItems = [];
 
     for (const item of rawArticles) {
-      const generated = await generateFormattedArticle({
-        section: currentSection,
-        rawText: item.rawText,
-        link: lawLink
-      });
+      const articleBody = item.rawText
+        .replace(/\{[^}]*\}/g, '')
+        .replace(/\r/g, '')
+        .trim();
+
+      const firstLineEnd = articleBody.indexOf('\n');
+      let cleanBody = '';
+
+      if (firstLineEnd !== -1) {
+        cleanBody = articleBody.slice(firstLineEnd + 1).trim();
+      }
 
       generatedItems.push({
         section: currentSection,
-        law: generated.law,
-        short: generated.short,
-        details: generated.details,
-        link: generated.link || lawLink || ''
+        law: `Стаття ${item.articleNumber}`,
+        short: item.articleTitle || `Стаття ${item.articleNumber}`,
+        details: `*${item.articleTitle || `Стаття ${item.articleNumber}`}*\n\n${cleanBody}`,
+        link: lawLink || ''
       });
     }
 
@@ -483,7 +489,7 @@ startBulkImport.addEventListener('click', async () => {
     showToast(`Додано ${generatedItems.length} статей`, 'success');
   } catch (error) {
     console.error(error);
-    showToast('Помилка генерації', 'error');
+    showToast('Помилка імпорту', 'error');
   } finally {
     startBulkImport.disabled = false;
     startBulkImport.textContent = 'Імпортувати статті';
@@ -1097,29 +1103,6 @@ function splitArticlesFromRawText(text) {
   }
 
   return result;
-}
-
-async function generateFormattedArticle({ section, rawText, link }) {
-  const response = await fetch('/api/generate-article', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      section,
-      rawText,
-      link
-    })
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    console.error("SERVER RESPONSE:", data);
-    throw new Error(data.error || JSON.stringify(data) || 'Помилка генерації');
-  }
-
-  return data;
 }
 
 async function addManyArticlesToDB(articlesArray) {
