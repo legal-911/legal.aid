@@ -65,36 +65,35 @@ ${rawText}
 
     const data = await response.json();
 
-    if (!response.ok) {
-      console.log("GEMINI ERROR:", data);
-      return res.status(500).json({
-        error: "Gemini API error",
-        details: data
-      });
-    }
+const content = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
-    const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+if (!content) {
+  console.log("BAD GEMINI RESPONSE:", data);
+  return res.status(500).json({
+    error: "Gemini не повернув текст",
+    details: data
+  });
+}
 
-    if (!content) {
-      console.log("BAD GEMINI RESPONSE:", data);
-      return res.status(500).json({
-        error: "Gemini не повернув текст",
-        details: data
-      });
-    }
+// пробуємо знайти JSON навіть якщо Gemini обгорнув його в ```json
+const cleaned = content
+  .replace(/^```json\s*/i, "")
+  .replace(/^```\s*/i, "")
+  .replace(/\s*```$/i, "")
+  .trim();
 
-    let parsed;
-    try {
-      parsed = JSON.parse(content);
-    } catch (e) {
-      console.log("INVALID JSON FROM GEMINI:", content);
-      return res.status(500).json({
-        error: "Gemini повернув не JSON",
-        raw: content
-      });
-    }
+let parsed;
+try {
+  parsed = JSON.parse(cleaned);
+} catch (e) {
+  console.log("INVALID JSON FROM GEMINI:", content);
+  return res.status(500).json({
+    error: "Gemini повернув не JSON",
+    raw: content
+  });
+}
 
-    return res.status(200).json(parsed);
+return res.status(200).json(parsed);
 
   } catch (err) {
     console.log("SERVER ERROR:", err);
