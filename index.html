@@ -432,7 +432,7 @@ let aiSearchTimer = null;
     await loadArticles();
   }
 
- startBulkImport.addEventListener('click', async () => {
+startBulkImport.addEventListener('click', async () => {
   const rawText = bulkImportText.value.trim();
   const lawLink = bulkImportLink.value.trim();
 
@@ -446,18 +446,36 @@ let aiSearchTimer = null;
     return;
   }
 
-  const parsedArticles = splitArticlesFromRawText(rawText, currentSection, lawLink);
+  const rawArticles = splitArticlesFromRawText(rawText);
 
-  if (parsedArticles.length === 0) {
+  if (rawArticles.length === 0) {
     showToast('Не знайдено жодної статті', 'error');
     return;
   }
 
   try {
     startBulkImport.disabled = true;
-    startBulkImport.textContent = 'Імпорт...';
+    startBulkImport.textContent = 'Генерація...';
 
-    await addManyArticlesToDB(parsedArticles);
+    const generatedItems = [];
+
+    for (const item of rawArticles) {
+      const generated = await generateFormattedArticle({
+        section: currentSection,
+        rawText: item.rawText,
+        link: lawLink
+      });
+
+      generatedItems.push({
+        section: currentSection,
+        law: generated.law,
+        short: generated.short,
+        details: generated.details,
+        link: generated.link || lawLink || ''
+      });
+    }
+
+    await addManyArticlesToDB(generatedItems);
 
     bulkImportModal.style.display = 'none';
     bulkImportModal.classList.remove('show');
@@ -465,10 +483,10 @@ let aiSearchTimer = null;
     bulkImportText.value = '';
     bulkImportLink.value = '';
 
-    showToast(`Додано ${parsedArticles.length} статей`, 'success');
+    showToast(`Додано ${generatedItems.length} статей`, 'success');
   } catch (error) {
     console.error(error);
-    showToast('Помилка імпорту', 'error');
+    showToast('Помилка генерації', 'error');
   } finally {
     startBulkImport.disabled = false;
     startBulkImport.textContent = 'Імпортувати статті';
@@ -587,13 +605,8 @@ function formatText(text) {
   if (!text) return "";
 
   return text
-    // курсив (спочатку подвійні *)
     .replace(/\*\*(.*?)\*\*/g, "<i>$1</i>")
-
-    // жирний (потім одинарні *)
     .replace(/\*(.*?)\*/g, "<b>$1</b>")
-
-    // переноси рядків
     .replace(/\n/g, "<br>");
 }
 
@@ -660,15 +673,6 @@ async function renderArticles() {
         <h2>${escapeHtml(a.law)}</h2>
         <p><b>${escapeHtml(a.section || "Без назви закону")}</b></p>
         <p>${escapeHtml(a.short || "")}</p>
-      `;
-
-      const detailsDiv = document.createElement("div");
-      detailsDiv.className = "details";
-      detailsDiv.innerHTML = `
-        <div style="line-height:1.6; white-space:pre-line;">
-          ${formatText(a.details)}
-          ${a.link ? `<a href="${a.link}" target="_blank" style="display:block; margin-top:10px; color:#004080; font-weight:500;">Посилання на статтю</a>` : ""}
-        </div>
       `;
 
       div.appendChild(detailsDiv);
@@ -933,11 +937,8 @@ async function renderArticles() {
     bulkImportModal.classList.remove('show');
   });
 
-function splitArticlesFromRawText(text, section, link) {
-  // прибираємо службові вставки у фігурних дужках
+function splitArticlesFromRawText(text) {
   text = text.replace(/\{[^}]*\}/g, '');
-
-  // нормалізуємо переноси
   text = text.replace(/\r/g, '').trim();
 
   const regex = /Стаття\s+(\d+)\.?\s*([^\n]*)/gi;
@@ -954,29 +955,11 @@ function splitArticlesFromRawText(text, section, link) {
     const articleNumber = matches[i][1].trim();
     const articleTitle = (matches[i][2] || '').trim();
 
-    // прибираємо перший рядок "Стаття X. Назва"
-    const firstLineEnd = fullBlock.indexOf('\n');
-    let articleBody = '';
-
-    if (firstLineEnd !== -1) {
-      articleBody = fullBlock.slice(firstLineEnd + 1).trim();
-    }
-
-    // чистимо зайві пусті рядки
-    articleBody = articleBody
-      .replace(/\n{3,}/g, '\n\n')
-      .trim();
-
-    // формуємо details у твоєму стилі
-    const formattedDetails = `*${articleTitle || `Стаття ${articleNumber}`}*\n\n${articleBody}`.trim();
-
     result.push({
-  section: section,
-  law: `Стаття ${articleNumber}`,
-  short: articleTitle || `Стаття ${articleNumber}`,
-  details: formattedDetails,
-  link: link || ''
-});
+      articleNumber,
+      articleTitle,
+      rawText: fullBlock
+    });
   }
 
   return result;
@@ -1109,6 +1092,56 @@ function buildGlobalSearchResults(query, expandedTerms) {
     });
 }
 
+function splitArticlesFromRawText(text) {
+  text = text.replace(/\{[^}]*\}/g, '');
+  text = text.replace(/\r/g, '').trim();
+
+  const regex = /Стаття\s+(\d+)\.?\s*([^\n]*)/gi;
+  const matches = [...text.matchAll(regex)];
+  const result = [];
+
+  if (matches.length === 0) return result;
+
+  for (let i = 0; i < matches.length; i++) {
+    const start = matches[i].index;
+    const end = i + 1 < matches.length ? matches[i + 1].index : text.length;
+
+    const fullBlock = text.slice(start, end).trim();
+    const articleNumber = matches[i][1].trim();
+    const articleTitle = (matches[i][2] || '').trim();
+
+    result.push({
+      articleNumber,
+      articleTitle,
+      rawText: fullBlock
+    });
+  }
+
+  return result;
+}
+
+async function generateFormattedArticle({ section, rawText, link }) {
+  const response = await fetch('/api/generate-article', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      section,
+      rawText,
+      link
+    })
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || 'Помилка генерації');
+  }
+
+  return data;
+}
+
 async function addManyArticlesToDB(articlesArray) {
   try {
     for (const article of articlesArray) {
@@ -1121,7 +1154,6 @@ async function addManyArticlesToDB(articlesArray) {
       });
     }
 
-    console.log("Статті додано");
     await loadArticles();
   } catch (error) {
     console.error("Помилка додавання:", error);
