@@ -384,8 +384,7 @@
   ];
 
   let currentSection = null;
-
-const GEMINI_API_KEY = "AIzaSyBQu0bYiTIu80Hf9H7Ql6HnP3bmg620wgU";
+  
 let aiSearchCache = new Map();
 let aiSearchTimer = null;
 
@@ -1114,7 +1113,8 @@ async function generateFormattedArticle({ section, rawText, link }) {
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.error || 'Помилка генерації');
+    console.error("SERVER RESPONSE:", data);
+    throw new Error(data.error || JSON.stringify(data) || 'Помилка генерації');
   }
 
   return data;
