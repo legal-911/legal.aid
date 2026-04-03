@@ -454,38 +454,39 @@ startBulkImport.addEventListener('click', async () => {
     startBulkImport.disabled = true;
     startBulkImport.textContent = 'Імпорт...';
 
-    const generatedItems = [];
+const generatedItems = [];
 
-    for (const item of rawArticles) {
-      const articleBody = item.rawText
-        .replace(/\{[^}]*\}/g, '')
-        .replace(/\r/g, '')
-        .trim();
+for (const item of rawArticles) {
+  const articleBody = item.rawText
+    .replace(/\{[^}]*\}/g, '')
+    .replace(/\r/g, '')
+    .trim();
 
-      const firstLineEnd = articleBody.indexOf('\n');
-      let cleanBody = '';
+  const firstLineEnd = articleBody.indexOf('\n');
+  let cleanBody = '';
 
-      if (firstLineEnd !== -1) {
-        cleanBody = articleBody.slice(firstLineEnd + 1).trim();
-      }
+  if (firstLineEnd !== -1) {
+    cleanBody = articleBody.slice(firstLineEnd + 1).trim();
+  }
 
-     generatedItems.push({
-  section: currentSection,
-  law: `Стаття ${item.articleNumber}`,
-  short: item.articleTitle || `Стаття ${item.articleNumber}`,
-  details: `*${item.articleTitle || `Стаття ${item.articleNumber}`}*\n\n${cleanBody}`,
-  link: lawLink || ''
-});
+  generatedItems.push({
+    section: currentSection,
+    law: `Стаття ${item.articleNumber}`,
+    short: item.articleTitle || `Стаття ${item.articleNumber}`,
+    details: `*${item.articleTitle || `Стаття ${item.articleNumber}`}*\n\n${cleanBody}`,
+    link: lawLink || ''
+  });
+}
 
-    await addManyArticlesToDB(generatedItems);
+await addManyArticlesToDB(generatedItems);
 
-    bulkImportModal.style.display = 'none';
-    bulkImportModal.classList.remove('show');
+bulkImportModal.style.display = 'none';
+bulkImportModal.classList.remove('show');
 
-    bulkImportText.value = '';
-    bulkImportLink.value = '';
+bulkImportText.value = '';
+bulkImportLink.value = '';
 
-    showToast(`Додано ${generatedItems.length} статей`, 'success');
+showToast(`Додано ${generatedItems.length} статей`, 'success');
   } catch (error) {
     console.error(error);
     showToast('Помилка імпорту', 'error');
