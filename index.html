@@ -605,9 +605,11 @@ showToast(`Додано ${generatedItems.length} статей`, 'success');
 function formatText(text) {
   if (!text) return "";
 
-  return text
-    .replace(/\*\*(.*?)\*\*/g, "<i>$1</i>")
-    .replace(/\*(.*?)\*/g, "<b>$1</b>")
+  return escapeHtml(text)
+    .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")
+    .replace(/\*(.*?)\*/g, "<i>$1</i>")
+    .replace(/__(.*?)__/g, "<u>$1</u>")
+    .replace(/~~(.*?)~~/g, "<s>$1</s>")
     .replace(/\n/g, "<br>");
 }
 
@@ -648,8 +650,6 @@ async function renderArticles() {
         <p>Шукаю по всіх законах</p>
       </div>
     `;
-
-const expandedTerms = await expandQueryWithAI(query);
 
 const prefilteredArticles = articles.map((a, index) => ({
   ...a,
@@ -742,17 +742,15 @@ filteredGlobalArticles.forEach((a) => {
   backDiv.appendChild(backBtn);
   articlesDiv.appendChild(backDiv);
 
-  const filteredArticles = articles
-    .map((a, index) => ({ ...a, originalIndex: index }))
-    .filter(a =>
-      a.section === currentSection &&
-      (
-        normalizeSearchText(a.law).includes(normalizeSearchText(query)) ||
-        normalizeSearchText(a.short).includes(normalizeSearchText(query)) ||
-        normalizeSearchText(a.details).includes(normalizeSearchText(query))
-      )
-    )
-    .sort((a, b) => getArticleNumber(a.law) - getArticleNumber(b.law));
+ let filteredArticles = articles
+  .map((a, index) => ({ ...a, originalIndex: index }))
+  .filter(a => a.section === currentSection);
+
+if (query) {
+  filteredArticles = fallbackRankArticles(query, filteredArticles);
+} else {
+  filteredArticles = filteredArticles.sort((a, b) => getArticleNumber(a.law) - getArticleNumber(b.law));
+}
 
  filteredArticles.forEach((a) => {
   const index = a.originalIndex;
@@ -955,9 +953,40 @@ filteredGlobalArticles.forEach((a) => {
 function normalizeSearchText(text) {
   return (text || "")
     .toLowerCase()
-    .replace(/['’`"]/g, "")
+    .replace(/[‘’‚‛'`"]/g, "")
+    .replace(/[іїёєґ]/g, ch => ({
+      "і": "и",
+      "ї": "и",
+      "ё": "е",
+      "є": "е",
+      "ґ": "г"
+    }[ch] || ch))
+    .replace(/i/g, "і")
+    .replace(/c/g, "с")
+    .replace(/o/g, "о")
+    .replace(/p/g, "р")
+    .replace(/a/g, "а")
+    .replace(/e/g, "е")
+    .replace(/x/g, "х")
+    .replace(/y/g, "у")
+    .replace(/k/g, "к")
+    .replace(/m/g, "м")
+    .replace(/t/g, "т")
+    .replace(/b/g, "в")
+    .replace(/h/g, "н")
+    .replace(/0/g, "о")
+    .replace(/3/g, "з")
+    .replace(/[^а-яa-z0-9\s]/gi, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function getQueryTerms(query) {
+  const q = normalizeSearchText(query);
+  if (!q) return [];
+
+  const words = q.split(" ").filter(word => word.length >= 2);
+  return [q, ...words];
 }
 
 function escapeHtml(text) {
@@ -1088,6 +1117,7 @@ async function addManyArticlesToDB(articlesArray) {
 
 function fallbackRankArticles(query, candidates) {
   const q = normalizeSearchText(query);
+  const terms = getQueryTerms(query);
 
   const conceptMap = [
     {
@@ -1107,6 +1137,67 @@ function fallbackRankArticles(query, candidates) {
       boosts: ["особисте життя", "приватне життя", "огляд речей", "конфіденційна інформація", "стаття 32"]
     }
   ];
+
+  function scoreText(article) {
+    const law = normalizeSearchText(article.law);
+    const short = normalizeSearchText(article.short);
+    const details = normalizeSearchText(article.details);
+    const section = normalizeSearchText(article.section);
+    const whole = `${law} ${short} ${details} ${section}`;
+
+    let score = 0;
+
+    for (const term of terms) {
+      if (!term) continue;
+
+      if (law.includes(term)) score += 18;
+      if (short.includes(term)) score += 22;
+      if (details.includes(term)) score += 16;
+      if (section.includes(term)) score += 10;
+    }
+
+    const queryWords = q.split(" ").filter(w => w.length >= 3);
+    for (const word of queryWords) {
+      if (law.includes(word)) score += 8;
+      if (short.includes(word)) score += 12;
+      if (details.includes(word)) score += 7;
+      if (section.includes(word)) score += 4;
+    }
+
+    if (whole.includes(q)) score += 40;
+
+    if (q.includes("мовч") && whole.includes("свідч")) score += 45;
+    if (q.includes("мовч") && whole.includes("показан")) score += 40;
+    if (q.includes("себе") && whole.includes("проти себе")) score += 35;
+    if (q.includes("себе") && whole.includes("щодо себе")) score += 35;
+    if (q.includes("родич") && whole.includes("близьких родичів")) score += 25;
+
+    for (const group of conceptMap) {
+      const triggered = group.triggers.some(t => q.includes(normalizeSearchText(t)));
+      if (triggered) {
+        for (const boost of group.boosts) {
+          if (whole.includes(normalizeSearchText(boost))) {
+            score += 30;
+          }
+        }
+      }
+    }
+
+    if (q.includes("документ") && whole.includes("документ")) score += 25;
+    if (q.includes("поліц") && section.includes("національну поліцію")) score += 20;
+
+    return score;
+  }
+
+  return candidates
+    .map(item => ({
+      ...item,
+      aiScore: scoreText(item),
+      aiReason: "fallback"
+    }))
+    .filter(item => item.aiScore > 0)
+    .sort((a, b) => b.aiScore - a.aiScore);
+}
 
   function scoreText(article) {
     const law = normalizeSearchText(article.law);
@@ -1158,9 +1249,13 @@ if (q.includes("родич") && whole.includes("близьких родичів"
     }))
     .filter(item => item.aiScore > 0)
     .sort((a, b) => b.aiScore - a.aiScore);
-}
 
 async function rankArticlesWithAI(query, candidates) {
+  const fallbackRanked = fallbackRankArticles(query, candidates);
+  const fallbackMap = new Map(
+    fallbackRanked.map(item => [item.originalIndex, item.aiScore || 0])
+  );
+
   try {
     const response = await fetch('/api/search-ai', {
       method: 'POST',
@@ -1172,28 +1267,37 @@ async function rankArticlesWithAI(query, candidates) {
 
     if (!response.ok || !Array.isArray(data.results)) {
       console.error("AI rank error:", data);
-      return fallbackRankArticles(query, candidates);
+      return fallbackRanked;
     }
 
-    const byIndex = new Map(candidates.map(item => [item.originalIndex, item]));
+    const aiMap = new Map();
+    for (const item of data.results) {
+      if (typeof item.index !== "number") continue;
+      aiMap.set(item.index, {
+        score: Number(item.score) || 0,
+        reason: item.reason || ""
+      });
+    }
 
-    const ranked = data.results
+    const merged = candidates
       .map(item => {
-        const base = byIndex.get(item.index);
-        if (!base) return null;
+        const ai = aiMap.get(item.originalIndex);
+        const fallbackScore = fallbackMap.get(item.originalIndex) || 0;
+        const aiScore = ai ? ai.score : 0;
+
         return {
-          ...base,
-          aiScore: Number(item.score) || 0,
-          aiReason: item.reason || ""
+          ...item,
+          aiScore: Math.max(aiScore, fallbackScore),
+          aiReason: ai?.reason || (fallbackScore > 0 ? "fallback" : "")
         };
       })
-      .filter(Boolean)
+      .filter(item => item.aiScore > 0)
       .sort((a, b) => b.aiScore - a.aiScore);
 
-    return ranked.length ? ranked : fallbackRankArticles(query, candidates);
+    return merged.length ? merged : fallbackRanked;
   } catch (error) {
     console.error("AI rank failed:", error);
-    return fallbackRankArticles(query, candidates);
+    return fallbackRanked;
   }
 }
 
