@@ -385,8 +385,6 @@
 
   let currentSection = null;
 
-  const GEMINI_API_KEY = "AIzaSyBQu0bYiTIu80Hf9H7Ql6HnP3bmg620wgU";
-
 let aiSearchCache = new Map();
 let aiSearchTimer = null;
 
@@ -651,8 +649,9 @@ async function renderArticles() {
       </div>
     `;
 
-    const expandedTerms = await expandQueryWithAI(query);
-    const filteredGlobalArticles = buildGlobalSearchResults(query, expandedTerms);
+const expandedTerms = await expandQueryWithAI(query);
+const prefilteredArticles = buildGlobalSearchResults(query, expandedTerms).slice(0, 40);
+const filteredGlobalArticles = await rankArticlesWithAI(query, prefilteredArticles);
 
     articlesDiv.innerHTML = "";
 
@@ -965,35 +964,7 @@ function escapeHtml(text) {
 
 async function expandQueryWithAI(query) {
   const cleanQuery = normalizeSearchText(query);
-
-  if (!cleanQuery) return [cleanQuery];
-  if (aiSearchCache.has(cleanQuery)) return aiSearchCache.get(cleanQuery);
-
-  try {
-    const response = await fetch('/api/search-ai', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query: cleanQuery })
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      console.error("AI search server error:", data);
-      return [cleanQuery];
-    }
-
-    let parsed = Array.isArray(data.terms) ? data.terms : [cleanQuery];
-    parsed = [...new Set(parsed.map(item => normalizeSearchText(String(item))).filter(Boolean))];
-
-    if (!parsed.includes(cleanQuery)) parsed.unshift(cleanQuery);
-
-    aiSearchCache.set(cleanQuery, parsed);
-    return parsed;
-  } catch (error) {
-    console.error("AI search error:", error);
-    return [cleanQuery];
-  }
+  return cleanQuery ? [cleanQuery] : [];
 }
 
 function scoreArticle(article, terms) {
@@ -1089,6 +1060,41 @@ async function addManyArticlesToDB(articlesArray) {
   } catch (error) {
     console.error("Помилка додавання:", error);
     throw error;
+  }
+}
+
+async function rankArticlesWithAI(query, candidates) {
+  try {
+    const response = await fetch('/api/search-ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, candidates })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !Array.isArray(data.results)) {
+      console.error("AI rank error:", data);
+      return candidates;
+    }
+
+    const byIndex = new Map(candidates.map(item => [item.originalIndex, item]));
+    const ranked = data.results
+      .map(item => {
+        const base = byIndex.get(item.index);
+        if (!base) return null;
+        return {
+          ...base,
+          aiScore: item.score || 0,
+          aiReason: item.reason || ""
+        };
+      })
+      .filter(Boolean);
+
+    return ranked.length ? ranked : candidates;
+  } catch (error) {
+    console.error("AI rank failed:", error);
+    return candidates;
   }
 }
 
