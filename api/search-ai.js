@@ -4,24 +4,46 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { query } = req.body;
+    const { query, candidates } = req.body;
 
-    if (!query) {
-      return res.status(400).json({ error: "No query provided" });
+    if (!query || !Array.isArray(candidates) || candidates.length === 0) {
+      return res.status(400).json({ error: "No query or candidates" });
     }
 
+    const compactCandidates = candidates.map(item => ({
+      index: item.originalIndex,
+      law: item.law || "",
+      section: item.section || "",
+      short: item.short || "",
+      details: (item.details || "").slice(0, 1800)
+    }));
+
     const prompt = `
-Ти допомагаєш юридичному сайту шукати статті законів України.
-Користувач ввів запит: "${query}"
+Ти допомагаєш юридичному сайту України знаходити найбільш релевантні статті закону.
 
-Поверни JSON-масив із 6-10 коротких варіантів пошуку українською мовою.
-Додай:
-- головну фразу
-- юридичні синоніми
-- близькі формулювання
-- можливу назву права або процесуальної дії
+Користувач описав ситуацію простою мовою:
+"${query}"
 
-Тільки JSON-масив рядків. Без пояснень.
+Нижче список статей. Для кожної статті оціни, наскільки вона підходить до ситуації користувача.
+
+Правила:
+- орієнтуйся на сенс, а не тільки на окремі слова
+- зверху мають бути статті, які найбільш точно підходять до опису ситуації
+- якщо стаття майже не підходить, можна дати низький бал
+- score від 0 до 100
+- поверни тільки JSON
+
+Формат:
+{
+  "results": [
+    { "index": 1, "score": 98, "reason": "дуже близько за змістом" },
+    { "index": 7, "score": 90, "reason": "регулює схожу ситуацію" },
+    { "index": 3, "score": 40, "reason": "лише частково підходить" }
+  ]
+}
+
+Статті:
+${JSON.stringify(compactCandidates, null, 2)}
 `;
 
     const response = await fetch(
@@ -67,21 +89,18 @@ export default async function handler(req, res) {
       .replace(/\s*```$/i, "")
       .trim();
 
-    let terms = [];
+    let parsed;
     try {
-      terms = JSON.parse(cleaned);
+      parsed = JSON.parse(cleaned);
     } catch {
-      const match = cleaned.match(/\[[\s\S]*\]/);
-      if (match) {
-        terms = JSON.parse(match[0]);
-      }
+      return res.status(500).json({
+        error: "Gemini returned invalid JSON",
+        raw: text
+      });
     }
 
-    if (!Array.isArray(terms) || terms.length === 0) {
-      terms = [query];
-    }
-
-    return res.status(200).json({ terms });
+    const results = Array.isArray(parsed.results) ? parsed.results : [];
+    return res.status(200).json({ results });
   } catch (err) {
     return res.status(500).json({
       error: err.message || "Server error"
