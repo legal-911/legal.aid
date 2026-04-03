@@ -649,9 +649,10 @@ async function renderArticles() {
       </div>
     `;
 
-const expandedTerms = await expandQueryWithAI(query);
-const prefilteredArticles = buildGlobalSearchResults(query, expandedTerms).slice(0, 40);
-const filteredGlobalArticles = await rankArticlesWithAI(query, prefilteredArticles);
+const filteredGlobalArticles = await rankArticlesWithAI(query, articles.map((a, index) => ({
+  ...a,
+  originalIndex: index
+})));
 
     articlesDiv.innerHTML = "";
 
@@ -963,8 +964,7 @@ function escapeHtml(text) {
 }
 
 async function expandQueryWithAI(query) {
-  const cleanQuery = normalizeSearchText(query);
-  return cleanQuery ? [cleanQuery] : [];
+  return [];
 }
 
 function scoreArticle(article, terms) {
@@ -1079,19 +1079,21 @@ async function rankArticlesWithAI(query, candidates) {
     }
 
     const byIndex = new Map(candidates.map(item => [item.originalIndex, item]));
+
     const ranked = data.results
       .map(item => {
         const base = byIndex.get(item.index);
         if (!base) return null;
         return {
           ...base,
-          aiScore: item.score || 0,
+          aiScore: Number(item.score) || 0,
           aiReason: item.reason || ""
         };
       })
-      .filter(Boolean);
+      .filter(Boolean)
+      .sort((a, b) => b.aiScore - a.aiScore);
 
-    return ranked.length ? ranked : candidates;
+    return ranked;
   } catch (error) {
     console.error("AI rank failed:", error);
     return candidates;
