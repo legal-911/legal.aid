@@ -649,10 +649,14 @@ async function renderArticles() {
       </div>
     `;
 
-const filteredGlobalArticles = await rankArticlesWithAI(query, articles.map((a, index) => ({
+const expandedTerms = await expandQueryWithAI(query);
+
+const prefilteredArticles = articles.map((a, index) => ({
   ...a,
   originalIndex: index
-})));
+}));
+
+const filteredGlobalArticles = await rankArticlesWithAI(query, prefilteredArticles);
 
     articlesDiv.innerHTML = "";
 
@@ -964,7 +968,8 @@ function escapeHtml(text) {
 }
 
 async function expandQueryWithAI(query) {
-  return [];
+  const cleanQuery = normalizeSearchText(query);
+  return cleanQuery ? [cleanQuery] : [];
 }
 
 function scoreArticle(article, terms) {
@@ -997,19 +1002,37 @@ function scoreArticle(article, terms) {
 }
 
 function buildGlobalSearchResults(query, expandedTerms) {
+  const q = normalizeSearchText(query);
+
   return articles
-    .map((a, index) => ({
-      ...a,
-      originalIndex: index,
-      relevanceScore: scoreArticle(a, expandedTerms)
-    }))
-    .filter(a => a.relevanceScore > 0)
-    .sort((a, b) => {
-      if (b.relevanceScore !== a.relevanceScore) {
-        return b.relevanceScore - a.relevanceScore;
+    .map((a, index) => {
+      const law = normalizeSearchText(a.law);
+      const short = normalizeSearchText(a.short);
+      const details = normalizeSearchText(a.details);
+      const section = normalizeSearchText(a.section);
+
+      let relevanceScore = 0;
+
+      for (const term of expandedTerms) {
+        if (!term) continue;
+
+        if (law.includes(term)) relevanceScore += 8;
+        if (short.includes(term)) relevanceScore += 12;
+        if (details.includes(term)) relevanceScore += 7;
+        if (section.includes(term)) relevanceScore += 4;
       }
-      return getArticleNumber(a.law) - getArticleNumber(b.law);
-    });
+
+      if (short.includes(q)) relevanceScore += 30;
+      if (details.includes(q)) relevanceScore += 20;
+
+      return {
+        ...a,
+        originalIndex: index,
+        relevanceScore
+      };
+    })
+    .filter(a => a.relevanceScore > 0)
+    .sort((a, b) => b.relevanceScore - a.relevanceScore);
 }
 
 function splitArticlesFromRawText(text) {
@@ -1063,6 +1086,80 @@ async function addManyArticlesToDB(articlesArray) {
   }
 }
 
+function fallbackRankArticles(query, candidates) {
+  const q = normalizeSearchText(query);
+
+  const conceptMap = [
+    {
+      triggers: ["право на мовчання", "мовчати", "не свідчити", "не давати показання", "проти себе", "відмова давати показання"],
+      boosts: ["стаття 63", "не несе відповідальності за відмову давати показання", "щодо себе", "членів сімї", "близьких родичів"]
+    },
+    {
+      triggers: ["перевірка документів", "документи", "вимагають документи", "поліція перевіряє документи"],
+      boosts: ["стаття 32", "перевірка документів", "предявлення документів", "поліцейський має право вимагати"]
+    },
+    {
+      triggers: ["жетон", "посвідчення поліцейського", "предяви посвідчення", "назви своє прізвище"],
+      boosts: ["стаття 18", "службове посвідчення", "нагрудний знак", "поліцейський повинен назвати"]
+    },
+    {
+      triggers: ["обшук рюкзака", "огляд речей", "перевірка речей", "школа перевіряє рюкзак"],
+      boosts: ["особисте життя", "приватне життя", "огляд речей", "конфіденційна інформація", "стаття 32"]
+    }
+  ];
+
+  function scoreText(article) {
+    const law = normalizeSearchText(article.law);
+    const short = normalizeSearchText(article.short);
+    const details = normalizeSearchText(article.details);
+    const section = normalizeSearchText(article.section);
+    const whole = `${law} ${short} ${details} ${section}`;
+
+    let score = 0;
+
+    const queryWords = q.split(" ").filter(w => w.length >= 3);
+    for (const word of queryWords) {
+      if (law.includes(word)) score += 8;
+      if (short.includes(word)) score += 12;
+      if (details.includes(word)) score += 7;
+      if (section.includes(word)) score += 4;
+    }
+
+    if (whole.includes(q)) score += 35;
+    if (q.includes("мовч") && whole.includes("показан")) score += 35;
+if (q.includes("себе") && whole.includes("проти себе")) score += 30;
+if (q.includes("себе") && whole.includes("щодо себе")) score += 30;
+if (q.includes("родич") && whole.includes("близьких родичів")) score += 20;
+
+    for (const group of conceptMap) {
+      const triggered = group.triggers.some(t => q.includes(normalizeSearchText(t)));
+      if (triggered) {
+        for (const boost of group.boosts) {
+          if (whole.includes(normalizeSearchText(boost))) {
+            score += 28;
+          }
+        }
+      }
+    }
+
+    if (q.includes("мовч") && whole.includes("свідч")) score += 35;
+    if (q.includes("показан") && whole.includes("себе")) score += 25;
+    if (q.includes("документ") && whole.includes("документ")) score += 25;
+    if (q.includes("поліц") && section.includes("національну поліцію")) score += 15;
+
+    return score;
+  }
+
+  return candidates
+    .map(item => ({
+      ...item,
+      aiScore: scoreText(item),
+      aiReason: "fallback"
+    }))
+    .filter(item => item.aiScore > 0)
+    .sort((a, b) => b.aiScore - a.aiScore);
+}
+
 async function rankArticlesWithAI(query, candidates) {
   try {
     const response = await fetch('/api/search-ai', {
@@ -1075,7 +1172,7 @@ async function rankArticlesWithAI(query, candidates) {
 
     if (!response.ok || !Array.isArray(data.results)) {
       console.error("AI rank error:", data);
-      return candidates;
+      return fallbackRankArticles(query, candidates);
     }
 
     const byIndex = new Map(candidates.map(item => [item.originalIndex, item]));
@@ -1093,10 +1190,10 @@ async function rankArticlesWithAI(query, candidates) {
       .filter(Boolean)
       .sort((a, b) => b.aiScore - a.aiScore);
 
-    return ranked;
+    return ranked.length ? ranked : fallbackRankArticles(query, candidates);
   } catch (error) {
     console.error("AI rank failed:", error);
-    return candidates;
+    return fallbackRankArticles(query, candidates);
   }
 }
 
