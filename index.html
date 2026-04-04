@@ -613,14 +613,12 @@ function formatText(text) {
     .replace(/\n/g, "<br>");
 }
 
-  // Рендер статей
 async function renderArticles() {
   articlesDiv.innerHTML = "";
   const query = searchInput.value.trim().toLowerCase();
 
   // ===== ГОЛОВНА СТОРІНКА =====
   if (currentSection === null) {
-    // Якщо пошук порожній — показуємо закони
     if (!query) {
       lawSections.forEach(section => {
         const div = document.createElement("div");
@@ -651,12 +649,12 @@ async function renderArticles() {
       </div>
     `;
 
-const prefilteredArticles = articles.map((a, index) => ({
-  ...a,
-  originalIndex: index
-}));
+    const prefilteredArticles = articles.map((a, index) => ({
+      ...a,
+      originalIndex: index
+    }));
 
-const filteredGlobalArticles = await rankArticlesWithAI(query, prefilteredArticles);
+    const filteredGlobalArticles = await rankArticlesWithAI(query, prefilteredArticles);
 
     articlesDiv.innerHTML = "";
 
@@ -670,59 +668,59 @@ const filteredGlobalArticles = await rankArticlesWithAI(query, prefilteredArticl
       return;
     }
 
-filteredGlobalArticles.forEach((a) => {
-  const index = a.originalIndex;
-  const div = document.createElement("div");
-  div.className = "article";
+    filteredGlobalArticles.forEach((a) => {
+      const index = a.originalIndex;
+      const div = document.createElement("div");
+      div.className = "article";
 
-  div.innerHTML = `
-    <h2>${escapeHtml(a.law)}</h2>
-    <p><b>${escapeHtml(a.section || "Без назви закону")}</b></p>
-    <p>${escapeHtml(a.short || "")}</p>
-  `;
+      div.innerHTML = `
+        <h2>${escapeHtml(a.law)}</h2>
+        <p><b>${escapeHtml(a.section || "Без назви закону")}</b></p>
+        <p>${escapeHtml(a.short || "")}</p>
+      `;
 
-  const detailsDiv = document.createElement("div");
-  detailsDiv.className = "details";
+      const detailsDiv = document.createElement("div");
+      detailsDiv.className = "details";
 
-  detailsDiv.innerHTML = `
-    <div style="line-height:1.6;">
-      ${formatText(a.details)}
-      ${a.link ? `<a href="${a.link}" target="_blank" style="display:block; margin-top:10px; color:#004080;">Посилання</a>` : ""}
-    </div>
-  `;
+      detailsDiv.innerHTML = `
+        <div style="line-height:1.6;">
+          ${formatText(a.details)}
+          ${a.link ? `<a href="${a.link}" target="_blank" style="display:block; margin-top:10px; color:#004080;">Посилання</a>` : ""}
+        </div>
+      `;
 
-  div.appendChild(detailsDiv);
+      div.appendChild(detailsDiv);
 
-  const moreBtn = document.createElement("button");
-  moreBtn.textContent = "Докладніше";
-  moreBtn.onclick = () => {
-    detailsDiv.style.display = detailsDiv.style.display === "block" ? "none" : "block";
-  };
-  div.appendChild(moreBtn);
+      const moreBtn = document.createElement("button");
+      moreBtn.textContent = "Докладніше";
+      moreBtn.onclick = () => {
+        detailsDiv.style.display = detailsDiv.style.display === "block" ? "none" : "block";
+      };
+      div.appendChild(moreBtn);
 
-  const openLawBtn = document.createElement("button");
-  openLawBtn.textContent = "Відкрити закон";
-  openLawBtn.onclick = () => {
-    currentSection = a.section;
-    renderArticles();
-  };
-  div.appendChild(openLawBtn);
+      const openLawBtn = document.createElement("button");
+      openLawBtn.textContent = "Відкрити закон";
+      openLawBtn.onclick = () => {
+        currentSection = a.section;
+        renderArticles();
+      };
+      div.appendChild(openLawBtn);
 
-  if (isAdmin) {
-    const editBtn = document.createElement("button");
-    editBtn.textContent = "Редагувати";
-    editBtn.onclick = () => openEditModal(index);
+      if (isAdmin) {
+        const editBtn = document.createElement("button");
+        editBtn.textContent = "Редагувати";
+        editBtn.onclick = () => openEditModal(index);
 
-    const delBtn = document.createElement("button");
-    delBtn.textContent = "Видалити";
-    delBtn.onclick = () => openDeleteModal(index);
+        const delBtn = document.createElement("button");
+        delBtn.textContent = "Видалити";
+        delBtn.onclick = () => openDeleteModal(index);
 
-    div.appendChild(editBtn);
-    div.appendChild(delBtn);
-  }
+        div.appendChild(editBtn);
+        div.appendChild(delBtn);
+      }
 
-  articlesDiv.appendChild(div);
-});
+      articlesDiv.appendChild(div);
+    });
 
     return;
   }
@@ -742,65 +740,57 @@ filteredGlobalArticles.forEach((a) => {
   backDiv.appendChild(backBtn);
   articlesDiv.appendChild(backDiv);
 
- let filteredArticles = articles
-  .map((a, index) => ({ ...a, originalIndex: index }))
-  .filter(a => a.section === currentSection);
+  let filteredArticles = articles
+    .map((a, index) => ({ ...a, originalIndex: index }))
+    .filter(a => a.section === currentSection);
 
-if (query) {
-  filteredArticles = fallbackRankArticles(query, filteredArticles);
-} else {
-  filteredArticles = filteredArticles.sort((a, b) => getArticleNumber(a.law) - getArticleNumber(b.law));
-}
-
- filteredArticles.forEach((a) => {
-  const index = a.originalIndex;
-  const div = document.createElement("div");
-  div.className = "article";
-
-  div.innerHTML = `<h2>${escapeHtml(a.law)}</h2><p>${escapeHtml(a.short || "")}</p>`;
-
-  const detailsDiv = document.createElement("div");
-  detailsDiv.className = "details";
-  detailsDiv.innerHTML = `
-    <div style="line-height:1.6; white-space:pre-line;">
-      ${formatText(a.details)}
-      ${a.link ? `<a href="${a.link}" target="_blank" style="display:block; margin-top:10px; color:#004080; font-weight:500;">Посилання на статтю</a>` : ""}
-    </div>
-  `;
-
-  div.appendChild(detailsDiv);
-
-  const moreBtn = document.createElement("button");
-  moreBtn.textContent = "Докладніше";
-  moreBtn.onclick = () => {
-    detailsDiv.style.display = detailsDiv.style.display === "block" ? "none" : "block";
-  };
-  div.appendChild(moreBtn);
-
-  if (isAdmin) {
-    const editBtn = document.createElement("button");
-    editBtn.textContent = "Редагувати";
-    editBtn.onclick = () => openEditModal(index);
-
-    const delBtn = document.createElement("button");
-    delBtn.textContent = "Видалити";
-    delBtn.onclick = () => openDeleteModal(index);
-
-    div.appendChild(editBtn);
-    div.appendChild(delBtn);
+  if (query) {
+    filteredArticles = fallbackRankArticles(query, filteredArticles);
+  } else {
+    filteredArticles = filteredArticles.sort((a, b) => getArticleNumber(a.law) - getArticleNumber(b.law));
   }
 
-  articlesDiv.appendChild(div);
-});
-}
+  filteredArticles.forEach((a) => {
+    const index = a.originalIndex;
+    const div = document.createElement("div");
+    div.className = "article";
 
-  // Пошук
-  searchInput.addEventListener('input', () => {
-  clearTimeout(aiSearchTimer);
-  aiSearchTimer = setTimeout(() => {
-    renderArticles();
-  }, 450);
-});
+    div.innerHTML = `<h2>${escapeHtml(a.law)}</h2><p>${escapeHtml(a.short || "")}</p>`;
+
+    const detailsDiv = document.createElement("div");
+    detailsDiv.className = "details";
+    detailsDiv.innerHTML = `
+      <div style="line-height:1.6; white-space:pre-line;">
+        ${formatText(a.details)}
+        ${a.link ? `<a href="${a.link}" target="_blank" style="display:block; margin-top:10px; color:#004080; font-weight:500;">Посилання на статтю</a>` : ""}
+      </div>
+    `;
+
+    div.appendChild(detailsDiv);
+
+    const moreBtn = document.createElement("button");
+    moreBtn.textContent = "Докладніше";
+    moreBtn.onclick = () => {
+      detailsDiv.style.display = detailsDiv.style.display === "block" ? "none" : "block";
+    };
+    div.appendChild(moreBtn);
+
+    if (isAdmin) {
+      const editBtn = document.createElement("button");
+      editBtn.textContent = "Редагувати";
+      editBtn.onclick = () => openEditModal(index);
+
+      const delBtn = document.createElement("button");
+      delBtn.textContent = "Видалити";
+      delBtn.onclick = () => openDeleteModal(index);
+
+      div.appendChild(editBtn);
+      div.appendChild(delBtn);
+    }
+
+    articlesDiv.appendChild(div);
+  });
+}
 
   function openEditModal(index){
     editIndex=index;
@@ -915,7 +905,7 @@ if (query) {
   }
 
   function showAddButton(){
-    if(isAdmin && !document.getElementById('deleteAllBtn')){
+    if (isAdmin && !document.getElementById('addBtn')) {
       const addBtn=document.createElement('button');
       addBtn.id='addBtn';
       addBtn.textContent='Додати статтю';
@@ -1190,65 +1180,13 @@ function fallbackRankArticles(query, candidates) {
   }
 
   return candidates
-    .map(item => ({
-      ...item,
-      aiScore: scoreText(item),
-      aiReason: "fallback"
+    .map(article => ({
+      ...article,
+      aiScore: scoreText(article)
     }))
-    .filter(item => item.aiScore > 0)
+    .filter(article => article.aiScore > 0)
     .sort((a, b) => b.aiScore - a.aiScore);
 }
-
-  function scoreText(article) {
-    const law = normalizeSearchText(article.law);
-    const short = normalizeSearchText(article.short);
-    const details = normalizeSearchText(article.details);
-    const section = normalizeSearchText(article.section);
-    const whole = `${law} ${short} ${details} ${section}`;
-
-    let score = 0;
-
-    const queryWords = q.split(" ").filter(w => w.length >= 3);
-    for (const word of queryWords) {
-      if (law.includes(word)) score += 8;
-      if (short.includes(word)) score += 12;
-      if (details.includes(word)) score += 7;
-      if (section.includes(word)) score += 4;
-    }
-
-    if (whole.includes(q)) score += 35;
-    if (q.includes("мовч") && whole.includes("показан")) score += 35;
-if (q.includes("себе") && whole.includes("проти себе")) score += 30;
-if (q.includes("себе") && whole.includes("щодо себе")) score += 30;
-if (q.includes("родич") && whole.includes("близьких родичів")) score += 20;
-
-    for (const group of conceptMap) {
-      const triggered = group.triggers.some(t => q.includes(normalizeSearchText(t)));
-      if (triggered) {
-        for (const boost of group.boosts) {
-          if (whole.includes(normalizeSearchText(boost))) {
-            score += 28;
-          }
-        }
-      }
-    }
-
-    if (q.includes("мовч") && whole.includes("свідч")) score += 35;
-    if (q.includes("показан") && whole.includes("себе")) score += 25;
-    if (q.includes("документ") && whole.includes("документ")) score += 25;
-    if (q.includes("поліц") && section.includes("національну поліцію")) score += 15;
-
-    return score;
-  }
-
-  return candidates
-    .map(item => ({
-      ...item,
-      aiScore: scoreText(item),
-      aiReason: "fallback"
-    }))
-    .filter(item => item.aiScore > 0)
-    .sort((a, b) => b.aiScore - a.aiScore);
 
 async function rankArticlesWithAI(query, candidates) {
   const fallbackRanked = fallbackRankArticles(query, candidates);
