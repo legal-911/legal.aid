@@ -1415,6 +1415,14 @@ document.querySelectorAll('.example-btn').forEach(btn => {
   });
 });
 
+history.scrollRestoration = "manual";
+
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    window.scrollTo(0, 0);
+  }, 50);
+});
+
   // Ініціалізаці
  async function initApp(){
   fillSearchSectionOptions();
