@@ -815,11 +815,20 @@ backBtn.onclick = () => {
     .map((a, index) => ({ ...a, originalIndex: index }))
     .filter(a => a.section === currentSection);
 
-  if (query) {
-    filteredArticles = fallbackRankArticles(query, filteredArticles);
-  } else {
-    filteredArticles = filteredArticles.sort((a, b) => getArticleNumber(a.law) - getArticleNumber(b.law));
+if (query) {
+  const sectionCandidates = filteredArticles.map((a, index) => ({
+    ...a,
+    originalIndex: a.originalIndex ?? index
+  }));
+
+  filteredArticles = await rankArticlesWithAI(query, sectionCandidates);
+
+  if (filteredArticles.length === 0) {
+    filteredArticles = fallbackRankArticles(query, sectionCandidates);
   }
+} else {
+  filteredArticles = filteredArticles.sort((a, b) => getArticleNumber(a.law) - getArticleNumber(b.law));
+}
 
   filteredArticles.forEach((a) => {
     const index = a.originalIndex;
@@ -1022,21 +1031,23 @@ function normalizeSearchText(text) {
       "є": "е",
       "ґ": "г"
     }[ch] || ch))
-    .replace(/i/g, "і")
-    .replace(/c/g, "с")
-    .replace(/o/g, "о")
-    .replace(/p/g, "р")
     .replace(/a/g, "а")
+    .replace(/b/g, "в")
+    .replace(/c/g, "с")
     .replace(/e/g, "е")
-    .replace(/x/g, "х")
-    .replace(/y/g, "у")
+    .replace(/h/g, "н")
+    .replace(/i/g, "і")
     .replace(/k/g, "к")
     .replace(/m/g, "м")
+    .replace(/o/g, "о")
+    .replace(/p/g, "р")
     .replace(/t/g, "т")
-    .replace(/b/g, "в")
-    .replace(/h/g, "н")
+    .replace(/x/g, "х")
+    .replace(/y/g, "у")
     .replace(/0/g, "о")
+    .replace(/1/g, "і")
     .replace(/3/g, "з")
+    .replace(/6/g, "б")
     .replace(/[^а-яa-z0-9\s]/gi, " ")
     .replace(/\s+/g, " ")
     .trim();
@@ -1047,7 +1058,37 @@ function getQueryTerms(query) {
   if (!q) return [];
 
   const words = q.split(" ").filter(word => word.length >= 2);
-  return [q, ...words];
+  const extra = [];
+
+  for (const word of words) {
+    extra.push(word);
+
+    if (word.startsWith("затрим")) {
+      extra.push("затримання", "затримали", "затримати", "обмеження свободи");
+    }
+
+    if (word.startsWith("президент")) {
+      extra.push("президент україни", "глава держави", "недоторканність", "імунітет");
+    }
+
+    if (word.startsWith("мовч")) {
+      extra.push("право на мовчання", "не свідчити", "не давати показання", "проти себе");
+    }
+
+    if (word.startsWith("документ")) {
+      extra.push("перевірка документів", "предявлення документів", "посвідчення");
+    }
+
+    if (word.startsWith("обш") || word.startsWith("огляд")) {
+      extra.push("обшук", "огляд речей", "перевірка речей", "рюкзак", "сумка");
+    }
+
+    if (word.startsWith("поліц") || word.startsWith("полиц")) {
+      extra.push("поліція", "поліцейський", "правоохоронець");
+    }
+  }
+
+  return [...new Set([q, ...words, ...extra].map(normalizeSearchText).filter(Boolean))];
 }
 
 function escapeHtml(text) {
@@ -1216,17 +1257,14 @@ for (const term of terms) {
   if (details.includes(term)) score += 18;
   if (section.includes(term)) score += 18;
 }
+for (const term of terms) {
+  if (!term) continue;
 
-let matchedFields = 0;
-
-if (terms.some(term => law.includes(term))) matchedFields++;
-if (terms.some(term => short.includes(term))) matchedFields++;
-if (terms.some(term => details.includes(term))) matchedFields++;
-if (terms.some(term => section.includes(term))) matchedFields++;
-
-if (matchedFields >= 2) score += 20;
-if (matchedFields >= 3) score += 35;
-if (matchedFields === 4) score += 50;
+  if (law.includes(term)) score += 18;
+  if (short.includes(term)) score += 18;
+  if (details.includes(term)) score += 18;
+  if (section.includes(term)) score += 18;
+}
 
 const queryWords = q.split(" ").filter(w => w.length >= 3);
 for (const word of queryWords) {
@@ -1235,6 +1273,16 @@ for (const word of queryWords) {
   if (details.includes(word)) score += 8;
   if (section.includes(word)) score += 8;
 }
+
+let matchedFields = 0;
+if (terms.some(term => law.includes(term))) matchedFields++;
+if (terms.some(term => short.includes(term))) matchedFields++;
+if (terms.some(term => details.includes(term))) matchedFields++;
+if (terms.some(term => section.includes(term))) matchedFields++;
+
+if (matchedFields >= 2) score += 20;
+if (matchedFields >= 3) score += 35;
+if (matchedFields === 4) score += 50;
     if (whole.includes(q)) score += 40;
 
     if (q.includes("мовч") && whole.includes("свідч")) score += 45;
