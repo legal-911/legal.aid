@@ -800,6 +800,7 @@ articlesDiv.innerHTML = `
   }
 
   // ===== СТОРІНКА КОНКРЕТНОГО ЗАКОНУ =====
+const backDiv = document.createElement("div");
 backDiv.className = "section-header";
 backDiv.innerHTML = `
   <h2>${escapeHtml(currentSection)}</h2>
@@ -811,8 +812,8 @@ backDiv.innerHTML = `
   </p>
 `;
 
-  const backBtn = document.createElement("button");
-  backBtn.textContent = "Назад до розділів";
+const backBtn = document.createElement("button");
+backBtn.textContent = "Назад до розділів";
 backBtn.onclick = () => {
   currentSection = null;
   renderArticles();
@@ -822,8 +823,8 @@ backBtn.onclick = () => {
   }, 50);
 };
 
-  backDiv.appendChild(backBtn);
-  articlesDiv.appendChild(backDiv);
+backDiv.appendChild(backBtn);
+articlesDiv.appendChild(backDiv);
 
   let filteredArticles = articles
     .map((a, index) => ({ ...a, originalIndex: index }))
