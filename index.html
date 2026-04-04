@@ -733,10 +733,11 @@ async function renderArticles() {
 
   const backBtn = document.createElement("button");
   backBtn.textContent = "Назад до розділів";
-  backBtn.onclick = () => {
-    currentSection = null;
-    renderArticles();
-  };
+ backBtn.onclick = () => {
+  currentSection = null;
+  renderArticles();
+  window.scrollTo(0, 0);
+};
 
   backDiv.appendChild(backBtn);
   articlesDiv.appendChild(backDiv);
