@@ -712,7 +712,7 @@ async function renderArticles() {
     articlesDiv.innerHTML = `
       <div class="section-header">
         <h2>Пошук...</h2>
-        <p>Шукаю по всіх законах... Це може зайняти кілька секунд</p>
+        <p>Шукаю по всіх законах... Це може зайняти деякий час</p>
       </div>
     `;
 
@@ -800,9 +800,16 @@ articlesDiv.innerHTML = `
   }
 
   // ===== СТОРІНКА КОНКРЕТНОГО ЗАКОНУ =====
-  const backDiv = document.createElement("div");
-  backDiv.className = "section-header";
-  backDiv.innerHTML = `<h2>${escapeHtml(currentSection)}</h2><p>Список статей розділу</p>`;
+backDiv.className = "section-header";
+backDiv.innerHTML = `
+  <h2>${escapeHtml(currentSection)}</h2>
+  <p>
+    ${query
+      ? `Результати пошуку в ${escapeHtml(currentSection)}`
+      : "Список статей розділу"
+    }
+  </p>
+`;
 
   const backBtn = document.createElement("button");
   backBtn.textContent = "Назад до розділів";
