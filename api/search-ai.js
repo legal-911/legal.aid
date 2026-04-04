@@ -1177,6 +1177,15 @@ function fallbackRankArticles(query, candidates) {
 
     return score;
   }
+
+  return candidates
+    .map(item => ({
+      ...item,
+      aiScore: scoreText(item),
+      aiReason: "fallback"
+    }))
+    .filter(item => item.aiScore > 0)
+    .sort((a, b) => b.aiScore - a.aiScore);
 }
 
 async function rankArticlesWithAI(query, candidates) {
