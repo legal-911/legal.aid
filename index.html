@@ -631,10 +631,11 @@ async function renderArticles() {
 
         const openBtn = document.createElement("button");
         openBtn.textContent = "Відкрити";
-        openBtn.onclick = () => {
-          currentSection = section;
-          renderArticles();
-        };
+       openBtn.onclick = () => {
+  currentSection = section;
+  renderArticles();
+  window.scrollTo(0, 0);
+};
 
         div.appendChild(openBtn);
         articlesDiv.appendChild(div);
