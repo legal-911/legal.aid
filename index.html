@@ -333,7 +333,7 @@
     ></textarea>
 
     <p style="font-size:13px; color:#555; margin-top:-2px; margin-bottom:10px;">
-      Наприклад: право на мовчання, перевірка документів, обшук речей у школі
+      Наприклад: право на мовчання, перевірка документів, дрібне хуліганство, тощо..
     </p>
 
     <button id="runSearchBtn">Пошук</button>
@@ -1206,25 +1206,35 @@ function fallbackRankArticles(query, candidates) {
     const section = normalizeSearchText(article.section);
     const whole = `${law} ${short} ${details} ${section}`;
 
-    let score = 0;
+let score = 0;
 
-    for (const term of terms) {
-      if (!term) continue;
+for (const term of terms) {
+  if (!term) continue;
 
-      if (law.includes(term)) score += 18;
-      if (short.includes(term)) score += 22;
-      if (details.includes(term)) score += 16;
-      if (section.includes(term)) score += 10;
-    }
+  if (law.includes(term)) score += 18;
+  if (short.includes(term)) score += 18;
+  if (details.includes(term)) score += 18;
+  if (section.includes(term)) score += 18;
+}
 
-    const queryWords = q.split(" ").filter(w => w.length >= 3);
-    for (const word of queryWords) {
-      if (law.includes(word)) score += 8;
-      if (short.includes(word)) score += 12;
-      if (details.includes(word)) score += 7;
-      if (section.includes(word)) score += 4;
-    }
+let matchedFields = 0;
 
+if (terms.some(term => law.includes(term))) matchedFields++;
+if (terms.some(term => short.includes(term))) matchedFields++;
+if (terms.some(term => details.includes(term))) matchedFields++;
+if (terms.some(term => section.includes(term))) matchedFields++;
+
+if (matchedFields >= 2) score += 20;
+if (matchedFields >= 3) score += 35;
+if (matchedFields === 4) score += 50;
+
+const queryWords = q.split(" ").filter(w => w.length >= 3);
+for (const word of queryWords) {
+  if (law.includes(word)) score += 8;
+  if (short.includes(word)) score += 8;
+  if (details.includes(word)) score += 8;
+  if (section.includes(word)) score += 8;
+}
     if (whole.includes(q)) score += 40;
 
     if (q.includes("мовч") && whole.includes("свідч")) score += 45;
