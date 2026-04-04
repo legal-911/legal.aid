@@ -65,24 +65,23 @@ ${JSON.stringify(compactCandidates, null, 2)}
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
-        "HTTP-Referer": "https://legal-aid-d4cg.vercel.app",
-        "X-Title": "Юридична допомога"
-      },
+   headers: {
+  "Content-Type": "application/json; charset=utf-8",
+  "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+  "HTTP-Referer": "https://legal-aid-d4cg.vercel.app",
+  "X-Title": "Юридична допомога"
+},
       body: JSON.stringify({
-        model: "openrouter/auto",
-        messages: [
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-        temperature: 0.2,
-        response_format: { type: "json_object" }
+  model: "openrouter/auto",
+  messages: [
+    {
+      role: "user",
+      content: prompt
+    }
+  ],
+  temperature: 0.2
       })
-    });
+}); 
 
     const data = await response.json();
 
