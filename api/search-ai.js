@@ -50,6 +50,7 @@ export default async function handler(req, res) {
    - нижче 50: слабка релевантність
 
 Поверни тільки JSON без будь-якого іншого тексту.
+НІКОЛИ не обгортай JSON у ```json або ``` . Поверни тільки чистий JSON-об’єкт.
 
 Формат:
 {
@@ -83,32 +84,30 @@ ${JSON.stringify(compactCandidates, null, 2)}
       })
 }); 
 
-    const data = await response.json();
+const text = data?.choices?.[0]?.message?.content?.trim();
 
-    if (!response.ok) {
-      return res.status(response.status).json({
-        error: data?.error?.message || "OpenRouter API error"
-      });
-    }
+if (!text) {
+  return res.status(500).json({
+    error: "OpenRouter returned empty text",
+    raw: data
+  });
+}
 
-    const text = data?.choices?.[0]?.message?.content?.trim();
+const cleaned = text
+  .replace(/^```json\s*/i, "")
+  .replace(/^```\s*/i, "")
+  .replace(/\s*```$/i, "")
+  .trim();
 
-    if (!text) {
-      return res.status(500).json({
-        error: "OpenRouter returned empty text",
-        raw: data
-      });
-    }
-
-    let parsed;
-    try {
-      parsed = JSON.parse(text);
-    } catch {
-      return res.status(500).json({
-        error: "OpenRouter returned invalid JSON",
-        raw: text
-      });
-    }
+let parsed;
+try {
+  parsed = JSON.parse(cleaned);
+} catch {
+  return res.status(500).json({
+    error: "OpenRouter returned invalid JSON",
+    raw: text
+  });
+}
 
     let results = Array.isArray(parsed.results) ? parsed.results : [];
 
