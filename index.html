@@ -336,13 +336,6 @@
       Наприклад: право на мовчання, перевірка документів, обшук речей у школі
     </p>
 
-    <div id="searchExamples" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
-      <button type="button" class="example-btn">право на мовчання</button>
-      <button type="button" class="example-btn">перевірка документів поліцією</button>
-      <button type="button" class="example-btn">обшук речей у школі</button>
-      <button type="button" class="example-btn">поліцейський не показав посвідчення</button>
-    </div>
-
     <button id="runSearchBtn">Пошук</button>
     <button id="clearSearchBtn" style="background:#6b7280;">Очистити</button>
     <button id="closeSearchBtn" style="background:#9ca3af;">Закрити</button>
@@ -1406,13 +1399,6 @@ searchModal.addEventListener('click', (e) => {
   if (e.target === searchModal) {
     closeSearchModal();
   }
-});
-
-document.querySelectorAll('.example-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    searchModalInput.value = btn.textContent.trim();
-    searchModalInput.focus();
-  });
 });
 
 history.scrollRestoration = "manual";
