@@ -182,6 +182,21 @@
     line-height: 1.5;
   }
 
+  .example-btn {
+  background: #e8f0ff;
+  color: #004080;
+  border: 1px solid #bfd3f5;
+  border-radius: 16px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.example-btn:hover {
+  background: #dbeafe;
+}
+
   </style>
   </head>
   <body>
@@ -192,7 +207,7 @@
 
     <div class="search-box">
       <button id="searchToggle" class="search-btn">&#128269;</button>
-      <input type="text" id="searchInput" placeholder="Опишіть ситуацію...">
+      <input type="text" id="searchInput" placeholder="Опишіть ситуацію..." style="display:none;">
     </div>
   </header>
 
@@ -298,6 +313,42 @@
     font-size:14px;
   "></div>
 
+<div class="modal" id="searchModal">
+  <div class="modal-content" style="max-width:520px; width:92%; transform:none;">
+    <span class="close" id="closeSearch">&times;</span>
+    <h2>Пошук по сайту</h2>
+    <p style="font-size:14px; margin-bottom:12px;">
+      Знайдіть потрібну статтю за описом ситуації або ключовими словами
+    </p>
+
+    <select id="searchSection">
+      <option value="all">Шукати по всіх законах</option>
+    </select>
+
+    <textarea
+      id="searchModalInput"
+      rows="5"
+      placeholder="Опишіть ситуацію або введіть ключові слова..."
+      style="resize:vertical; min-height:120px;"
+    ></textarea>
+
+    <p style="font-size:13px; color:#555; margin-top:-2px; margin-bottom:10px;">
+      Наприклад: право на мовчання, перевірка документів, обшук речей у школі
+    </p>
+
+    <div id="searchExamples" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+      <button type="button" class="example-btn">право на мовчання</button>
+      <button type="button" class="example-btn">перевірка документів поліцією</button>
+      <button type="button" class="example-btn">обшук речей у школі</button>
+      <button type="button" class="example-btn">поліцейський не показав посвідчення</button>
+    </div>
+
+    <button id="runSearchBtn">Пошук</button>
+    <button id="clearSearchBtn" style="background:#6b7280;">Очистити</button>
+    <button id="closeSearchBtn" style="background:#9ca3af;">Закрити</button>
+  </div>
+</div>
+
   <footer>
     Інформація від "Офіційний вебпортал парламенту України"<br>©2026
   </footer>
@@ -357,6 +408,14 @@
   const maintenanceOffBtn = document.getElementById('maintenanceOffBtn');
   const maintenanceScreen = document.getElementById('maintenanceScreen');
 
+const searchModal = document.getElementById('searchModal');
+const closeSearch = document.getElementById('closeSearch');
+const closeSearchBtn = document.getElementById('closeSearchBtn');
+const clearSearchBtn = document.getElementById('clearSearchBtn');
+const runSearchBtn = document.getElementById('runSearchBtn');
+const searchModalInput = document.getElementById('searchModalInput');
+const searchSection = document.getElementById('searchSection');
+
   const searchToggle = document.getElementById('searchToggle');
   const searchBox = document.querySelector('.search-box');
 
@@ -400,6 +459,28 @@ let aiSearchTimer = null;
 
   let editIndex = null;
   let deleteIndex = null;
+
+  function fillSearchSectionOptions() {
+  searchSection.innerHTML = '<option value="all">Шукати по всіх законах</option>';
+
+  lawSections.forEach(section => {
+    const option = document.createElement('option');
+    option.value = section;
+    option.textContent = section;
+    searchSection.appendChild(option);
+  });
+}
+
+function openSearchModal() {
+  searchModal.style.display = 'flex';
+  searchModal.classList.add('show');
+  searchModalInput.focus();
+}
+
+function closeSearchModal() {
+  searchModal.style.display = 'none';
+  searchModal.classList.remove('show');
+}
 
   async function seedArticlesIfEmpty(){
     const querySnapshot = await getDocs(collection(db, "Юридична допомога"));
@@ -540,16 +621,7 @@ showToast(`Додано ${generatedItems.length} статей`, 'success');
   // Меню
   menu.addEventListener('click', () => nav.style.display = nav.style.display === 'block'? 'none':'block');
 
-  searchToggle.addEventListener('click', () => {
-    searchBox.classList.toggle('active');
 
-    if (searchBox.classList.contains('active')) {
-      searchInput.focus();
-    } else {
-      searchInput.value = '';
-      renderArticles();
-    }
-  });
 
   maintenanceOnBtn.addEventListener('click', async () => {
     await setMaintenanceMode(true);
@@ -1245,6 +1317,39 @@ async function rankArticlesWithAI(query, candidates) {
   }
 }
 
+function runModalSearch() {
+  const query = searchModalInput.value.trim();
+  const selectedSection = searchSection.value;
+
+  if (!query) {
+    showToast('Введіть запит для пошуку', 'error');
+    return;
+  }
+
+  searchInput.value = query;
+
+  if (selectedSection === 'all') {
+    currentSection = null;
+  } else {
+    currentSection = selectedSection;
+  }
+
+  closeSearchModal();
+  renderArticles();
+  window.scrollTo(0, 0);
+}
+
+runSearchBtn.addEventListener('click', () => {
+  runModalSearch();
+});
+
+searchModalInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    runModalSearch();
+  }
+});
+
   // Видалення
   function openDeleteModal(index){ deleteIndex=index; deleteModal.style.display='flex'; deleteModal.classList.add('show'); }
   closeDelete.addEventListener('click',()=>{deleteModal.style.display='none'; deleteModal.classList.remove('show');});
@@ -1279,15 +1384,45 @@ async function rankArticlesWithAI(query, candidates) {
     await checkMaintenanceMode();
   }
 
+  searchToggle.addEventListener('click', () => {
+  openSearchModal();
+});
+
+closeSearch.addEventListener('click', () => {
+  closeSearchModal();
+});
+
+closeSearchBtn.addEventListener('click', () => {
+  closeSearchModal();
+});
+
+clearSearchBtn.addEventListener('click', () => {
+  searchModalInput.value = '';
+  searchSection.value = 'all';
+  searchModalInput.focus();
+});
+
+searchModal.addEventListener('click', (e) => {
+  if (e.target === searchModal) {
+    closeSearchModal();
+  }
+});
+
+document.querySelectorAll('.example-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    searchModalInput.value = btn.textContent.trim();
+    searchModalInput.focus();
+  });
+});
 
   // Ініціалізаці
-  async function initApp(){
-    updateAdminUI();
-    await seedArticlesIfEmpty();
-    await loadArticles();
-    await checkMaintenanceMode();
-
-  }
+ async function initApp(){
+  fillSearchSectionOptions();
+  updateAdminUI();
+  await seedArticlesIfEmpty();
+  await loadArticles();
+  await checkMaintenanceMode();
+}
 
   initApp();
 
