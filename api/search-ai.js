@@ -65,11 +65,11 @@ ${JSON.stringify(compactCandidates, null, 2)}
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
-   headers: {
+  headers: {
   "Content-Type": "application/json; charset=utf-8",
   "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
   "HTTP-Referer": "https://legal-aid-d4cg.vercel.app",
-  "X-Title": "Юридична допомога"
+  "X-Title": "Legal Aid"
 },
       body: JSON.stringify({
   model: "openrouter/auto",
