@@ -18,7 +18,7 @@ export default async function handler(req, res) {
       details: (item.details || "").slice(0, 1800)
     }));
 
-const prompt = `
+    const prompt = `
 Ти допомагаєш юридичному сайту України знаходити найбільш релевантні статті закону.
 
 Користувач описав ситуацію:
@@ -42,7 +42,8 @@ const prompt = `
 4. Якщо в запиті є орфографічні помилки або розмовна форма — все одно намагайся знайти правильну статтю.
 5. Віддавай перевагу більш точним і конкретним нормам.
 6. Не обирай слабко релевантні результати, якщо є сильніші.
-7. score від 0 до 100:
+7. Якщо є стаття, яка прямо описує правовий статус, імунітет, недоторканність, право, обов’язок або заборону у ситуації користувача — піднімай її вище.
+8. score від 0 до 100:
    - 90-100: майже точне попадання по ситуації
    - 70-89: сильна релевантність
    - 50-69: часткова, але корисна релевантність
@@ -62,73 +63,64 @@ const prompt = `
 ${JSON.stringify(compactCandidates, null, 2)}
 `;
 
-    const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": process.env.GEMINI_API_KEY
-        },
-body: JSON.stringify({
-  generationConfig: {
-    temperature: 0.2,
-    responseMimeType: "application/json"
-  },
-  contents: [
-    {
-      parts: [{ text: prompt }]
-    }
-  ]
-})
-      }
-    );
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        "HTTP-Referer": "https://legal-aid-d4cg.vercel.app",
+        "X-Title": "Юридична допомога"
+      },
+      body: JSON.stringify({
+        model: "openrouter/auto",
+        messages: [
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        temperature: 0.2,
+        response_format: { type: "json_object" }
+      })
+    });
 
     const data = await response.json();
 
     if (!response.ok) {
       return res.status(response.status).json({
-        error: data?.error?.message || "Gemini API error",
-        details: data
+        error: data?.error?.message || "OpenRouter API error"
       });
     }
 
-    const parts = data.candidates?.[0]?.content?.parts || [];
-    const text = parts.map(p => p.text || "").join("").trim();
+    const text = data?.choices?.[0]?.message?.content?.trim();
 
     if (!text) {
       return res.status(500).json({
-        error: "Gemini returned empty text",
+        error: "OpenRouter returned empty text",
         raw: data
       });
     }
 
-    const cleaned = text
-      .replace(/^```json\s*/i, "")
-      .replace(/^```\s*/i, "")
-      .replace(/\s*```$/i, "")
-      .trim();
-
     let parsed;
     try {
-      parsed = JSON.parse(cleaned);
+      parsed = JSON.parse(text);
     } catch {
       return res.status(500).json({
-        error: "Gemini returned invalid JSON",
+        error: "OpenRouter returned invalid JSON",
         raw: text
       });
     }
 
-let results = Array.isArray(parsed.results) ? parsed.results : [];
+    let results = Array.isArray(parsed.results) ? parsed.results : [];
 
-results = results
-  .filter(item => typeof item.index === "number")
-  .filter(item => typeof item.score === "number")
-  .filter(item => item.score >= 45)
-  .sort((a, b) => b.score - a.score)
-  .slice(0, 10);
+    results = results
+      .filter(item => typeof item.index === "number")
+      .filter(item => typeof item.score === "number")
+      .filter(item => item.score >= 45)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 10);
 
-return res.status(200).json({ results });
+    return res.status(200).json({ results });
   } catch (err) {
     return res.status(500).json({
       error: err.message || "Server error"
