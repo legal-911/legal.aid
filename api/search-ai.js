@@ -1,112 +1,178 @@
-export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
+async function renderArticles() {
+  articlesDiv.innerHTML = "";
+  const query = searchInput.value.trim().toLowerCase();
 
-  try {
-    const { query, candidates } = req.body;
+  // ===== ГОЛОВНА СТОРІНКА =====
+  if (currentSection === null) {
+    if (!query) {
+      lawSections.forEach(section => {
+        const div = document.createElement("div");
+        div.className = "section-header";
 
-    if (!query || !Array.isArray(candidates) || candidates.length === 0) {
-      return res.status(400).json({ error: "No query or candidates" });
+        div.innerHTML = `
+          <h2>${escapeHtml(section)}</h2>
+          <p>Перейти до статей розділу</p>
+        `;
+
+        const openBtn = document.createElement("button");
+        openBtn.textContent = "Відкрити";
+        openBtn.onclick = () => {
+          currentSection = section;
+          renderArticles();
+        };
+
+        div.appendChild(openBtn);
+        articlesDiv.appendChild(div);
+      });
+      return;
     }
 
-    const compactCandidates = candidates.map(item => ({
-      index: item.originalIndex,
-      law: item.law || "",
-      section: item.section || "",
-      short: item.short || "",
-      details: (item.details || "").slice(0, 1800)
+    articlesDiv.innerHTML = `
+      <div class="section-header">
+        <h2>Пошук...</h2>
+        <p>Шукаю по всіх законах</p>
+      </div>
+    `;
+
+    const prefilteredArticles = articles.map((a, index) => ({
+      ...a,
+      originalIndex: index
     }));
 
-    const prompt = `
-Ти допомагаєш юридичному сайту України знаходити найбільш релевантні статті закону.
+    const filteredGlobalArticles = await rankArticlesWithAI(query, prefilteredArticles);
 
-Користувач описав ситуацію простою мовою:
-"${query}"
+    articlesDiv.innerHTML = "";
 
-Нижче список кандидатів. Потрібно вибрати найбільш схожі статті саме за змістом ситуації, а не лише за окремими словами.
-
-Правила:
-- враховуй сенс ситуації
-- віддавай перевагу конкретним статтям, а не занадто загальним
-- можна вибрати від 1 до 10 найкращих результатів
-- якщо стаття слабко підходить, краще не включати її
-- поверни тільки JSON без пояснень поза JSON
-
-Формат відповіді:
-{
-  "results": [
-    { "index": 12, "score": 95, "reason": "коротка причина" },
-    { "index": 7, "score": 88, "reason": "коротка причина" }
-  ]
-}
-
-Кандидати:
-${JSON.stringify(compactCandidates, null, 2)}
-`;
-
-    const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": process.env.GEMINI_API_KEY
-        },
-body: JSON.stringify({
-  generationConfig: {
-    temperature: 0.2,
-    responseMimeType: "application/json"
-  },
-  contents: [
-    {
-      parts: [{ text: prompt }]
+    if (filteredGlobalArticles.length === 0) {
+      articlesDiv.innerHTML = `
+        <div class="section-header">
+          <h2>Нічого не знайдено</h2>
+          <p>Спробуйте інше ключове слово</p>
+        </div>
+      `;
+      return;
     }
-  ]
-})
+
+    filteredGlobalArticles.forEach((a) => {
+      const index = a.originalIndex;
+      const div = document.createElement("div");
+      div.className = "article";
+
+      div.innerHTML = `
+        <h2>${escapeHtml(a.law)}</h2>
+        <p><b>${escapeHtml(a.section || "Без назви закону")}</b></p>
+        <p>${escapeHtml(a.short || "")}</p>
+      `;
+
+      const detailsDiv = document.createElement("div");
+      detailsDiv.className = "details";
+
+      detailsDiv.innerHTML = `
+        <div style="line-height:1.6;">
+          ${formatText(a.details)}
+          ${a.link ? `<a href="${a.link}" target="_blank" style="display:block; margin-top:10px; color:#004080;">Посилання</a>` : ""}
+        </div>
+      `;
+
+      div.appendChild(detailsDiv);
+
+      const moreBtn = document.createElement("button");
+      moreBtn.textContent = "Докладніше";
+      moreBtn.onclick = () => {
+        detailsDiv.style.display = detailsDiv.style.display === "block" ? "none" : "block";
+      };
+      div.appendChild(moreBtn);
+
+      const openLawBtn = document.createElement("button");
+      openLawBtn.textContent = "Відкрити закон";
+      openLawBtn.onclick = () => {
+        currentSection = a.section;
+        renderArticles();
+      };
+      div.appendChild(openLawBtn);
+
+      if (isAdmin) {
+        const editBtn = document.createElement("button");
+        editBtn.textContent = "Редагувати";
+        editBtn.onclick = () => openEditModal(index);
+
+        const delBtn = document.createElement("button");
+        delBtn.textContent = "Видалити";
+        delBtn.onclick = () => openDeleteModal(index);
+
+        div.appendChild(editBtn);
+        div.appendChild(delBtn);
       }
-    );
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      return res.status(response.status).json({
-        error: data?.error?.message || "Gemini API error",
-        details: data
-      });
-    }
-
-    const parts = data.candidates?.[0]?.content?.parts || [];
-    const text = parts.map(p => p.text || "").join("").trim();
-
-    if (!text) {
-      return res.status(500).json({
-        error: "Gemini returned empty text",
-        raw: data
-      });
-    }
-
-    const cleaned = text
-      .replace(/^```json\s*/i, "")
-      .replace(/^```\s*/i, "")
-      .replace(/\s*```$/i, "")
-      .trim();
-
-    let parsed;
-    try {
-      parsed = JSON.parse(cleaned);
-    } catch {
-      return res.status(500).json({
-        error: "Gemini returned invalid JSON",
-        raw: text
-      });
-    }
-
-    const results = Array.isArray(parsed.results) ? parsed.results : [];
-    return res.status(200).json({ results });
-  } catch (err) {
-    return res.status(500).json({
-      error: err.message || "Server error"
+      articlesDiv.appendChild(div);
     });
+
+    return;
   }
+
+  // ===== СТОРІНКА КОНКРЕТНОГО ЗАКОНУ =====
+  const backDiv = document.createElement("div");
+  backDiv.className = "section-header";
+  backDiv.innerHTML = `<h2>${escapeHtml(currentSection)}</h2><p>Список статей розділу</p>`;
+
+  const backBtn = document.createElement("button");
+  backBtn.textContent = "Назад до розділів";
+  backBtn.onclick = () => {
+    currentSection = null;
+    renderArticles();
+  };
+
+  backDiv.appendChild(backBtn);
+  articlesDiv.appendChild(backDiv);
+
+  let filteredArticles = articles
+    .map((a, index) => ({ ...a, originalIndex: index }))
+    .filter(a => a.section === currentSection);
+
+  if (query) {
+    filteredArticles = fallbackRankArticles(query, filteredArticles);
+  } else {
+    filteredArticles = filteredArticles.sort((a, b) => getArticleNumber(a.law) - getArticleNumber(b.law));
+  }
+
+  filteredArticles.forEach((a) => {
+    const index = a.originalIndex;
+    const div = document.createElement("div");
+    div.className = "article";
+
+    div.innerHTML = `<h2>${escapeHtml(a.law)}</h2><p>${escapeHtml(a.short || "")}</p>`;
+
+    const detailsDiv = document.createElement("div");
+    detailsDiv.className = "details";
+    detailsDiv.innerHTML = `
+      <div style="line-height:1.6; white-space:pre-line;">
+        ${formatText(a.details)}
+        ${a.link ? `<a href="${a.link}" target="_blank" style="display:block; margin-top:10px; color:#004080; font-weight:500;">Посилання на статтю</a>` : ""}
+      </div>
+    `;
+
+    div.appendChild(detailsDiv);
+
+    const moreBtn = document.createElement("button");
+    moreBtn.textContent = "Докладніше";
+    moreBtn.onclick = () => {
+      detailsDiv.style.display = detailsDiv.style.display === "block" ? "none" : "block";
+    };
+    div.appendChild(moreBtn);
+
+    if (isAdmin) {
+      const editBtn = document.createElement("button");
+      editBtn.textContent = "Редагувати";
+      editBtn.onclick = () => openEditModal(index);
+
+      const delBtn = document.createElement("button");
+      delBtn.textContent = "Видалити";
+      delBtn.onclick = () => openDeleteModal(index);
+
+      div.appendChild(editBtn);
+      div.appendChild(delBtn);
+    }
+
+    articlesDiv.appendChild(div);
+  });
 }
