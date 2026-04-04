@@ -1,3 +1,617 @@
+  <!DOCTYPE html>
+  <html lang="uk">
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Юридична допомога</title>
+
+  <!-- Красивий шрифт Roboto -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+  body { 
+    margin:0; 
+    font-family: 'Roboto', Arial, sans-serif; 
+    background:#f5f5f5; 
+    display:flex; 
+    flex-direction:column; 
+    min-height:100vh;
+  }
+
+  header { 
+    background:#004080; 
+    color:white; 
+    padding:10px 20px; 
+    position:sticky; 
+    top:0; 
+    z-index:1000; 
+    display:flex; 
+    justify-content:space-between; 
+    align-items:center;   
+    font-weight:500;
+  }
+  header h1 { 
+    margin:0; 
+    font-size:22px; 
+    font-weight:700;
+  }
+  .menu { font-size:24px; cursor:pointer; }
+  .search-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+  }
+
+  .search-btn {
+    background: white;
+    border: none;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #searchInput {
+    width: 0;
+    opacity: 0;
+    padding: 8px 0;
+    border: none;
+    border-radius: 20px;
+    outline: none;
+    transition: all 0.3s ease;
+    font-family: 'Roboto', sans-serif;
+  }
+
+  .search-box.active #searchInput {
+    width: 260px;
+    opacity: 1;
+    padding: 8px 12px;
+  }
+
+  @media (max-width: 700px) {
+    header {
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .search-box.active #searchInput {
+      width: 180px;
+    }
+
+    header h1 {
+      font-size: 18px;
+    }
+  }
+
+  nav {
+    display: none;
+    position: fixed; /* ← вот главное изменение */
+    top: 50px;
+    left: 0;
+    width: 220px;
+    height: calc(100% - 60px);
+    background: #003366;
+    padding: 10px;
+    z-index: 2000;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+  }
+  nav button { 
+    display:block; width:100%; margin-bottom:5px; padding:10px; color:white; background:#0055a0; 
+    border:none; cursor:pointer; border-radius:4px; text-align:center; font-family: 'Roboto', sans-serif; font-weight:500;
+  }
+
+  .articles { padding:20px; max-width:900px; margin:auto; flex:1;}
+  .article { background:white; padding:15px; margin-bottom:15px; border-radius:5px; box-shadow:0 1px 3px rgba(0,0,0,0.2); position:relative; }
+  .article h2 { font-weight:700; margin-bottom:5px; font-size:18px; }
+  .article p { margin:0 0 10px 0; font-weight:400; font-size:14px; }
+  .article button { padding:5px 8px; font-size:12px; margin-right:5px; cursor:pointer; min-width:70px; border-radius:4px; font-family: 'Roboto', sans-serif; font-weight:500; }
+
+  .details { display:none; background:#eef; padding:10px; border-radius:5px; margin-top:10px; font-size:14px; line-height:1.5; }
+
+  .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:2000; transition:all 0.3s ease; }
+  .modal-content { background:white; padding:20px; border-radius:6px; width:350px; max-width:90%; position:relative; transform:translateX(-100%); transition:transform 0.4s ease; display:flex; flex-direction:column; font-family: 'Roboto', sans-serif;}
+  .modal.show .modal-content { transform:translateX(0); }
+  .modal input, .modal textarea, .modal button { margin-bottom:10px; font-family: 'Roboto', sans-serif;}
+  .modal input, .modal textarea { display:block; width:100%; padding:8px; border-radius:4px; border:1px solid #ccc; font-size:14px; }
+  .modal button { padding:10px; background:#004080; color:white; border:none; cursor:pointer; border-radius:4px; width:100%; font-weight:500; }
+  .modal .close { position:absolute; top:5px; right:10px; font-size:18px; cursor:pointer; color:#333; }
+  .modal select {
+    display:block;
+    width:100%;
+    padding:8px;
+    border-radius:4px;
+    border:1px solid #ccc;
+    font-size:14px;
+    margin-bottom:10px;
+    font-family:'Roboto', sans-serif;
+  }
+  .section-header{
+    background: linear-gradient(135deg, #004080, #0a5bb5);
+    color: white;
+    padding: 22px;
+    margin-bottom: 18px;
+    border-radius: 10px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+  }
+
+  .section-header h2{
+    margin: 0 0 8px 0;
+    font-size: 26px;
+    font-weight: 700;
+  }
+
+  .section-header p{
+    margin: 0 0 14px 0;
+    font-size: 15px;
+    opacity: 0.95;
+  }
+
+  .section-header button{
+    background: white;
+    color: #004080;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  footer { 
+    text-align:center; 
+    padding:15px 0; 
+    background:#004080; 
+    color:white; 
+    font-family: 'Roboto', sans-serif; 
+    font-weight:500;
+    line-height:1.5;
+  }
+
+  .modal input, .modal textarea, .modal button {
+    margin-bottom: 10px;
+    font-family: 'Roboto', sans-serif;
+  }
+
+  #bulkImportText {
+    min-height: 260px;
+    resize: vertical;
+    line-height: 1.5;
+  }
+
+  </style>
+  </head>
+  <body>
+
+  <header>
+    <div class="menu">&#9776;</div>
+    <h1>Юридична допомога</h1>
+
+    <div class="search-box">
+      <button id="searchToggle" class="search-btn">&#128269;</button>
+      <input type="text" id="searchInput" placeholder="Опишіть ситуацію...">
+    </div>
+  </header>
+
+  <nav id="navMenu">
+    <button id="loginBtn">Увійти</button>
+  <button id="logoutBtn" style="display:none;">Вийти</button>
+  <button id="maintenanceOnBtn" style="display:none;">Увімкнути технічні роботи</button>
+  <button id="maintenanceOffBtn" style="display:none;">Вимкнути технічні роботи</button>
+  </nav>
+
+  <div class="articles" id="articles"></div>
+  <div id="maintenanceScreen" style="display:none; padding:40px; text-align:center;">
+    <h2>Сайт тимчасово недоступний</h2>
+    <p>⚠Проводяться технічні роботи. Спробуйте пізніше⚠</p>
+  </div>
+
+  <!-- Модальні вікна -->
+  <div class="modal" id="loginModal">
+    <div class="modal-content">
+      <span class="close" id="closeLogin">&times;</span>
+      <h2>Вхід</h2>
+      <input type="text" id="loginField" placeholder="Логін">
+      <input type="password" id="passwordField" placeholder="Пароль">
+      <button id="submitLogin">Увійти</button>
+    </div>
+  </div>
+
+  <div class="modal" id="editModal">
+    <div class="modal-content">
+      <span class="close" id="closeEdit">&times;</span>
+      <h2 id="editTitle">Додати/Редагувати статтю</h2>
+      <input type="text" id="articleLaw" placeholder="Стаття / Закон">
+      <select id="articleSection">
+    <option value="Закон України «Про Національну поліцію»">Закон України «Про Національну поліцію»</option>
+    <option value="Кримінальний процесуальний кодекс України">Кримінальний процесуальний кодекс України</option>
+    <option value="Кримінальний кодекс України">Кримінальний кодекс України</option>
+    <option value="Цивільний кодекс України">Цивільний кодекс України</option>
+    <option value="Кодекс України про адміністративні правопорушення">Кодекс України про адміністративні правопорушення</option>
+    <option value="Конституція України">Конституція України</option>
+    <option value="Цивільний процесуальний кодекс України">Цивільний процесуальний кодекс України</option>
+    <option value="Господарський процесуальний кодекс України">Господарський процесуальний кодекс України</option>
+    <option value="Кодекс адміністративного судочинства України">Кодекс адміністративного судочинства України</option>
+    <option value="Кодекс законів про працю України">Кодекс законів про працю України</option>
+    <option value="Сімейний кодекс України">Сімейний кодекс України</option>
+    <option value="Земельний кодекс України">Земельний кодекс України</option>
+    <option value="Закон України «Про захист прав споживачів»">Закон України «Про захист прав споживачів»</option>
+    <option value="Закон України «Про звернення громадян»">Закон України «Про звернення громадян»</option>
+    <option value="Закон України «Про адвокатуру та адвокатську діяльність»">Закон України «Про адвокатуру та адвокатську діяльність»</option>
+    <option value="Закон України «Про судоустрій і статус суддів»">Закон України «Про судоустрій і статус суддів»</option>
+  </select>
+      <input type="text" id="articleShort" placeholder="Малий опис">
+      <textarea id="articleDetails" placeholder="Додаткова інформація" rows="5"></textarea>
+      <input type="text" id="articleLink" placeholder="Посилання (https://...)">
+      <button id="saveArticle">Зберегти</button>
+    </div>
+  </div>
+
+  <div class="modal" id="deleteModal">
+    <div class="modal-content">
+      <span class="close" id="closeDelete">&times;</span>
+      <h2>Видалити статтю?</h2>
+      <button id="confirmDelete">Підтвердити</button>
+      <button id="cancelDelete">Відміна</button>
+    </div>
+  </div>
+
+<div class="modal" id="bulkImportModal">
+  <div class="modal-content">
+    <span class="close" id="closeBulkImport">&times;</span>
+    <h2>Масове додавання статей</h2>
+
+    <p style="font-size:14px; margin-bottom:10px;">
+      Вставте одразу багато статей у форматі:
+      <br><b>Стаття 1. Назва</b>
+      <br>Текст статті...
+    </p>
+
+    <textarea id="bulkImportText" rows="12" placeholder="Вставте текст закону тут..."></textarea>
+
+    <input type="text" id="bulkImportLink" placeholder="Посилання на закон (https://...)">
+
+    <button id="startBulkImport">Імпортувати статті</button>
+  </div>
+</div>
+
+  <div style="flex:1"></div>
+
+  <div id="toast" style="
+    display:none;
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    padding:14px 18px;
+    border-radius:12px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.25);
+    z-index:9999;
+    font-family:'Roboto', Arial, sans-serif;
+    max-width:320px;
+    opacity:0;
+    transform:translateY(15px) scale(0.95);
+    transition:all 0.3s ease;
+    color:white;
+    font-size:14px;
+  "></div>
+
+  <footer>
+    Інформація від "Офіційний вебпортал парламенту України"<br>©2026
+  </footer>
+
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyC1eGjYHzLhZOMp-FTw19lWb0FehZa_dg",
+    authDomain: "legal-and-aid.firebaseapp.com",
+    projectId: "legal-and-aid",
+    storageBucket: "legal-and-aid.firebasestorage.app",
+    messagingSenderId: "665556934402",
+    appId: "1:665556934402:web:2a862e1688be429b852c1b",
+    measurementId: "G-G3YPZN159E"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  let isAdmin = localStorage.getItem('isAdmin') === 'true';
+  const menu = document.querySelector('.menu');
+  const nav = document.getElementById('navMenu');
+  const loginBtn = document.getElementById('loginBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const loginModal = document.getElementById('loginModal');
+  const closeLogin = document.getElementById('closeLogin');
+  const submitLogin = document.getElementById('submitLogin');
+  const editModal = document.getElementById('editModal');
+  const closeEdit = document.getElementById('closeEdit');
+  const saveArticle = document.getElementById('saveArticle');
+
+  closeEdit.addEventListener('click', () => {
+    editModal.style.display = 'none';
+    editModal.classList.remove('show');
+  });
+
+  const articleLaw = document.getElementById('articleLaw');
+  const articleShort = document.getElementById('articleShort');
+  const articleDetails = document.getElementById('articleDetails');
+  const articleLink = document.getElementById('articleLink');
+
+  const deleteModal = document.getElementById('deleteModal');
+  const bulkImportModal = document.getElementById('bulkImportModal');
+  const closeBulkImport = document.getElementById('closeBulkImport');
+  const startBulkImport = document.getElementById('startBulkImport');
+  const bulkImportText = document.getElementById('bulkImportText');
+  const closeDelete = document.getElementById('closeDelete');
+  const confirmDelete = document.getElementById('confirmDelete');
+  const cancelDelete = document.getElementById('cancelDelete');
+
+  const searchInput = document.getElementById('searchInput');
+  const articlesDiv = document.getElementById('articles');
+
+  const maintenanceOnBtn = document.getElementById('maintenanceOnBtn');
+  const maintenanceOffBtn = document.getElementById('maintenanceOffBtn');
+  const maintenanceScreen = document.getElementById('maintenanceScreen');
+
+  const searchToggle = document.getElementById('searchToggle');
+  const searchBox = document.querySelector('.search-box');
+
+  const toast = document.getElementById('toast');
+
+  const bulkImportLink = document.getElementById('bulkImportLink');
+
+  const lawSections = [
+    "Закон України «Про Національну поліцію»",
+    "Кримінальний процесуальний кодекс України",
+    "Кримінальний кодекс України",
+    "Цивільний кодекс України",
+    "Кодекс України про адміністративні правопорушення",
+    "Конституція України",
+    "Цивільний процесуальний кодекс України",
+    "Господарський процесуальний кодекс України",
+    "Кодекс адміністративного судочинства України",
+    "Кодекс законів про працю України",
+    "Сімейний кодекс України",
+    "Земельний кодекс України",
+    "Закон України «Про захист прав споживачів»",
+    "Закон України «Про звернення громадян»",
+    "Закон України «Про адвокатуру та адвокатську діяльність»",
+    "Закон України «Про судоустрій і статус суддів»"
+  ];
+
+  let currentSection = null;
+
+let aiSearchTimer = null;
+
+  let articles = [
+    {section:"Закон про державну службу", law: "Мова спілкування державного службовця – українська", short:"Це передбачає Закон про державну службу Стаття 2", details:"Витяг з статті: державна мова є українська мова, якій Конституцією України надано статус мови офіційного спілкування посадових осіб державних органів та органів місцевого самоврядування під час виконання посадових обов'язків, а також мови діловодства і документації цих органів та посадових осіб.", link:""},
+    {section:"Закон України «Про Національну поліцію»", law:"Працівник поліції є державним службовцем", short:"Згідно з Закону про державну службу та Закону про поліцію", details:"Стаття 2 Закону про державну службу поширюється на працівників поліції.", link:""},
+    {section:"Конституція України", law:"Право на свободу особистої думки", short:"Це передбачає Стаття 34 Конституції України", details:"Кожному гарантується право на свободу думки і слова, на вільне вираження своїх поглядів і переконань", link:""},
+    {section:"Конституція України", law:"Право мовчати", short:"Ви маєте право відмовитися давати свідчення", details:"Витяг з статті: Особа не несе відповІдальностІ за вІдмову давати показання щодо себе, членIв сIм'Ї чи близьких родичIв.\nПоправка: ВІдмова свIдчити можлива, коли йде обвинувачення вас, членIв сIм'Ї або ваших близьких родичIв.", link:""},
+    {section:"Закон України «Про НацІональну полIцIю»", law:"Пред’явлення документIв та ідентифІкацIя полIцейського", short:"Це передбачає Стаття 18 Закону про НацІональну полIцIю", details:"Витяг з статтI: полIцейський повинен назвати своє прІзвище, посаду, спецIальне звання та пред’явити службове посвIdчення.\nПоправка: ПолIцейський зобов'язаний мати нагрудний знак (жетон) і не може його приховувати.", link:""},
+    {section:"Закон України «Про НацІональну полIcIю»", law:"ПІdстави для перевІрки документIв", short:"Регулює Стаття 32 Закону про НацІональну полIcIю", details:"ПолIcейський має право вимагати пред’явлення документIв, якщо є пІdстави вважати, що особа вчинила або має намІр вчинити правопорушеннЯ.\nПоправка: ПолIcейський не може перевІряти документи без причини.", link:""},
+    {section:"Кодекс УкраЇни про адмІnISTRATивнИ правопорушеннЯ", law:"ДрĪbне хулĪганство", short:"Стаття 173 КУpАП", details:"Витяг з статтī: ДрĪbне хулĪганство тягне за собою накладення штрафу, громадські роботи або вiправні роботи, або адмΙnISTRATивний арешт.", link:""}
+  ];
+
+  let editIndex = null;
+  let deleteIndex = null;
+
+  async function seedArticlesIfEmpty(){
+    const querySnapshot = await getDocs(collection(db, "Юридична допомога"));
+    if (querySnapshot.empty) {
+      for (const article of articles) {
+        await addDoc(collection(db, "Юридична допомога"), {
+          section: article.section || "",
+          law: article.law,
+          short: article.short,
+          details: article.details,
+          link: article.link || ""
+        });
+      }
+    }
+  }
+
+  async function addArticleToDB(section, law, short, details, link){
+    await addDoc(collection(db, "Юридична допомога"), {
+      section,
+      law,
+      short,
+      details,
+      link
+    });
+    await loadArticles();
+  }
+
+startBulkImport.addEventListener('click', async () => {
+  const rawText = bulkImportText.value.trim();
+  const lawLink = bulkImportLink.value.trim();
+
+  if (!currentSection) {
+    showToast('Розділ не вибрано', 'error');
+    return;
+  }
+
+  if (!rawText) {
+    showToast('Вставте текст зі статтями', 'error');
+    return;
+  }
+
+  const rawArticles = splitArticlesFromRawText(rawText);
+
+  if (rawArticles.length === 0) {
+    showToast('Не знайдено жодної статті', 'error');
+    return;
+  }
+
+  try {
+    startBulkImport.disabled = true;
+    startBulkImport.textContent = 'Імпорт...';
+
+const generatedItems = [];
+
+for (const item of rawArticles) {
+  const articleBody = item.rawText
+    .replace(/\{[^}]*\}/g, '')
+    .replace(/\r/g, '')
+    .trim();
+
+  const firstLineEnd = articleBody.indexOf('\n');
+  let cleanBody = '';
+
+  if (firstLineEnd !== -1) {
+    cleanBody = articleBody.slice(firstLineEnd + 1).trim();
+  }
+
+  generatedItems.push({
+    section: currentSection,
+    law: `Стаття ${item.articleNumber}`,
+    short: item.articleTitle || `Стаття ${item.articleNumber}`,
+    details: `*${item.articleTitle || `Стаття ${item.articleNumber}`}*\n\n${cleanBody}`,
+    link: lawLink || ''
+  });
+}
+
+await addManyArticlesToDB(generatedItems);
+
+bulkImportModal.style.display = 'none';
+bulkImportModal.classList.remove('show');
+
+bulkImportText.value = '';
+bulkImportLink.value = '';
+
+showToast(`Додано ${generatedItems.length} статей`, 'success');
+  } catch (error) {
+    console.error(error);
+    showToast('Помилка імпорту', 'error');
+  } finally {
+    startBulkImport.disabled = false;
+    startBulkImport.textContent = 'Імпортувати статті';
+  }
+});
+
+  async function updateArticleInDB(id, section, law, short, details, link){
+    await updateDoc(doc(db, "Юридична допомога", id), {
+      section,
+      law,
+      short,
+      details,
+      link
+    });
+    await loadArticles();
+  }
+
+  async function deleteArticleFromDB(id){
+    await deleteDoc(doc(db, "Юридична допомога", id));
+    await loadArticles();
+  }
+
+  async function setMaintenanceMode(value){
+    await setDoc(doc(db, "siteSettings", "main"), {
+      maintenance: value
+    }, { merge: true });
+
+    await checkMaintenanceMode();
+  }
+
+  async function checkMaintenanceMode(){
+    const settingsRef = doc(db, "siteSettings", "main");
+    const settingsSnap = await getDoc(settingsRef);
+
+    let maintenance = false;
+
+    if(settingsSnap.exists()){
+      maintenance = settingsSnap.data().maintenance === true;
+    }
+
+    if(maintenance && !isAdmin){
+      articlesDiv.style.display = 'none';
+      maintenanceScreen.style.display = 'block';
+    } else {
+      articlesDiv.style.display = 'block';
+      maintenanceScreen.style.display = 'none';
+    }
+  }
+
+  // Меню
+  menu.addEventListener('click', () => nav.style.display = nav.style.display === 'block'? 'none':'block');
+
+  searchToggle.addEventListener('click', () => {
+    searchBox.classList.toggle('active');
+
+    if (searchBox.classList.contains('active')) {
+      searchInput.focus();
+    } else {
+      searchInput.value = '';
+      renderArticles();
+    }
+  });
+
+  maintenanceOnBtn.addEventListener('click', async () => {
+    await setMaintenanceMode(true);
+    showToast('Технічні роботи увімкнено', 'warning');
+  });
+
+  maintenanceOffBtn.addEventListener('click', async () => {
+    await setMaintenanceMode(false);
+    showToast('Технічні роботи вимкнено', 'success');
+  });
+
+  // Вхід
+  loginBtn.addEventListener('click', () => { loginModal.style.display='flex'; loginModal.classList.add('show'); });
+  closeLogin.addEventListener('click', () => { loginModal.style.display='none'; loginModal.classList.remove('show'); });
+
+  submitLogin.addEventListener('click', async () => {
+    const login = document.getElementById('loginField').value.trim();
+    const password = document.getElementById('passwordField').value.trim();
+
+    try {
+      const adminRef = doc(db, "siteSettings", "admin");
+      const adminSnap = await getDoc(adminRef);
+
+      if (adminSnap.exists()) {
+        const adminData = adminSnap.data();
+
+        if (login === adminData.login && password === adminData.password) {
+          isAdmin = true;
+          localStorage.setItem('isAdmin', 'true');
+          loginModal.style.display = 'none';
+          loginModal.classList.remove('show');
+          updateAdminUI();
+          showToast('Вхід виконано', 'success');
+        } else {
+          showToast('Невірний логін або пароль', 'error');
+        }
+      } else {
+        showToast('Документ admin не знайдено', 'error');
+      }
+    } catch (error) {
+      console.error(error);
+      showToast('Помилка входу', 'error');
+    }
+  });
+
+  logoutBtn.addEventListener('click', async ()=>{
+    isAdmin = false;
+    localStorage.removeItem('isAdmin');
+    updateAdminUI();
+    await checkMaintenanceMode();
+  });
+
+function formatText(text) {
+  if (!text) return "";
+
+  return escapeHtml(text)
+    .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")
+    .replace(/\*(.*?)\*/g, "<i>$1</i>")
+    .replace(/__(.*?)__/g, "<u>$1</u>")
+    .replace(/~~(.*?)~~/g, "<s>$1</s>")
+    .replace(/\n/g, "<br>");
+}
+
 async function renderArticles() {
   articlesDiv.innerHTML = "";
   const query = searchInput.value.trim().toLowerCase();
@@ -176,3 +790,493 @@ async function renderArticles() {
     articlesDiv.appendChild(div);
   });
 }
+
+  function openEditModal(index){
+    editIndex=index;
+    const articleSection = document.getElementById('articleSection');
+
+    if(index!==null){
+      articleSection.value = articles[index].section || lawSections[0];
+      articleLaw.value=articles[index].law;
+      articleShort.value=articles[index].short;
+      articleDetails.value=articles[index].details;
+      articleLink.value = articles[index].link || '';
+    }else{
+      articleSection.value = currentSection || lawSections[0];
+      articleLaw.value='';
+      articleShort.value='';
+      articleDetails.value='';
+      articleLink.value = '';
+    }
+
+    editModal.style.display='flex';
+    editModal.classList.add('show');
+  }
+
+  function updateAdminUI(){
+    if(isAdmin){
+      loginBtn.style.display = 'none';
+      logoutBtn.style.display = 'block';
+      maintenanceOnBtn.style.display = 'block';
+      maintenanceOffBtn.style.display = 'block';
+      showAddButton();
+    } else {
+      loginBtn.style.display = 'block';
+      logoutBtn.style.display = 'none';
+      maintenanceOnBtn.style.display = 'none';
+      maintenanceOffBtn.style.display = 'none';
+      document.getElementById('addBtn')?.remove();
+    }
+
+    renderArticles();
+  }
+
+  function showToast(message, type = 'info'){
+    const colors = {
+      success: '#22c55e',
+      error: '#ef4444',
+      info: '#3b82f6',
+      warning: '#f59e0b'
+    };
+
+    const icons = {
+      success: '✔',
+      error: '✖',
+      info: 'ℹ',
+      warning: '⚠'
+    };
+
+    toast.innerHTML = `
+      <span style="margin-right:8px;">${icons[type]}</span>
+      <span>${message}</span>
+    `;
+
+    toast.style.background = colors[type] || colors.info;
+    toast.style.display = 'flex';
+    toast.style.alignItems = 'center';
+
+    requestAnimationFrame(() => {
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateY(0)';
+    });
+
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(15px)';
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 300);
+    }, 2500);
+  }
+
+  saveArticle.addEventListener('click', async ()=>{
+    const section = document.getElementById('articleSection').value;
+    const law = articleLaw.value.trim();
+    const short = articleShort.value.trim();
+    const details = articleDetails.value.trim();
+    const link = articleLink.value.trim();
+
+    if(section && law && short){
+      if(editIndex !== null){
+        if(articles[editIndex].id){
+          await updateArticleInDB(articles[editIndex].id, section, law, short, details, link);
+        } else {
+          articles[editIndex] = {section, law, short, details, link};
+          renderArticles();
+        }
+        showToast('Статтю змінено', 'info');
+      } else {
+        await addArticleToDB(section, law, short, details, link);
+        showToast('Статтю додано', 'success');
+      }
+
+      currentSection = section;
+      editModal.style.display = 'none';
+      editModal.classList.remove('show');
+    } else {
+      showToast('Заповніть потрібні поля', 'error');
+    }
+  });
+
+  function getArticleNumber(title){
+    const match = title.match(/Стаття\s*(\d+)/i);
+    return match ? parseInt(match[1], 10) : 999999;
+  }
+
+  function showAddButton(){
+    if(isAdmin && !document.getElementById('deleteAllBtn')){
+      const addBtn=document.createElement('button');
+      addBtn.id='addBtn';
+      addBtn.textContent='Додати статтю';
+      addBtn.style.margin='0px';
+      addBtn.onclick=()=> openEditModal(null);
+      nav.appendChild(addBtn);
+    }
+
+    if(!document.getElementById('bulkImportBtn')){
+      const bulkBtn = document.createElement('button');
+      bulkBtn.id = 'bulkImportBtn';
+      bulkBtn.textContent = 'Масово додати статті';
+      bulkBtn.style.margin = '5px 0 0 0';
+      bulkBtn.onclick = () => openBulkImportModal();
+      nav.appendChild(bulkBtn);
+    }
+  }
+
+  function openBulkImportModal(){
+    if(!currentSection){
+      showToast('Спочатку відкрий потрібний розділ', 'warning');
+      return;
+    }
+
+    bulkImportText.value = '';
+    bulkImportModal.style.display = 'flex';
+    bulkImportModal.classList.add('show');
+  }
+
+  closeBulkImport.addEventListener('click', () => {
+    bulkImportModal.style.display = 'none';
+    bulkImportModal.classList.remove('show');
+  });
+
+function normalizeSearchText(text) {
+  return (text || "")
+    .toLowerCase()
+    .replace(/[‘’‚‛'`"]/g, "")
+    .replace(/[іїёєґ]/g, ch => ({
+      "і": "и",
+      "ї": "и",
+      "ё": "е",
+      "є": "е",
+      "ґ": "г"
+    }[ch] || ch))
+    .replace(/i/g, "і")
+    .replace(/c/g, "с")
+    .replace(/o/g, "о")
+    .replace(/p/g, "р")
+    .replace(/a/g, "а")
+    .replace(/e/g, "е")
+    .replace(/x/g, "х")
+    .replace(/y/g, "у")
+    .replace(/k/g, "к")
+    .replace(/m/g, "м")
+    .replace(/t/g, "т")
+    .replace(/b/g, "в")
+    .replace(/h/g, "н")
+    .replace(/0/g, "о")
+    .replace(/3/g, "з")
+    .replace(/[^а-яa-z0-9\s]/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function getQueryTerms(query) {
+  const q = normalizeSearchText(query);
+  if (!q) return [];
+
+  const words = q.split(" ").filter(word => word.length >= 2);
+  return [q, ...words];
+}
+
+function escapeHtml(text) {
+  return (text || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+async function expandQueryWithAI(query) {
+  const cleanQuery = normalizeSearchText(query);
+  return cleanQuery ? [cleanQuery] : [];
+}
+
+function scoreArticle(article, terms) {
+  const law = normalizeSearchText(article.law);
+  const short = normalizeSearchText(article.short);
+  const details = normalizeSearchText(article.details);
+  const section = normalizeSearchText(article.section);
+
+  let score = 0;
+
+  for (const term of terms) {
+    if (!term) continue;
+
+    if (law.includes(term)) score += 8;
+    if (short.includes(term)) score += 6;
+    if (details.includes(term)) score += 4;
+    if (section.includes(term)) score += 3;
+
+    const words = term.split(" ").filter(Boolean);
+    for (const word of words) {
+      if (word.length < 3) continue;
+      if (law.includes(word)) score += 3;
+      if (short.includes(word)) score += 2;
+      if (details.includes(word)) score += 1;
+      if (section.includes(word)) score += 1;
+    }
+  }
+
+  return score;
+}
+
+function buildGlobalSearchResults(query, expandedTerms) {
+  const q = normalizeSearchText(query);
+
+  return articles
+    .map((a, index) => {
+      const law = normalizeSearchText(a.law);
+      const short = normalizeSearchText(a.short);
+      const details = normalizeSearchText(a.details);
+      const section = normalizeSearchText(a.section);
+
+      let relevanceScore = 0;
+
+      for (const term of expandedTerms) {
+        if (!term) continue;
+
+        if (law.includes(term)) relevanceScore += 8;
+        if (short.includes(term)) relevanceScore += 12;
+        if (details.includes(term)) relevanceScore += 7;
+        if (section.includes(term)) relevanceScore += 4;
+      }
+
+      if (short.includes(q)) relevanceScore += 30;
+      if (details.includes(q)) relevanceScore += 20;
+
+      return {
+        ...a,
+        originalIndex: index,
+        relevanceScore
+      };
+    })
+    .filter(a => a.relevanceScore > 0)
+    .sort((a, b) => b.relevanceScore - a.relevanceScore);
+}
+
+function splitArticlesFromRawText(text) {
+  text = text
+  .split('\n')
+  .filter(line => !/^Розділ\s+[IVXLCDM]+/i.test(line.trim()))
+  .join('\n');
+  text = text.replace(/\{[^}]*\}/g, '');
+  text = text.replace(/\r/g, '').trim();
+
+  const regex = /Стаття\s+(\d+)\.?\s*([^\n]*)/gi;
+  const matches = [...text.matchAll(regex)];
+  const result = [];
+
+  if (matches.length === 0) return result;
+
+  for (let i = 0; i < matches.length; i++) {
+    const start = matches[i].index;
+    const end = i + 1 < matches.length ? matches[i + 1].index : text.length;
+
+    const fullBlock = text.slice(start, end).trim();
+    const articleNumber = matches[i][1].trim();
+    const articleTitle = (matches[i][2] || '').trim();
+
+    result.push({
+      articleNumber,
+      articleTitle,
+      rawText: fullBlock
+    });
+  }
+
+  return result;
+}
+
+async function addManyArticlesToDB(articlesArray) {
+  try {
+    for (const article of articlesArray) {
+      await addDoc(collection(db, "Юридична допомога"), {
+        law: article.law,
+        short: article.short,
+        details: article.details,
+        section: article.section,
+        link: article.link || ""
+      });
+    }
+
+    await loadArticles();
+  } catch (error) {
+    console.error("Помилка додавання:", error);
+    throw error;
+  }
+}
+
+function fallbackRankArticles(query, candidates) {
+  const q = normalizeSearchText(query);
+  const terms = getQueryTerms(query);
+
+  const conceptMap = [
+    {
+      triggers: ["право на мовчання", "мовчати", "не свідчити", "не давати показання", "проти себе", "відмова давати показання"],
+      boosts: ["стаття 63", "не несе відповідальності за відмову давати показання", "щодо себе", "членів сімї", "близьких родичів"]
+    },
+    {
+      triggers: ["перевірка документів", "документи", "вимагають документи", "поліція перевіряє документи"],
+      boosts: ["стаття 32", "перевірка документів", "предявлення документів", "поліцейський має право вимагати"]
+    },
+    {
+      triggers: ["жетон", "посвідчення поліцейського", "предяви посвідчення", "назви своє прізвище"],
+      boosts: ["стаття 18", "службове посвідчення", "нагрудний знак", "поліцейський повинен назвати"]
+    },
+    {
+      triggers: ["обшук рюкзака", "огляд речей", "перевірка речей", "школа перевіряє рюкзак"],
+      boosts: ["особисте життя", "приватне життя", "огляд речей", "конфіденційна інформація", "стаття 32"]
+    }
+  ];
+
+  function scoreText(article) {
+    const law = normalizeSearchText(article.law);
+    const short = normalizeSearchText(article.short);
+    const details = normalizeSearchText(article.details);
+    const section = normalizeSearchText(article.section);
+    const whole = `${law} ${short} ${details} ${section}`;
+
+    let score = 0;
+
+    for (const term of terms) {
+      if (!term) continue;
+
+      if (law.includes(term)) score += 18;
+      if (short.includes(term)) score += 22;
+      if (details.includes(term)) score += 16;
+      if (section.includes(term)) score += 10;
+    }
+
+    const queryWords = q.split(" ").filter(w => w.length >= 3);
+    for (const word of queryWords) {
+      if (law.includes(word)) score += 8;
+      if (short.includes(word)) score += 12;
+      if (details.includes(word)) score += 7;
+      if (section.includes(word)) score += 4;
+    }
+
+    if (whole.includes(q)) score += 40;
+
+    if (q.includes("мовч") && whole.includes("свідч")) score += 45;
+    if (q.includes("мовч") && whole.includes("показан")) score += 40;
+    if (q.includes("себе") && whole.includes("проти себе")) score += 35;
+    if (q.includes("себе") && whole.includes("щодо себе")) score += 35;
+    if (q.includes("родич") && whole.includes("близьких родичів")) score += 25;
+
+    for (const group of conceptMap) {
+      const triggered = group.triggers.some(t => q.includes(normalizeSearchText(t)));
+      if (triggered) {
+        for (const boost of group.boosts) {
+          if (whole.includes(normalizeSearchText(boost))) {
+            score += 30;
+          }
+        }
+      }
+    }
+
+    if (q.includes("документ") && whole.includes("документ")) score += 25;
+    if (q.includes("поліц") && section.includes("національну поліцію")) score += 20;
+
+    return score;
+  }
+}
+
+async function rankArticlesWithAI(query, candidates) {
+  const fallbackRanked = fallbackRankArticles(query, candidates);
+  const fallbackMap = new Map(
+    fallbackRanked.map(item => [item.originalIndex, item.aiScore || 0])
+  );
+
+  try {
+    const response = await fetch('/api/search-ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, candidates })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !Array.isArray(data.results)) {
+      console.error("AI rank error:", data);
+      return fallbackRanked;
+    }
+
+    const aiMap = new Map();
+    for (const item of data.results) {
+      if (typeof item.index !== "number") continue;
+      aiMap.set(item.index, {
+        score: Number(item.score) || 0,
+        reason: item.reason || ""
+      });
+    }
+
+    const merged = candidates
+      .map(item => {
+        const ai = aiMap.get(item.originalIndex);
+        const fallbackScore = fallbackMap.get(item.originalIndex) || 0;
+        const aiScore = ai ? ai.score : 0;
+
+        return {
+          ...item,
+          aiScore: Math.max(aiScore, fallbackScore),
+          aiReason: ai?.reason || (fallbackScore > 0 ? "fallback" : "")
+        };
+      })
+      .filter(item => item.aiScore > 0)
+      .sort((a, b) => b.aiScore - a.aiScore);
+
+    return merged.length ? merged : fallbackRanked;
+  } catch (error) {
+    console.error("AI rank failed:", error);
+    return fallbackRanked;
+  }
+}
+
+  // Видалення
+  function openDeleteModal(index){ deleteIndex=index; deleteModal.style.display='flex'; deleteModal.classList.add('show'); }
+  closeDelete.addEventListener('click',()=>{deleteModal.style.display='none'; deleteModal.classList.remove('show');});
+  cancelDelete.addEventListener('click',()=>{deleteModal.style.display='none'; deleteModal.classList.remove('show');});
+  confirmDelete.addEventListener('click', async ()=>{
+    if(deleteIndex!==null){
+      if(articles[deleteIndex].id){
+        await deleteArticleFromDB(articles[deleteIndex].id);
+      } else {
+        articles.splice(deleteIndex,1);
+      renderArticles();
+      }
+
+      deleteModal.style.display='none';
+      deleteModal.classList.remove('show');
+      showToast('Статтю видалено', 'error');
+    }
+  });
+  async function loadArticles(){
+    const querySnapshot = await getDocs(collection(db, "Юридична допомога"));
+    const loaded = [];
+
+    querySnapshot.forEach((docItem)=>{
+      loaded.push({ id: docItem.id, ...docItem.data() });
+    });
+
+    if(loaded.length > 0){
+      articles = loaded;
+    }
+
+    renderArticles();
+    await checkMaintenanceMode();
+  }
+
+
+  // Ініціалізаці
+  async function initApp(){
+    updateAdminUI();
+    await seedArticlesIfEmpty();
+    await loadArticles();
+    await checkMaintenanceMode();
+
+  }
+
+  initApp();
+
+  </script>
+
+  </body> 
+  </html>
