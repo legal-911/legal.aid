@@ -384,7 +384,7 @@
   ];
 
   let currentSection = null;
-
+let savedScroll = 0;
 let aiSearchCache = new Map();
 let aiSearchTimer = null;
 
@@ -631,7 +631,8 @@ async function renderArticles() {
 
         const openBtn = document.createElement("button");
         openBtn.textContent = "Відкрити";
-       openBtn.onclick = () => {
+      openBtn.onclick = () => {
+  savedScroll = window.scrollY; // ← запам'ятали позицію
   currentSection = section;
   renderArticles();
   window.scrollTo(0, 0);
@@ -733,10 +734,13 @@ async function renderArticles() {
 
   const backBtn = document.createElement("button");
   backBtn.textContent = "Назад до розділів";
- backBtn.onclick = () => {
+backBtn.onclick = () => {
   currentSection = null;
   renderArticles();
-  window.scrollTo(0, 0);
+
+  setTimeout(() => {
+    window.scrollTo(0, savedScroll);
+  }, 50);
 };
 
   backDiv.appendChild(backBtn);
