@@ -88,36 +88,53 @@
       }
     }
 
-  nav {
-    display: none;
-    position: fixed;
-    top: 50px;
-    left: 0;
-    width: 220px;
-    height: calc(100% - 60px);
-    background: #003366;
-    padding: 10px;
-    z-index: 2000;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+nav {
+  display: none;
+  position: fixed;
+  top: 60px;
+  left: 0;
+  bottom: 0;
+  width: 220px;
+  background: #003366;
+  padding: 10px;
+  z-index: 5000;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.3);
 
-    flex-direction: column;
-    justify-content: space-between;
-  }
+  flex-direction: column;
+}
 
-  nav button {
-    display: block;
-    width: 100%;
-    margin-bottom: 5px;
-    padding: 10px;
-    color: white;
-    background: #0055a0;
-    border: none;
-    cursor: pointer;
-    border-radius: 4px;
-    text-align: center;
-    font-family: 'Roboto', sans-serif;
-    font-weight: 500;
-  }
+.menu-top {
+  flex: 0 0 auto;
+}
+
+.menu-middle {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  margin-top: 10px;
+}
+
+.menu-bottom {
+  flex: 0 0 auto;
+  margin-top: 10px;
+  background: #003366;
+  position: relative;
+  z-index: 5001;
+}
+
+nav button {
+  display: block;
+  width: 100%;
+  margin-bottom: 5px;
+  padding: 10px;
+  color: white;
+  background: #0055a0;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  text-align: center;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+}
 
   .menu-top {
     margin-bottom: 10px;
@@ -265,7 +282,7 @@
 
     <!-- 🔻 Низ -->
     <div class="menu-bottom">
-      <button id="feedbackBtn">Відгуки/Написати відгук</button>
+      <button id="feedbackBtn" type="button">Відгуки/Надіслати відгук</button>
       <button id="loginBtn">Увійти</button>
       <button id="logoutBtn" style="display:none;">Вийти</button>
     </div>
@@ -1615,6 +1632,11 @@ const openSendFeedbackModalBtn = document.getElementById('openSendFeedbackModalB
       runModalSearch();
     }
   });
+
+  feedbackBtn.onclick = async () => {
+  nav.style.display = 'none';
+  await openFeedbackListModal();
+};
 
   async function openFeedbackListModal() {
   feedbackListModal.style.display = 'flex';
