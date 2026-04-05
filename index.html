@@ -844,16 +844,16 @@ if (query) {
     filteredArticles = fallbackRankArticles(query, sectionCandidates);
   }
 } else {
-filteredArticles = filteredArticles.sort((a, b) => {
-  const aNum = getArticleNumber(a.law);
-  const bNum = getArticleNumber(b.law);
+  filteredArticles = filteredArticles.sort((a, b) => {
+    const aNum = getArticleNumber(a.law);
+    const bNum = getArticleNumber(b.law);
 
-  if (aNum.main !== bNum.main) {
-    return aNum.main - bNum.main;
-  }
+    if (aNum.main !== bNum.main) {
+      return aNum.main - bNum.main;
+    }
 
-  return aNum.sub - bNum.sub;
-});
+    return aNum.sub - bNum.sub;
+  });
 
   filteredArticles.forEach((a) => {
     const index = a.originalIndex;
@@ -897,7 +897,8 @@ filteredArticles = filteredArticles.sort((a, b) => {
   });
 }
 
-  function openEditModal(index){
+}
+function openEditModal(index){
     editIndex=index;
     const articleSection = document.getElementById('articleSection');
 
