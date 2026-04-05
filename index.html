@@ -24,24 +24,23 @@ html, body {
   padding-top: 64px;
 }
 
-    header { 
-  background:#004080; 
-  color:white; 
-  padding:10px 20px; 
+header {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 10000;
-  display:flex; 
-  justify-content:space-between; 
-  align-items:center;   
-  font-weight:500;
-  box-sizing: border-box;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transform: translateZ(0);
 }
-    header h1 {
-  text-align: center;
+
+header h1 {
+  font-weight: 500;
+  letter-spacing: 0.2px;
 }
+
     .menu { font-size:24px; cursor:pointer; }
     .search-box {
       display: flex;
