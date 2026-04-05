@@ -1262,8 +1262,8 @@ let currentReplyFeedbackId = null;
     bulkBtn.onclick = () => openBulkImportModal();
 
     const feedbackAdminBtn = document.createElement('button');
-    feedbackAdminBtn.textContent = 'Переглянути відгуки';
-    feedbackAdminBtn.onclick = () => openAdminFeedbackModal();
+feedbackAdminBtn.textContent = 'Переглянути відгуки';
+feedbackAdminBtn.onclick = () => openFeedbackListModal();
 
     const maintenanceOn = document.createElement('button');
     maintenanceOn.textContent = 'Увімкнути технічні роботи';
@@ -1430,17 +1430,16 @@ let currentReplyFeedbackId = null;
         if (isAdmin) {
   const replyBtn = document.createElement('button');
   replyBtn.textContent = 'Відповісти';
+  replyBtn.style.marginTop = '10px';
 
   replyBtn.onclick = () => {
     currentReplyFeedbackId = docItem.id;
-
     replyModal.style.display = 'flex';
     replyModal.classList.add('show');
-
-    replyText.value = '';
+    replyText.value = data.reply || '';
   };
 
-  item.appendChild(replyBtn);
+  card.appendChild(replyBtn);
 }
 
         adminFeedbackList.appendChild(item);
