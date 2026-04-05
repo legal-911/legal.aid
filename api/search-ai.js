@@ -1,41 +1,29 @@
 const PRIMARY_TIMEOUT_MS = 4500;
 const BACKUP_TIMEOUT_MS = 5000;
 
-async function fetchWithTimeout(url, options, timeoutMs) {
+async function fetchWithTimeout(url, options = {}, timeoutMs = 5000) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
     return await fetch(url, {
       ...options,
       signal: controller.signal
     });
+  } catch (error) {
+    if (error.name === "AbortError") {
+      const timeoutError = new Error(`Request timed out after ${timeoutMs}ms`);
+      timeoutError.code = "TIMEOUT";
+      throw timeoutError;
+    }
+    throw error;
   } finally {
-    clearTimeout(timeout);
+    clearTimeout(timeoutId);
   }
-}
-
-function shouldFallback(status, errorText = "") {
-  if (!status) return true;
-  if (status === 408 || status === 409 || status === 423 || status === 425 || status === 429) return true;
-  if (status >= 500) return true;
-
-  const text = String(errorText || "").toLowerCase();
-  if (
-    text.includes("rate limit") ||
-    text.includes("quota") ||
-    text.includes("resource exhausted") ||
-    text.includes("temporarily unavailable") ||
-    text.includes("overloaded")
-  ) {
-    return true;
-  }
-
-  return false;
 }
 
 function buildPrompt(query, candidates) {
-  const compactCandidates = candidates.map(item => ({
+  const compactCandidates = candidates.map((item) => ({
     index: item.originalIndex,
     law: item.law || "",
     section: item.section || "",
@@ -88,7 +76,15 @@ function buildPrompt(query, candidates) {
 
 Кандидати:
 ${JSON.stringify(compactCandidates, null, 2)}
-`;
+`.trim();
+}
+
+function tryParseJson(text) {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
 }
 
 function extractJsonObject(text) {
@@ -100,36 +96,55 @@ function extractJsonObject(text) {
     .replace(/\s*```$/i, "")
     .trim();
 
-  if (!cleaned.startsWith("{")) return null;
+  const direct = tryParseJson(cleaned);
+  if (direct) return direct;
 
-  try {
-    return JSON.parse(cleaned);
-  } catch {
+  const firstBrace = cleaned.indexOf("{");
+  const lastBrace = cleaned.lastIndexOf("}");
+
+  if (firstBrace === -1 || lastBrace === -1 || lastBrace <= firstBrace) {
     return null;
   }
+
+  const sliced = cleaned.slice(firstBrace, lastBrace + 1);
+  return tryParseJson(sliced);
 }
 
 function normalizeResults(parsed) {
-  let results = Array.isArray(parsed?.results) ? parsed.results : [];
+  const rawResults = Array.isArray(parsed?.results) ? parsed.results : [];
 
-  results = results
-    .filter(item => typeof item.index === "number")
-    .filter(item => typeof item.score === "number")
-    .map(item => ({
+  return rawResults
+    .filter((item) => item && typeof item.index === "number")
+    .map((item) => ({
       index: item.index,
-      score: item.score,
-      reason: item.reason || ""
+      score: Number(item.score) || 0,
+      reason: String(item.reason || "")
     }))
-    .filter(item => item.score >= 45)
+    .filter((item) => item.score >= 45)
     .sort((a, b) => b.score - a.score)
     .slice(0, 10);
+}
 
-  return results;
+function buildError(message, extra = {}) {
+  const error = new Error(message);
+  Object.assign(error, extra);
+  return error;
 }
 
 async function callGemini(prompt) {
+  const apiKey = process.env.GEMINI_API_KEY;
   const model = process.env.GEMINI_MODEL || "gemini-1.5-flash";
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`;
+
+  if (!apiKey) {
+    throw buildError("Gemini API key is missing", {
+      provider: "gemini",
+      status: 500
+    });
+  }
+
+  const url =
+    `https://generativelanguage.googleapis.com/v1beta/models/` +
+    `${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
 
   const response = await fetchWithTimeout(
     url,
@@ -141,9 +156,7 @@ async function callGemini(prompt) {
       body: JSON.stringify({
         contents: [
           {
-            parts: [
-              { text: prompt }
-            ]
+            parts: [{ text: prompt }]
           }
         ],
         generationConfig: {
@@ -157,32 +170,36 @@ async function callGemini(prompt) {
   const raw = await response.text();
 
   if (!response.ok) {
-    const error = new Error("Gemini failed");
-    error.status = response.status;
-    error.raw = raw;
-    throw error;
+    throw buildError("Gemini request failed", {
+      provider: "gemini",
+      status: response.status,
+      raw
+    });
   }
 
-  let data;
-  try {
-    data = JSON.parse(raw);
-  } catch {
-    const error = new Error("Gemini returned invalid JSON");
-    error.status = 500;
-    error.raw = raw;
-    throw error;
+  const data = tryParseJson(raw);
+  if (!data) {
+    throw buildError("Gemini returned non-JSON response", {
+      provider: "gemini",
+      status: 500,
+      raw
+    });
   }
 
   const text =
-    data?.candidates?.[0]?.content?.parts?.map(part => part.text || "").join("").trim() || "";
+    data?.candidates?.[0]?.content?.parts
+      ?.map((part) => part?.text || "")
+      .join("")
+      .trim() || "";
 
   const parsed = extractJsonObject(text);
 
   if (!parsed) {
-    const error = new Error("Gemini returned invalid model JSON");
-    error.status = 500;
-    error.raw = text;
-    throw error;
+    throw buildError("Gemini returned invalid model JSON", {
+      provider: "gemini",
+      status: 500,
+      raw: text
+    });
   }
 
   return {
@@ -192,7 +209,15 @@ async function callGemini(prompt) {
 }
 
 async function callOpenAI(prompt) {
+  const apiKey = process.env.OPENAI_API_KEY;
   const model = process.env.OPENAI_MODEL || "gpt-4.1-mini";
+
+  if (!apiKey) {
+    throw buildError("OpenAI API key is missing", {
+      provider: "openai",
+      status: 500
+    });
+  }
 
   const response = await fetchWithTimeout(
     "https://api.openai.com/v1/chat/completions",
@@ -200,14 +225,18 @@ async function callOpenAI(prompt) {
       method: "POST",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
-        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
+        Authorization: `Bearer ${apiKey}`
       },
       body: JSON.stringify({
         model,
         messages: [
-          { role: "user", content: prompt }
+          {
+            role: "user",
+            content: prompt
+          }
         ],
-        temperature: 0.2
+        temperature: 0.2,
+        response_format: { type: "json_object" }
       })
     },
     BACKUP_TIMEOUT_MS
@@ -216,30 +245,31 @@ async function callOpenAI(prompt) {
   const raw = await response.text();
 
   if (!response.ok) {
-    const error = new Error("OpenAI backup failed");
-    error.status = response.status;
-    error.raw = raw;
-    throw error;
+    throw buildError("OpenAI request failed", {
+      provider: "openai",
+      status: response.status,
+      raw
+    });
   }
 
-  let data;
-  try {
-    data = JSON.parse(raw);
-  } catch {
-    const error = new Error("OpenAI returned invalid JSON");
-    error.status = 500;
-    error.raw = raw;
-    throw error;
+  const data = tryParseJson(raw);
+  if (!data) {
+    throw buildError("OpenAI returned non-JSON response", {
+      provider: "openai",
+      status: 500,
+      raw
+    });
   }
 
   const text = data?.choices?.[0]?.message?.content?.trim() || "";
   const parsed = extractJsonObject(text);
 
   if (!parsed) {
-    const error = new Error("OpenAI returned invalid model JSON");
-    error.status = 500;
-    error.raw = text;
-    throw error;
+    throw buildError("OpenAI returned invalid model JSON", {
+      provider: "openai",
+      status: 500,
+      raw: text
+    });
   }
 
   return {
@@ -248,13 +278,23 @@ async function callOpenAI(prompt) {
   };
 }
 
+function logProviderError(label, error) {
+  console.error(`${label}:`, {
+    message: error?.message || "Unknown error",
+    provider: error?.provider || "unknown",
+    status: error?.status || null,
+    code: error?.code || null,
+    raw: error?.raw || null
+  });
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
-    const { query, candidates } = req.body;
+    const { query, candidates } = req.body || {};
 
     if (!query || !Array.isArray(candidates) || candidates.length === 0) {
       return res.status(400).json({ error: "No query or candidates" });
@@ -263,52 +303,41 @@ export default async function handler(req, res) {
     const prompt = buildPrompt(query, candidates);
 
     try {
-      const primaryResult = await callGemini(prompt);
+      const geminiResult = await callGemini(prompt);
 
       return res.status(200).json({
-        results: primaryResult.results,
-        provider: primaryResult.provider
+        results: geminiResult.results,
+        provider: geminiResult.provider
       });
-    } catch (primaryError) {
-      console.error("Primary Gemini error:", {
-        message: primaryError.message,
-        status: primaryError.status,
-        raw: primaryError.raw
-      });
-
-      if (!shouldFallback(primaryError.status, primaryError.raw)) {
-        return res.status(500).json({
-          error: "Primary provider failed",
-          message: primaryError.message
-        });
-      }
+    } catch (geminiError) {
+      logProviderError("Primary Gemini error", geminiError);
     }
 
     try {
-      const backupResult = await callOpenAI(prompt);
+      const openaiResult = await callOpenAI(prompt);
 
       return res.status(200).json({
-        results: backupResult.results,
-        provider: backupResult.provider
+        results: openaiResult.results,
+        provider: openaiResult.provider
       });
-    } catch (backupError) {
-      console.error("Backup OpenAI error:", {
-        message: backupError.message,
-        status: backupError.status,
-        raw: backupError.raw
-      });
-
-      return res.status(200).json({
-        results: [],
-        provider: "none",
-        error: "Both providers failed"
-      });
+    } catch (openaiError) {
+      logProviderError("Backup OpenAI error", openaiError);
     }
-  } catch (err) {
-    console.error("search-ai fatal error:", err);
 
-    return res.status(500).json({
-      error: err.message || "Server error"
+    return res.status(200).json({
+      results: [],
+      provider: "none",
+      error: "Both providers failed"
+    });
+  } catch (error) {
+    console.error("search-ai fatal error:", {
+      message: error?.message || "Unknown fatal error"
+    });
+
+    return res.status(200).json({
+      results: [],
+      provider: "none",
+      error: error?.message || "Server error"
     });
   }
 }
