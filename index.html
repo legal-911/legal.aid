@@ -223,6 +223,12 @@ nav button {
   background: #dbeafe;
 }
 
+#feedbackText {
+  min-height: 140px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
   </style>
   </head>
   <body>
@@ -380,13 +386,33 @@ nav button {
   </div>
 </div>
 
+<div class="modal" id="feedbackModal">
+  <div class="modal-content">
+    <span class="close" id="closeFeedback">&times;</span>
+    <h2>Залишити відгук</h2>
+
+    <input type="text" id="feedbackName" placeholder="Ваше ім'я">
+    <textarea id="feedbackText" rows="6" placeholder="Напишіть ваш відгук..."></textarea>
+
+    <button id="sendFeedbackBtn">Надіслати</button>
+  </div>
+</div>
+
+<div class="modal" id="adminFeedbackModal">
+  <div class="modal-content" style="width:700px; max-width:95%;">
+    <span class="close" id="closeAdminFeedback">&times;</span>
+    <h2>Відгуки користувачів</h2>
+    <div id="adminFeedbackList" style="max-height:420px; overflow:auto;"></div>
+  </div>
+</div>
+
   <footer>
     Інформація від "Офіційний вебпортал парламенту України"<br>©2026
   </footer>
 
   <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, getDoc, setDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyC1eGjYHzLhZOMp-FTw19lWb0FehZa_dg",
@@ -452,6 +478,14 @@ const searchSection = document.getElementById('searchSection');
   const toast = document.getElementById('toast');
 
   const bulkImportLink = document.getElementById('bulkImportLink');
+const feedbackModal = document.getElementById('feedbackModal');
+const closeFeedback = document.getElementById('closeFeedback');
+const sendFeedbackBtn = document.getElementById('sendFeedbackBtn');
+const feedbackName = document.getElementById('feedbackName');
+const feedbackText = document.getElementById('feedbackText');
+const adminFeedbackModal = document.getElementById('adminFeedbackModal');
+const closeAdminFeedback = document.getElementById('closeAdminFeedback');
+const adminFeedbackList = document.getElementById('adminFeedbackList');
 
   const lawSections = [
     "Закон України «Про Національну поліцію»",
@@ -648,21 +682,9 @@ showToast(`Додано ${generatedItems.length} статей`, 'success');
     }
   }
 
-  // Меню
+// Меню
 menu.addEventListener('click', () => {
   nav.style.display = nav.style.display === 'flex' ? 'none' : 'flex';
-});
-
-
-
-maintenanceOnBtn.addEventListener('click', async () => {
-  await setMaintenanceMode(true);
-  showToast('Технічні роботи увімкнено', 'warning');
-});
-
-maintenanceOffBtn.addEventListener('click', async () => {
-  await setMaintenanceMode(false);
-  showToast('Технічні роботи вимкнено', 'success');
 });
 
   // Вхід
@@ -1070,6 +1092,10 @@ function showAddButton() {
   bulkBtn.textContent = 'Масово додати статті';
   bulkBtn.onclick = () => openBulkImportModal();
 
+  const feedbackAdminBtn = document.createElement('button');
+  feedbackAdminBtn.textContent = 'Переглянути відгуки';
+  feedbackAdminBtn.onclick = () => openAdminFeedbackModal();
+
   const maintenanceOn = document.createElement('button');
   maintenanceOn.textContent = 'Увімкнути технічні роботи';
   maintenanceOn.onclick = async () => {
@@ -1086,6 +1112,7 @@ function showAddButton() {
 
   adminMenu.appendChild(addBtn);
   adminMenu.appendChild(bulkBtn);
+  adminMenu.appendChild(feedbackAdminBtn);
   adminMenu.appendChild(maintenanceOn);
   adminMenu.appendChild(maintenanceOff);
 }
@@ -1182,6 +1209,61 @@ function escapeHtml(text) {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
+}
+
+async function openAdminFeedbackModal() {
+  adminFeedbackModal.style.display = 'flex';
+  adminFeedbackModal.classList.add('show');
+  adminFeedbackList.innerHTML = '<p>Завантаження...</p>';
+
+  try {
+    const q = query(
+      collection(db, "feedbacks"),
+      orderBy("createdAt", "desc")
+    );
+
+    const snapshot = await getDocs(q);
+
+    if (snapshot.empty) {
+      adminFeedbackList.innerHTML = '<p>Відгуків поки немає.</p>';
+      return;
+    }
+
+    adminFeedbackList.innerHTML = '';
+
+    snapshot.forEach((docItem) => {
+      const data = docItem.data();
+
+      const item = document.createElement('div');
+      item.style.background = '#f8fafc';
+      item.style.border = '1px solid #dbeafe';
+      item.style.borderRadius = '10px';
+      item.style.padding = '12px';
+      item.style.marginBottom = '12px';
+
+      let dateText = 'Невідомо';
+      if (data.createdAt?.toDate) {
+        dateText = data.createdAt.toDate().toLocaleString('uk-UA');
+      }
+
+      item.innerHTML = `
+        <div style="font-weight:700; margin-bottom:6px; color:#004080;">
+          ${escapeHtml(data.name || 'Анонімно')}
+        </div>
+        <div style="font-size:13px; color:#64748b; margin-bottom:8px;">
+          ${escapeHtml(dateText)}
+        </div>
+        <div style="white-space:pre-line; line-height:1.5; color:#111827;">
+          ${escapeHtml(data.text || '')}
+        </div>
+      `;
+
+      adminFeedbackList.appendChild(item);
+    });
+  } catch (error) {
+    console.error('Помилка завантаження відгуків:', error);
+    adminFeedbackList.innerHTML = '<p>Не вдалося завантажити відгуки.</p>';
+  }
 }
 
 async function expandQueryWithAI(query) {
@@ -1570,8 +1652,56 @@ homeBtn.addEventListener('click', () => {
 });
 
 feedbackBtn.addEventListener('click', () => {
-  alert('Тут буде форма відгуку');
+  feedbackModal.style.display = 'flex';
+  feedbackModal.classList.add('show');
   nav.style.display = 'none';
+});
+
+closeFeedback.addEventListener('click', () => {
+  feedbackModal.style.display = 'none';
+  feedbackModal.classList.remove('show');
+});
+
+feedbackModal.addEventListener('click', (e) => {
+  if (e.target === feedbackModal) {
+    feedbackModal.style.display = 'none';
+    feedbackModal.classList.remove('show');
+  }
+});
+
+sendFeedbackBtn.addEventListener('click', async () => {
+  const name = feedbackName.value.trim();
+  const text = feedbackText.value.trim();
+
+  if (!text) {
+    showToast('Напишіть відгук', 'error');
+    return;
+  }
+
+  try {
+    sendFeedbackBtn.disabled = true;
+    sendFeedbackBtn.textContent = 'Надсилання...';
+
+    await addDoc(collection(db, "feedbacks"), {
+      name: name || "Анонімно",
+      text,
+      createdAt: serverTimestamp()
+    });
+
+    feedbackName.value = '';
+    feedbackText.value = '';
+
+    feedbackModal.style.display = 'none';
+    feedbackModal.classList.remove('show');
+
+    showToast('Відгук надіслано', 'success');
+  } catch (error) {
+    console.error('Помилка відправки відгуку:', error);
+    showToast('Не вдалося надіслати відгук', 'error');
+  } finally {
+    sendFeedbackBtn.disabled = false;
+    sendFeedbackBtn.textContent = 'Надіслати';
+  }
 });
 
   // Ініціалізаці
