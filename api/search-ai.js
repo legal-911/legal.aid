@@ -50,7 +50,8 @@ export default async function handler(req, res) {
    - нижче 50: слабка релевантність
 
 Поверни тільки JSON без будь-якого іншого тексту.
-НІКОЛИ не обгортай JSON у ```json або ``` . Поверни тільки чистий JSON-об’єкт.
+НІКОЛИ не обгортай JSON у \`\`\`json або \`\`\`.
+Поверни тільки чистий JSON-об’єкт.
 
 Формат:
 {
@@ -66,50 +67,66 @@ ${JSON.stringify(compactCandidates, null, 2)}
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
-  headers: {
-  "Content-Type": "application/json; charset=utf-8",
-  "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
-  "HTTP-Referer": "https://legal-aid-d4cg.vercel.app",
-  "X-Title": "Legal Aid"
-},
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        "HTTP-Referer": "https://legal-aid-d4cg.vercel.app",
+        "X-Title": "Legal Aid"
+      },
       body: JSON.stringify({
-  model: "openrouter/auto",
-  messages: [
-    {
-      role: "user",
-      content: prompt
-    }
-  ],
-  temperature: 0.2
+        model: "openrouter/auto",
+        messages: [
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        temperature: 0.2
       })
-}); 
+    });
 
-const text = data?.choices?.[0]?.message?.content?.trim();
+    const raw = await response.text();
 
-if (!text) {
-  return res.status(500).json({
-    error: "OpenRouter returned empty text",
-    raw: data
-  });
-}
+    if (!response.ok) {
+      return res.status(500).json({
+        error: "OpenRouter request failed",
+        status: response.status,
+        raw
+      });
+    }
 
-const cleaned = text
-  .replace(/^```json\s*/i, "")
-  .replace(/^```\s*/i, "")
-  .replace(/\s*```$/i, "")
-  .trim();
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      return res.status(500).json({
+        error: "OpenRouter returned invalid JSON",
+        raw
+      });
+    }
 
-// если это вообще не JSON — сразу fallback
-if (!cleaned.startsWith("{")) {
-  return res.status(200).json({ results: [] });
-}
+    const text = data?.choices?.[0]?.message?.content?.trim();
 
-let parsed;
-try {
-  parsed = JSON.parse(cleaned);
-} catch {
-  return res.status(200).json({ results: [] });
-}
+    if (!text) {
+      return res.status(200).json({ results: [] });
+    }
+
+    const cleaned = text
+      .replace(/^```json\s*/i, "")
+      .replace(/^```\s*/i, "")
+      .replace(/\s*```$/i, "")
+      .trim();
+
+    if (!cleaned.startsWith("{")) {
+      return res.status(200).json({ results: [] });
+    }
+
+    let parsed;
+    try {
+      parsed = JSON.parse(cleaned);
+    } catch {
+      return res.status(200).json({ results: [] });
+    }
 
     let results = Array.isArray(parsed.results) ? parsed.results : [];
 
