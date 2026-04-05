@@ -28,28 +28,35 @@ header {
   background:#004080; 
   color:white; 
   padding:10px 20px; 
-  position:sticky; 
+  position: sticky; 
   top:0; 
   z-index:1000; 
   display:flex; 
-  justify-content:space-between; 
-  align-items:center;   
+  align-items:center;
   font-weight:500;
 }
+
+.menu {
+  font-size:24px;
+  cursor:pointer;
+  width:40px;
+  flex-shrink:0;
+}
+
+.search-box {
+  width:40px;
+  display:flex;
+  justify-content:flex-end;
+  flex-shrink:0;
+}
+
 header h1 { 
   margin:0; 
   font-size:22px; 
   font-weight:700;
-  text-align: center;
+  text-align:center;
+  flex:1;
 }
-
-    .menu { font-size:24px; cursor:pointer; }
-    .search-box {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      position: relative;
-    }
 
     .search-btn {
       background: white;
