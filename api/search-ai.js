@@ -99,14 +99,16 @@ const cleaned = text
   .replace(/\s*```$/i, "")
   .trim();
 
+// если это вообще не JSON — сразу fallback
+if (!cleaned.startsWith("{")) {
+  return res.status(200).json({ results: [] });
+}
+
 let parsed;
 try {
   parsed = JSON.parse(cleaned);
 } catch {
-  return res.status(500).json({
-    error: "OpenRouter returned invalid JSON",
-    raw: text
-  });
+  return res.status(200).json({ results: [] });
 }
 
     let results = Array.isArray(parsed.results) ? parsed.results : [];
