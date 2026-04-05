@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Юридична допомога</title>
 
-    <!-- Красивий шрифт Roboto -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
     <style>
@@ -772,16 +771,22 @@ let currentReplyFeedbackId = null;
   const generatedItems = [];
 
   for (const item of rawArticles) {
-    const articleBody = item.rawText
-      .replace(/\{[^}]*\}/g, '')
-      .replace(/\r/g, '')
-      .trim();
+const articleBody = item.rawText
+  .replace(/\{[^}]*\}/g, '')
+  .replace(/\r/g, '')
+  .replace(/\n{2,}/g, '\n')
+  .replace(/[ \t]+/g, ' ')
+  .trim();
 
     const firstLineEnd = articleBody.indexOf('\n');
     let cleanBody = '';
 
     if (firstLineEnd !== -1) {
-      cleanBody = articleBody.slice(firstLineEnd + 1).trim();
+cleanBody = articleBody
+  .slice(firstLineEnd + 1)
+  .replace(/\n{2,}/g, '\n')
+  .replace(/[ \t]+/g, ' ')
+  .trim();
     }
 
     generatedItems.push({
@@ -854,12 +859,10 @@ let currentReplyFeedbackId = null;
       }
     }
 
-  // Меню
   menu.addEventListener('click', () => {
     nav.style.display = nav.style.display === 'flex' ? 'none' : 'flex';
   });
 
-    // Вхід
     loginBtn.addEventListener('click', () => { loginModal.style.display='flex'; loginModal.classList.add('show'); });
     closeLogin.addEventListener('click', () => { loginModal.style.display='none'; loginModal.classList.remove('show'); });
 
@@ -915,7 +918,6 @@ let currentReplyFeedbackId = null;
     articlesDiv.innerHTML = "";
     const query = searchInput.value.trim().toLowerCase();
 
-    // ===== ГОЛОВНА СТОРІНКА =====
     if (currentSection === null) {
       if (!query) {
         lawSections.forEach(section => {
@@ -930,7 +932,7 @@ let currentReplyFeedbackId = null;
           const openBtn = document.createElement("button");
           openBtn.textContent = "Відкрити";
         openBtn.onclick = () => {
-    savedScroll = window.scrollY; // ← запам'ятали позицію
+    savedScroll = window.scrollY;
     currentSection = section;
     renderArticles();
     window.scrollTo(0, 0);
@@ -1034,7 +1036,6 @@ let currentReplyFeedbackId = null;
       return;
     }
 
-    // ===== СТОРІНКА КОНКРЕТНОГО ЗАКОНУ =====
   const backDiv = document.createElement("div");
   backDiv.className = "section-header";
   backDiv.innerHTML = `
@@ -1842,7 +1843,6 @@ card.innerHTML = `
   }
 }
 
-    // Видалення
     function openDeleteModal(index){ deleteIndex=index; deleteModal.style.display='flex'; deleteModal.classList.add('show'); }
     closeDelete.addEventListener('click',()=>{deleteModal.style.display='none'; deleteModal.classList.remove('show');});
     cancelDelete.addEventListener('click',()=>{deleteModal.style.display='none'; deleteModal.classList.remove('show');});
@@ -2029,7 +2029,7 @@ replyModal.addEventListener('click', (e) => {
   }
 });
 
-    // Ініціалізаці
+
   async function initApp(){
     fillSearchSectionOptions();
     updateAdminUI();
