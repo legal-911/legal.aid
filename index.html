@@ -256,6 +256,78 @@ nav button {
     z-index: 10;
   }
 
+  .feedback-card {
+  background: #ffffff;
+  border: 1px solid #cfd8e3;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.feedback-name {
+  font-weight: 700;
+  color: #004080;
+  margin-bottom: 6px;
+  font-size: 16px;
+}
+
+.feedback-date {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 10px;
+}
+
+.feedback-text {
+  white-space: pre-line;
+  line-height: 1.6;
+  color: #111827;
+}
+
+.admin-reply-wrap {
+  position: relative;
+  margin-top: 14px;
+  margin-left: 36px;
+}
+
+.admin-reply-curve {
+  position: absolute;
+  left: -28px;
+  top: -8px;
+  font-size: 42px;
+  line-height: 1;
+  color: #0a5bb5;
+  font-weight: bold;
+}
+
+.admin-reply {
+  background: #eef6ff;
+  border: 1px solid #bcd3f3;
+  border-right: 4px solid #0a5bb5;
+  border-radius: 10px;
+  padding: 12px 14px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.admin-reply-title {
+  font-weight: 700;
+  color: #004080;
+  margin-bottom: 6px;
+  font-size: 15px;
+}
+
+.admin-reply-date {
+  font-size: 13px;
+  color: #5b6b7f;
+  margin-bottom: 8px;
+}
+
+.admin-reply-text {
+  white-space: pre-line;
+  line-height: 1.6;
+  color: #111827;
+}
+
     </style>
     </head>
     <body>
@@ -1665,25 +1737,40 @@ const openSendFeedbackModalBtn = document.getElementById('openSendFeedbackModalB
         dateText = data.createdAt.toDate().toLocaleString('uk-UA');
       }
 
-      card.innerHTML = `
-        <div style="font-weight:700; margin-bottom:6px; color:#004080;">
-          ${escapeHtml(data.name || 'Анонімно')}
+card.innerHTML = `
+  <div style="font-weight:700; margin-bottom:6px; color:#004080;">
+    ${escapeHtml(data.name || 'Анонімно')}
+  </div>
+
+  <div class="feedback-meta">
+    ${escapeHtml(dateText)}
+  </div>
+
+  <div style="white-space:pre-line; line-height:1.5;">
+    ${escapeHtml(data.text || '')}
+  </div>
+
+  ${
+    data.reply && data.reply.trim()
+      ? `
+        <div style="
+          margin-top:12px;
+          padding:10px;
+          background:#eef6ff;
+          border-left:4px solid #004080;
+          border-radius:6px;
+        ">
+          <div style="font-weight:700; margin-bottom:4px;">
+            Відповідь адміністратора:
+          </div>
+          <div style="white-space:pre-line;">
+            ${escapeHtml(data.reply)}
+          </div>
         </div>
-        <div class="feedback-meta">${escapeHtml(dateText)}</div>
-        <div style="white-space:pre-line; line-height:1.5;">
-          ${escapeHtml(data.text || '')}
-        </div>
-        ${
-          data.reply
-            ? `
-              <div style="margin-top:10px; padding:10px; background:#eef6ff; border-radius:8px;">
-                <div style="font-weight:700; color:#004080; margin-bottom:4px;">Відповідь адміністратора</div>
-                <div style="white-space:pre-line;">${escapeHtml(data.reply)}</div>
-              </div>
-            `
-            : ''
-        }
-      `;
+      `
+      : ''
+  }
+`;
 
       feedbackList.appendChild(card);
     });
@@ -1835,6 +1922,37 @@ openSendFeedbackModalBtn.addEventListener('click', () => {
 
   feedbackModal.style.display = 'flex';
   feedbackModal.classList.add('show');
+});
+
+sendReplyBtn.addEventListener('click', async () => {
+  const text = replyText.value.trim();
+
+  if (!currentReplyFeedbackId) {
+    showToast('Не вибрано відгук', 'error');
+    return;
+  }
+
+  try {
+    sendReplyBtn.disabled = true;
+    sendReplyBtn.textContent = 'Надсилання...';
+
+    await updateDoc(doc(db, "feedbacks", currentReplyFeedbackId), {
+      reply: text,
+      replyCreatedAt: serverTimestamp()
+    });
+
+    replyModal.style.display = 'none';
+    replyModal.classList.remove('show');
+
+    showToast('Відповідь збережено', 'success');
+    await openAdminFeedbackModal();
+  } catch (error) {
+    console.error('Помилка відповіді:', error);
+    showToast('Не вдалося зберегти відповідь', 'error');
+  } finally {
+    sendReplyBtn.disabled = false;
+    sendReplyBtn.textContent = 'Надіслати відповідь';
+  }
 });
 
     // Ініціалізаці
