@@ -91,7 +91,7 @@
 nav {
   display: none;
   position: fixed;
-  top: 60px;
+  top: 50px;
   left: 0;
   bottom: 0;
   width: 220px;
@@ -1792,41 +1792,47 @@ feedbackModal.addEventListener('click', (e) => {
 });
 
   sendFeedbackBtn.addEventListener('click', async () => {
-    const name = feedbackName.value.trim();
-    const text = feedbackText.value.trim();
+  const name = feedbackName.value.trim();
+  const text = feedbackText.value.trim();
 
-    if (!text) {
-      showToast('Напишіть відгук', 'error');
-      return;
-    }
+  if (!text) {
+    showToast('Напишіть відгук', 'error');
+    return;
+  }
 
-    try {
-      sendFeedbackBtn.disabled = true;
-      sendFeedbackBtn.textContent = 'Надсилання...';
+  try {
+    sendFeedbackBtn.disabled = true;
+    sendFeedbackBtn.textContent = 'Надсилання...';
 
-      await addDoc(collection(db, "feedbacks"), {
-        name: name || "Анонімно",
-        text,
-        createdAt: serverTimestamp()
-      });
+    await addDoc(collection(db, "feedbacks"), {
+      name: name || "Анонімно",
+      text,
+      reply: "",
+      createdAt: serverTimestamp()
+    });
 
-      feedbackName.value = '';
-      feedbackText.value = '';
+    feedbackName.value = '';
+    feedbackText.value = '';
 
-      feedbackModal.style.display = 'none';
-      feedbackModal.classList.remove('show');
+    feedbackModal.style.display = 'none';
+    feedbackModal.classList.remove('show');
 
-      showToast('Відгук надіслано', 'success');
-    } catch (error) {
-      console.error('Помилка відправки відгуку:', error);
-      showToast('Не вдалося надіслати відгук', 'error');
-    } finally {
-      sendFeedbackBtn.disabled = false;
-      sendFeedbackBtn.textContent = 'Надіслати';
-    }
-  });
+    showToast('Відгук надіслано', 'success');
 
-  openSendFeedbackModalBtn.addEventListener('click', () => {
+    await openFeedbackListModal();
+  } catch (error) {
+    console.error('Помилка відправки відгуку:', error);
+    showToast('Не вдалося надіслати відгук', 'error');
+  } finally {
+    sendFeedbackBtn.disabled = false;
+    sendFeedbackBtn.textContent = 'Надіслати';
+  }
+});
+
+openSendFeedbackModalBtn.addEventListener('click', () => {
+  feedbackListModal.style.display = 'none';
+  feedbackListModal.classList.remove('show');
+
   feedbackModal.style.display = 'flex';
   feedbackModal.classList.add('show');
 });
