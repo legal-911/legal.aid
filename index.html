@@ -516,6 +516,17 @@ nav button {
   </div>
 </div>
 
+<div class="modal" id="replyModal">
+  <div class="modal-content">
+    <span class="close" id="closeReply">&times;</span>
+    <h2>Відповідь на відгук</h2>
+
+    <textarea id="replyText" rows="5" placeholder="Напишіть відповідь..."></textarea>
+
+    <button id="sendReplyBtn">Надіслати відповідь</button>
+  </div>
+</div>
+
     <footer>
       Інформація від "Офіційний вебпортал парламенту України"<br>©2026
     </footer>
@@ -614,6 +625,12 @@ const feedbackListModal = document.getElementById('feedbackListModal');
 const closeFeedbackList = document.getElementById('closeFeedbackList');
 const feedbackList = document.getElementById('feedbackList');
 const openSendFeedbackModalBtn = document.getElementById('openSendFeedbackModalBtn');
+const replyModal = document.getElementById('replyModal');
+const closeReply = document.getElementById('closeReply');
+const replyText = document.getElementById('replyText');
+const sendReplyBtn = document.getElementById('sendReplyBtn');
+
+let currentReplyFeedbackId = null;
 
     const lawSections = [
       "Закон України «Про Національну поліцію»",
@@ -1386,6 +1403,22 @@ const openSendFeedbackModalBtn = document.getElementById('openSendFeedbackModalB
           </div>
         `;
 
+        if (isAdmin) {
+  const replyBtn = document.createElement('button');
+  replyBtn.textContent = 'Відповісти';
+
+  replyBtn.onclick = () => {
+    currentReplyFeedbackId = docItem.id;
+
+    replyModal.style.display = 'flex';
+    replyModal.classList.add('show');
+
+    replyText.value = '';
+  };
+
+  item.appendChild(replyBtn);
+}
+
         adminFeedbackList.appendChild(item);
       });
     } catch (error) {
@@ -1952,6 +1985,18 @@ sendReplyBtn.addEventListener('click', async () => {
   } finally {
     sendReplyBtn.disabled = false;
     sendReplyBtn.textContent = 'Надіслати відповідь';
+  }
+});
+
+closeReply.addEventListener('click', () => {
+  replyModal.style.display = 'none';
+  replyModal.classList.remove('show');
+});
+
+replyModal.addEventListener('click', (e) => {
+  if (e.target === replyModal) {
+    replyModal.style.display = 'none';
+    replyModal.classList.remove('show');
   }
 });
 
