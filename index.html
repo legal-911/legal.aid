@@ -844,8 +844,16 @@ if (query) {
     filteredArticles = fallbackRankArticles(query, sectionCandidates);
   }
 } else {
-  filteredArticles = filteredArticles.sort((a, b) => getArticleNumber(a.law) - getArticleNumber(b.law));
-}
+filteredArticles = filteredArticles.sort((a, b) => {
+  const aNum = getArticleNumber(a.law);
+  const bNum = getArticleNumber(b.law);
+
+  if (aNum.main !== bNum.main) {
+    return aNum.main - bNum.main;
+  }
+
+  return aNum.sub - bNum.sub;
+});
 
   filteredArticles.forEach((a) => {
     const index = a.originalIndex;
@@ -996,10 +1004,20 @@ if (query) {
     }
   });
 
-  function getArticleNumber(title){
-    const match = title.match(/Стаття\s*(\d+)/i);
-    return match ? parseInt(match[1], 10) : 999999;
+function getArticleNumber(title) {
+  const match = title.match(/Стаття\s*(\d+(?:-\d+)*)/i);
+
+  if (!match) {
+    return { main: 999999, sub: 999999 };
   }
+
+  const parts = match[1].split('-').map(n => parseInt(n, 10));
+
+  return {
+    main: parts[0] ?? 999999,
+    sub: parts[1] ?? 0
+  };
+}
 
   function showAddButton(){
     if (isAdmin && !document.getElementById('addBtn')) {
@@ -1191,7 +1209,7 @@ function splitArticlesFromRawText(text) {
   text = text.replace(/\{[^}]*\}/g, '');
   text = text.replace(/\r/g, '').trim();
 
-  const regex = /Стаття\s+(\d+)\.?\s*([^\n]*)/gi;
+  const regex = /Стаття\s+(\d+(?:-\d+)*)\.?\s*([^\n]*)/gi;    
   const matches = [...text.matchAll(regex)];
   const result = [];
 
