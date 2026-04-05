@@ -1263,7 +1263,10 @@ let currentReplyFeedbackId = null;
 
     const feedbackAdminBtn = document.createElement('button');
 feedbackAdminBtn.textContent = 'Переглянути відгуки';
-feedbackAdminBtn.onclick = () => openFeedbackListModal();
+feedbackAdminBtn.onclick = () => {
+  nav.style.display = 'none';
+  openFeedbackListModal();
+};
 
     const maintenanceOn = document.createElement('button');
     maintenanceOn.textContent = 'Увімкнути технічні роботи';
