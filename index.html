@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
   <html lang="uk">
   <head>
   <meta charset="UTF-8">
@@ -1345,7 +1345,15 @@ async function rankArticlesWithAI(query, candidates) {
       body: JSON.stringify({ query, candidates })
     });
 
-    const data = await response.json();
+    const raw = await response.text();
+
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch (error) {
+      console.error("Server returned invalid JSON:", raw);
+      return fallbackRanked;
+    }
 
     if (!response.ok || !Array.isArray(data.results)) {
       console.error("AI rank error:", data);
