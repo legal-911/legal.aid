@@ -88,22 +88,48 @@
     }
   }
 
-  nav {
-    display: none;
-    position: fixed; /* ← вот главное изменение */
-    top: 50px;
-    left: 0;
-    width: 220px;
-    height: calc(100% - 60px);
-    background: #003366;
-    padding: 10px;
-    z-index: 2000;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
-  }
-  nav button { 
-    display:block; width:100%; margin-bottom:5px; padding:10px; color:white; background:#0055a0; 
-    border:none; cursor:pointer; border-radius:4px; text-align:center; font-family: 'Roboto', sans-serif; font-weight:500;
-  }
+nav {
+  display: none;
+  position: fixed;
+  top: 50px;
+  left: 0;
+  width: 220px;
+  height: calc(100% - 60px);
+  background: #003366;
+  padding: 10px;
+  z-index: 2000;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+nav button {
+  display: block;
+  width: 100%;
+  margin-bottom: 5px;
+  padding: 10px;
+  color: white;
+  background: #0055a0;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  text-align: center;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+}
+
+.menu-top {
+  margin-bottom: 10px;
+}
+
+.menu-middle {
+  flex: 1;
+}
+
+.menu-bottom {
+  margin-top: auto;
+}
 
   .articles { padding:20px; max-width:900px; margin:auto; flex:1;}
   .article { background:white; padding:15px; margin-bottom:15px; border-radius:5px; box-shadow:0 1px 3px rgba(0,0,0,0.2); position:relative; }
@@ -211,12 +237,24 @@
     </div>
   </header>
 
-  <nav id="navMenu">
+<nav id="navMenu">
+
+  <!-- 🔝 Верх -->
+  <div class="menu-top">
+    <button id="homeBtn">Головна</button>
+  </div>
+
+  <!-- 📦 Центр -->
+  <div class="menu-middle" id="adminMenu"></div>
+
+  <!-- 🔻 Низ -->
+  <div class="menu-bottom">
+    <button id="feedbackBtn">Відгук</button>
     <button id="loginBtn">Увійти</button>
-  <button id="logoutBtn" style="display:none;">Вийти</button>
-  <button id="maintenanceOnBtn" style="display:none;">Увімкнути технічні роботи</button>
-  <button id="maintenanceOffBtn" style="display:none;">Вимкнути технічні роботи</button>
-  </nav>
+    <button id="logoutBtn" style="display:none;">Вийти</button>
+  </div>
+
+</nav>
 
   <div class="articles" id="articles"></div>
   <div id="maintenanceScreen" style="display:none; padding:40px; text-align:center;">
@@ -368,6 +406,8 @@
   const nav = document.getElementById('navMenu');
   const loginBtn = document.getElementById('loginBtn');
   const logoutBtn = document.getElementById('logoutBtn');
+  const homeBtn = document.getElementById('homeBtn');
+const feedbackBtn = document.getElementById('feedbackBtn');
   const loginModal = document.getElementById('loginModal');
   const closeLogin = document.getElementById('closeLogin');
   const submitLogin = document.getElementById('submitLogin');
@@ -396,9 +436,6 @@
 
   const searchInput = document.getElementById('searchInput');
   const articlesDiv = document.getElementById('articles');
-
-  const maintenanceOnBtn = document.getElementById('maintenanceOnBtn');
-  const maintenanceOffBtn = document.getElementById('maintenanceOffBtn');
   const maintenanceScreen = document.getElementById('maintenanceScreen');
 
 const searchModal = document.getElementById('searchModal');
@@ -612,19 +649,21 @@ showToast(`Додано ${generatedItems.length} статей`, 'success');
   }
 
   // Меню
-  menu.addEventListener('click', () => nav.style.display = nav.style.display === 'block'? 'none':'block');
+menu.addEventListener('click', () => {
+  nav.style.display = nav.style.display === 'flex' ? 'none' : 'flex';
+});
 
 
 
-  maintenanceOnBtn.addEventListener('click', async () => {
-    await setMaintenanceMode(true);
-    showToast('Технічні роботи увімкнено', 'warning');
-  });
+maintenanceOnBtn.addEventListener('click', async () => {
+  await setMaintenanceMode(true);
+  showToast('Технічні роботи увімкнено', 'warning');
+});
 
-  maintenanceOffBtn.addEventListener('click', async () => {
-    await setMaintenanceMode(false);
-    showToast('Технічні роботи вимкнено', 'success');
-  });
+maintenanceOffBtn.addEventListener('click', async () => {
+  await setMaintenanceMode(false);
+  showToast('Технічні роботи вимкнено', 'success');
+});
 
   // Вхід
   loginBtn.addEventListener('click', () => { loginModal.style.display='flex'; loginModal.classList.add('show'); });
@@ -920,23 +959,18 @@ function openEditModal(index){
     editModal.classList.add('show');
   }
 
-  function updateAdminUI(){
-    if(isAdmin){
-      loginBtn.style.display = 'none';
-      logoutBtn.style.display = 'block';
-      maintenanceOnBtn.style.display = 'block';
-      maintenanceOffBtn.style.display = 'block';
-      showAddButton();
-    } else {
-      loginBtn.style.display = 'block';
-      logoutBtn.style.display = 'none';
-      maintenanceOnBtn.style.display = 'none';
-      maintenanceOffBtn.style.display = 'none';
-      document.getElementById('addBtn')?.remove();
-    }
-
-    renderArticles();
+function updateAdminUI() {
+  if (isAdmin) {
+    loginBtn.style.display = 'none';
+    logoutBtn.style.display = 'block';
+  } else {
+    loginBtn.style.display = 'block';
+    logoutBtn.style.display = 'none';
   }
+
+  showAddButton();
+  renderArticles();
+}
 
   function showToast(message, type = 'info'){
     const colors = {
@@ -1020,25 +1054,41 @@ function getArticleNumber(title) {
   };
 }
 
-  function showAddButton(){
-    if (isAdmin && !document.getElementById('addBtn')) {
-      const addBtn=document.createElement('button');
-      addBtn.id='addBtn';
-      addBtn.textContent='Додати статтю';
-      addBtn.style.margin='0px';
-      addBtn.onclick=()=> openEditModal(null);
-      nav.appendChild(addBtn);
-    }
+function showAddButton() {
+  const adminMenu = document.getElementById('adminMenu');
+  adminMenu.innerHTML = '';
 
-    if(!document.getElementById('bulkImportBtn')){
-      const bulkBtn = document.createElement('button');
-      bulkBtn.id = 'bulkImportBtn';
-      bulkBtn.textContent = 'Масово додати статті';
-      bulkBtn.style.margin = '5px 0 0 0';
-      bulkBtn.onclick = () => openBulkImportModal();
-      nav.appendChild(bulkBtn);
-    }
-  }
+  if (!isAdmin) return;
+
+  const addBtn = document.createElement('button');
+  addBtn.id = 'addBtn';
+  addBtn.textContent = 'Додати статтю';
+  addBtn.onclick = () => openEditModal(null);
+
+  const bulkBtn = document.createElement('button');
+  bulkBtn.id = 'bulkImportBtn';
+  bulkBtn.textContent = 'Масово додати статті';
+  bulkBtn.onclick = () => openBulkImportModal();
+
+  const maintenanceOn = document.createElement('button');
+  maintenanceOn.textContent = 'Увімкнути технічні роботи';
+  maintenanceOn.onclick = async () => {
+    await setMaintenanceMode(true);
+    showToast('Технічні роботи увімкнено', 'warning');
+  };
+
+  const maintenanceOff = document.createElement('button');
+  maintenanceOff.textContent = 'Вимкнути технічні роботи';
+  maintenanceOff.onclick = async () => {
+    await setMaintenanceMode(false);
+    showToast('Технічні роботи вимкнено', 'success');
+  };
+
+  adminMenu.appendChild(addBtn);
+  adminMenu.appendChild(bulkBtn);
+  adminMenu.appendChild(maintenanceOn);
+  adminMenu.appendChild(maintenanceOff);
+}
 
   function openBulkImportModal(){
     if(!currentSection){
@@ -1509,6 +1559,19 @@ window.addEventListener('load', () => {
   setTimeout(() => {
     window.scrollTo(0, 0);
   }, 50);
+});
+
+homeBtn.addEventListener('click', () => {
+  currentSection = null;
+  searchInput.value = '';
+  renderArticles();
+  window.scrollTo(0, 0);
+  nav.style.display = 'none';
+});
+
+feedbackBtn.addEventListener('click', () => {
+  alert('Тут буде форма відгуку');
+  nav.style.display = 'none';
 });
 
   // Ініціалізаці
