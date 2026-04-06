@@ -447,13 +447,246 @@ html, body {
   }
 }
 
+.site-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.ua-flag {
+  width: 28px;
+  height: 18px;
+  border-radius: 2px;
+  overflow: hidden;
+  display: inline-block;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.25);
+  background: linear-gradient(to bottom, #0057b7 50%, #ffd700 50%);
+  flex: 0 0 auto;
+}
+
+.home-hero {
+  background: linear-gradient(135deg, #114c96, #0a5bb5);
+  color: white;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.16);
+  padding: 26px;
+  margin-bottom: 22px;
+  overflow: hidden;
+}
+
+.home-hero-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.home-hero-title {
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.15;
+  margin-bottom: 10px;
+}
+
+.home-hero-subtitle {
+  font-size: 16px;
+  opacity: 0.95;
+  max-width: 700px;
+  line-height: 1.5;
+}
+
+.home-hero-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.home-nav-btn {
+  background: white;
+  color: #004080;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Roboto', sans-serif;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.home-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.home-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.10);
+  overflow: hidden;
+}
+
+.home-card-header {
+  background: linear-gradient(135deg, #004080, #0a5bb5);
+  color: white;
+  padding: 16px 18px;
+}
+
+.home-card-header h3 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.home-card-body {
+  padding: 18px;
+}
+
+.featured-topic {
+  position: relative;
+  min-height: 280px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1b4d96, #0a5bb5);
+  color: white;
+  display: flex;
+  align-items: flex-end;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+}
+
+.featured-topic-content {
+  padding: 20px;
+  width: 100%;
+  background: linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0.08));
+}
+
+.featured-topic-label {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 700;
+  background: rgba(255,255,255,0.16);
+  padding: 6px 10px;
+  border-radius: 999px;
+  margin-bottom: 10px;
+}
+
+.featured-topic-title {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 10px;
+}
+
+.featured-topic-text {
+  font-size: 15px;
+  line-height: 1.5;
+  opacity: 0.96;
+}
+
+.news-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.news-item {
+  padding-bottom: 14px;
+  border-bottom: 1px solid #dbe4f0;
+}
+
+.news-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.news-date {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 5px;
+}
+
+.news-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 6px;
+}
+
+.news-text {
+  font-size: 14px;
+  color: #334155;
+  line-height: 1.5;
+}
+
+.important-topics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.important-topic-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.10);
+  padding: 18px;
+}
+
+.important-topic-card h4 {
+  margin: 0 0 10px 0;
+  font-size: 18px;
+  color: #004080;
+}
+
+.important-topic-card p {
+  margin: 0;
+  line-height: 1.5;
+  color: #334155;
+  font-size: 14px;
+}
+
+.home-section-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 16px 0;
+  color: #0f172a;
+}
+
+@media (max-width: 950px) {
+  .home-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .important-topics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-hero-title {
+    font-size: 28px;
+  }
+
+  .featured-topic-title {
+    font-size: 24px;
+  }
+}
+
     </style>
     </head>
     <body>
 
     <header>
       <div class="menu">&#9776;</div>
-      <h1>Юридична допомога</h1>
+      <h1 class="site-title">
+  <span>Юридична допомога</span>
+  <span class="ua-flag" aria-hidden="true"></span>
+</h1>
 
       <div class="search-box">
         <button id="searchToggle" class="search-btn">&#128269;</button>
@@ -793,6 +1026,11 @@ let currentReplyFeedbackId = null;
       {section:"Конституція України", law:"Право на свободу слова", short:"Право на свободу слова гарантовано Конституцією України Стаття 34", details:"Витяг з статті: кожен має право на свободу думки і слова, на вільне вираження своїх поглядів і переконань. Це право включає свободу шукати, отримувати і поширювати інформацію та ідеї будь-якими засобами без втручання державних органів та незалежно від державних кордонів.", link:""},
       {section:"Закон України «Про НацІональну полIцIю»", law:"Пред'явлення документів поліцейському", short:"Громадянин зобов'язаний пред'явити документи поліцейському за його законною вимогою, відповідно до Статті 14 Закону України «Про Національну поліцію»", details:"Витяг з статті: громадянин зобов'язаний пред'явити документи, що посвідчують особу, поліцейському за його законною вимогою. Вимога про пред'явлення документів може бути висунута поліцейським у випадках, передбачених законом, зокрема для встановлення особи, перевірки документів, запобігання або припинення правопорушення.", link:""}
     ];
+
+let homeNews = [];
+let importantTopics = [];
+let featuredTopic = null;
+
     let editIndex = null;
     let deleteIndex = null;
 
@@ -1069,30 +1307,11 @@ function toggleDetailsBlock(detailsDiv, button) {
     articlesDiv.innerHTML = "";
     const query = searchInput.value.trim().toLowerCase();
 
-    if (currentSection === null) {
-      if (!query) {
-        lawSections.forEach(section => {
-          const div = document.createElement("div");
-          div.className = "section-header";
-
-          div.innerHTML = `
-            <h2>${escapeHtml(section)}</h2>
-            <p>Перейти до статей розділу</p>
-          `;
-
-          const openBtn = document.createElement("button");
-          openBtn.textContent = "Відкрити";
-        openBtn.onclick = () => {
-    savedScroll = window.scrollY;
-    currentSection = section;
-    renderArticles();
-    window.scrollTo(0, 0);
-  };
-
-          div.appendChild(openBtn);
-          articlesDiv.appendChild(div);
-        });
-        return;
+          if (currentSection === null) {
+  if (!query) {
+    renderHomePage();
+    return;
+  }
       }
 
       articlesDiv.innerHTML = `
@@ -1128,7 +1347,6 @@ function toggleDetailsBlock(detailsDiv, button) {
           </div>
         `;
         return;
-      }
 
       filteredGlobalArticles.forEach((a) => {
         const index = a.originalIndex;
@@ -1619,7 +1837,7 @@ feedbackAdminBtn.onclick = () => {
     replyText.value = data.reply || '';
   };
 
-  card.appendChild(replyBtn);
+item.appendChild(replyBtn);
 }
 
         adminFeedbackList.appendChild(item);
@@ -2232,13 +2450,237 @@ replyModal.addEventListener('click', (e) => {
 });
 
 
-  async function initApp(){
-    fillSearchSectionOptions();
-    updateAdminUI();
-    await seedArticlesIfEmpty();
-    await loadArticles();
-    await checkMaintenanceMode();
+async function initApp(){
+  fillSearchSectionOptions();
+  updateAdminUI();
+
+  await seedArticlesIfEmpty();
+  await seedHomeContentIfEmpty();
+
+  await loadHomeNews();
+  await loadImportantTopics();
+  await loadFeaturedTopic();
+  await loadArticles();
+
+  await checkMaintenanceMode();
+}
+
+  async function loadHomeNews() {
+  const snapshot = await getDocs(query(
+    collection(db, "homeNews"),
+    orderBy("createdAt", "desc")
+  ));
+
+  homeNews = [];
+  snapshot.forEach(docItem => {
+    homeNews.push({ id: docItem.id, ...docItem.data() });
+  });
+}
+
+async function loadImportantTopics() {
+  const snapshot = await getDocs(query(
+    collection(db, "importantTopics"),
+    orderBy("createdAt", "desc")
+  ));
+
+  importantTopics = [];
+  snapshot.forEach(docItem => {
+    importantTopics.push({ id: docItem.id, ...docItem.data() });
+  });
+}
+
+async function loadFeaturedTopic() {
+  const snapshot = await getDocs(collection(db, "featuredTopic"));
+
+  featuredTopic = null;
+
+  snapshot.forEach(docItem => {
+    if (!featuredTopic) {
+      featuredTopic = { id: docItem.id, ...docItem.data() };
+    }
+  });
+}
+
+async function seedHomeContentIfEmpty() {
+  const newsSnap = await getDocs(collection(db, "homeNews"));
+  if (newsSnap.empty) {
+    await addDoc(collection(db, "homeNews"), {
+      title: "На сайті додано новий розділ юридичних матеріалів",
+      text: "Тепер користувачі можуть швидше знаходити потрібні статті та юридичні пояснення.",
+      dateText: "Сьогодні",
+      createdAt: serverTimestamp()
+    });
+
+    await addDoc(collection(db, "homeNews"), {
+      title: "Оновлено блок пошуку по законодавству",
+      text: "Пошук працює по ключових словах та опису ситуації, щоб швидше знаходити потрібні статті.",
+      dateText: "Сьогодні",
+      createdAt: serverTimestamp()
+    });
   }
+
+  const topicsSnap = await getDocs(collection(db, "importantTopics"));
+  if (topicsSnap.empty) {
+    await addDoc(collection(db, "importantTopics"), {
+      title: "Перевірка документів",
+      text: "Пояснення щодо підстав перевірки документів, прав громадянина та обов’язків поліцейського.",
+      createdAt: serverTimestamp()
+    });
+
+    await addDoc(collection(db, "importantTopics"), {
+      title: "Право на мовчання",
+      text: "Коротке пояснення, коли особа має право не свідчити проти себе та близьких родичів.",
+      createdAt: serverTimestamp()
+    });
+
+    await addDoc(collection(db, "importantTopics"), {
+      title: "Огляд речей",
+      text: "Що потрібно знати про перевірку сумки, рюкзака та особистих речей у різних ситуаціях.",
+      createdAt: serverTimestamp()
+    });
+  }
+
+  const featuredSnap = await getDocs(collection(db, "featuredTopic"));
+  if (featuredSnap.empty) {
+    await addDoc(collection(db, "featuredTopic"), {
+      label: "Важлива тема",
+      title: "Права людини у повсякденних ситуаціях",
+      text: "Дізнайтеся про право на мовчання, перевірку документів, огляд речей, права при спілкуванні з поліцією та інші важливі юридичні питання.",
+      createdAt: serverTimestamp()
+    });
+  }
+}
+
+function renderHomePage() {
+  const featured = featuredTopic || {
+    label: "Важлива тема",
+    title: "Юридична допомога онлайн",
+    text: "Оберіть законодавство, знайдіть потрібну статтю або перегляньте важливі юридичні теми."
+  };
+
+  const hero = document.createElement("div");
+  hero.className = "home-hero";
+  hero.innerHTML = `
+    <div class="home-hero-top">
+      <div>
+        <div class="home-hero-title">Юридична допомога</div>
+        <div class="home-hero-subtitle">
+          Актуальні правові матеріали, пошук по законодавству, важливі теми та базова юридична консультація в одному місці.
+        </div>
+        <div class="home-hero-actions">
+          <button class="home-nav-btn" id="goToLawsBtn">Законодавство</button>
+          <button class="home-nav-btn" id="goToConsultBtn">Юридична консультація</button>
+        </div>
+      </div>
+    </div>
+  `;
+  articlesDiv.appendChild(hero);
+
+  const grid = document.createElement("div");
+  grid.className = "home-grid";
+
+  const left = document.createElement("div");
+  left.innerHTML = `
+    <div class="featured-topic">
+      <div class="featured-topic-content">
+        <div class="featured-topic-label">${escapeHtml(featured.label || "Важлива тема")}</div>
+        <div class="featured-topic-title">${escapeHtml(featured.title || "")}</div>
+        <div class="featured-topic-text">${escapeHtml(featured.text || "")}</div>
+      </div>
+    </div>
+  `;
+
+  const right = document.createElement("div");
+  right.className = "home-card";
+  right.innerHTML = `
+    <div class="home-card-header">
+      <h3>Новини</h3>
+    </div>
+    <div class="home-card-body">
+      <div class="news-list">
+        ${
+          homeNews.length
+            ? homeNews.map(item => `
+              <div class="news-item">
+                <div class="news-date">${escapeHtml(item.dateText || "")}</div>
+                <div class="news-title">${escapeHtml(item.title || "")}</div>
+                <div class="news-text">${escapeHtml(item.text || "")}</div>
+              </div>
+            `).join("")
+            : `<div class="news-text">Новини поки відсутні.</div>`
+        }
+      </div>
+    </div>
+  `;
+
+  grid.appendChild(left);
+  grid.appendChild(right);
+  articlesDiv.appendChild(grid);
+
+  const topicsTitle = document.createElement("h2");
+  topicsTitle.className = "home-section-title";
+  topicsTitle.textContent = "Важливі теми";
+  articlesDiv.appendChild(topicsTitle);
+
+  const topicsGrid = document.createElement("div");
+  topicsGrid.className = "important-topics-grid";
+  topicsGrid.innerHTML = importantTopics.length
+    ? importantTopics.map(item => `
+      <div class="important-topic-card">
+        <h4>${escapeHtml(item.title || "")}</h4>
+        <p>${escapeHtml(item.text || "")}</p>
+      </div>
+    `).join("")
+    : `<div class="important-topic-card"><h4>Немає тем</h4><p>Додайте важливі теми через адмін-панель.</p></div>`;
+
+  articlesDiv.appendChild(topicsGrid);
+
+  const lawsTitle = document.createElement("h2");
+  lawsTitle.className = "home-section-title";
+  lawsTitle.textContent = "Законодавство";
+  articlesDiv.appendChild(lawsTitle);
+
+  lawSections.forEach(section => {
+    const div = document.createElement("div");
+    div.className = "section-header";
+
+    div.innerHTML = `
+      <h2>${escapeHtml(section)}</h2>
+      <p>Перейти до статей розділу</p>
+    `;
+
+    const openBtn = document.createElement("button");
+    openBtn.textContent = "Відкрити";
+    openBtn.onclick = () => {
+      savedScroll = window.scrollY;
+      currentSection = section;
+      renderArticles();
+      window.scrollTo(0, 0);
+    };
+
+    div.appendChild(openBtn);
+    articlesDiv.appendChild(div);
+  });
+
+  const goToLawsBtn = document.getElementById("goToLawsBtn");
+  if (goToLawsBtn) {
+    goToLawsBtn.onclick = () => {
+      const target = document.querySelector(".section-header");
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    };
+  }
+
+  const goToConsultBtn = document.getElementById("goToConsultBtn");
+  if (goToConsultBtn) {
+    goToConsultBtn.onclick = () => {
+      openSearchModal();
+    };
+  }
+}
+
+
 
     initApp();
 
