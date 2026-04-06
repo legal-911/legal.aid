@@ -1202,33 +1202,35 @@ div.appendChild(moreBtn);
       .map((a, index) => ({ ...a, originalIndex: index }))
       .filter(a => a.section === currentSection);
 
-  if (query) {
-    const sectionCandidates = filteredArticles.map((a, index) => ({
-      ...a,
-      originalIndex: a.originalIndex ?? index
-    }));
+if (query) {
+  const sectionCandidates = filteredArticles.map((a, index) => ({
+    ...a,
+    originalIndex: a.originalIndex ?? index
+  }));
 
-    filteredArticles = await rankArticlesWithAI(query, sectionCandidates);
+  filteredArticles = await rankArticlesWithAI(query, sectionCandidates);
 
-    if (filteredArticles.length === 0) {
-      filteredArticles = fallbackRankArticles(query, sectionCandidates);
+  if (filteredArticles.length === 0) {
+    filteredArticles = fallbackRankArticles(query, sectionCandidates);
+  }
+} else {
+  filteredArticles = filteredArticles.sort((a, b) => {
+    const aNum = getArticleNumber(a.law);
+    const bNum = getArticleNumber(b.law);
+
+    if (aNum.main !== bNum.main) {
+      return aNum.main - bNum.main;
     }
-  } else {
-    filteredArticles = filteredArticles.sort((a, b) => {
-      const aNum = getArticleNumber(a.law);
-      const bNum = getArticleNumber(b.law);
 
-      if (aNum.main !== bNum.main) {
-        return aNum.main - bNum.main;
-      }
-
-      return aNum.sub - bNum.sub;
-    });
+    return aNum.sub - bNum.sub;
+  });
+}
 
 filteredArticles.forEach((a) => {
   const index = a.originalIndex;
   const div = document.createElement("div");
   div.className = "article";
+
 
     if (!shortText) {
     shortText = (a.details || '')
@@ -1272,7 +1274,6 @@ filteredArticles.forEach((a) => {
   articlesDiv.appendChild(div);
 });
     }
-  }
 
 homeBtn.addEventListener('click', () => {
   currentSection = null;
