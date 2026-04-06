@@ -1225,17 +1225,22 @@ div.appendChild(moreBtn);
       return aNum.sub - bNum.sub;
     });
 
-    filteredArticles.forEach((a) => {
-      const index = a.originalIndex;
-      const div = document.createElement("div");
-      div.className = "article";
+filteredArticles.forEach((a) => {
+  const index = a.originalIndex;
+  const div = document.createElement("div");
+  div.className = "article";
 
-      div.innerHTML = `
-  <h2>${escapeHtml(a.law.replace(/-/g, '.'))}</h2>
-  <p>${escapeHtml(shortText)}</p>
-`;
+    if (!shortText) {
+    shortText = (a.details || '')
+      .replace(/\*(.*?)\*/g, '$1')
+      .split('\n')
+      .map(line => line.trim())
+      .find(line => line.length > 0) || 'Короткий опис відсутній';
+  }
 
-      const detailsDiv = document.createElement("div");
+  div.innerHTML = `<h2>${escapeHtml(a.law.replace(/-/g, '.'))}</h2>`;
+
+  const detailsDiv = document.createElement("div");
       detailsDiv.className = "details";
       detailsDiv.innerHTML = `
         <div style="line-height:1.6; white-space:pre-line;">
@@ -1244,30 +1249,29 @@ div.appendChild(moreBtn);
         </div>
       `;
 
-      div.appendChild(detailsDiv);
+  div.appendChild(detailsDiv);
 
-const moreBtn = document.createElement("button");
-moreBtn.textContent = "Докладніше";
-moreBtn.onclick = () => toggleDetailsBlock(detailsDiv, moreBtn);
-div.appendChild(moreBtn);
+  const moreBtn = document.createElement("button");
+  moreBtn.textContent = "Докладніше";
+  moreBtn.onclick = () => toggleDetailsBlock(detailsDiv, moreBtn);
+  div.appendChild(moreBtn);
 
-      if (isAdmin) {
-        const editBtn = document.createElement("button");
-        editBtn.textContent = "Редагувати";
-        editBtn.onclick = () => openEditModal(index);
+  if (isAdmin) {
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "Редагувати";
+    editBtn.onclick = () => openEditModal(index);
 
-        const delBtn = document.createElement("button");
-        delBtn.textContent = "Видалити";
-        delBtn.onclick = () => openDeleteModal(index);
+    const delBtn = document.createElement("button");
+    delBtn.textContent = "Видалити";
+    delBtn.onclick = () => openDeleteModal(index);
 
-        div.appendChild(editBtn);
-        div.appendChild(delBtn);
-      }
-
-      articlesDiv.appendChild(div);
-    });
+    div.appendChild(editBtn);
+    div.appendChild(delBtn);
   }
 
+  articlesDiv.appendChild(div);
+});
+    }
   }
 
 homeBtn.addEventListener('click', () => {
