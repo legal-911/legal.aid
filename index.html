@@ -388,6 +388,65 @@ html, body {
   overflow-x: hidden;
 }
 
+.law-floating-bar {
+  position: fixed;
+  top: 56px;
+  left: 0;
+  right: 0;
+  z-index: 9990;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+
+  opacity: 0;
+  transform: translateY(-12px);
+  transition:
+    opacity 0.28s ease,
+    transform 0.28s ease;
+}
+
+.law-floating-bar.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.law-floating-bar-inner {
+  margin: 8px 14px 0;
+  width: min(900px, calc(100% - 28px));
+  background: rgba(0, 64, 128, 0.96);
+  color: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 10px 16px;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.2px;
+  pointer-events: auto;
+  box-sizing: border-box;
+}
+
+#lawFloatingBarTitle {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 700px) {
+  .law-floating-bar {
+    top: 56px;
+  }
+
+  .law-floating-bar-inner {
+    margin-top: 6px;
+    padding: 9px 12px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
+}
+
     </style>
     </head>
     <body>
@@ -401,6 +460,12 @@ html, body {
         <input type="text" id="searchInput" placeholder="Опишіть ситуацію..." style="display:none;">
       </div>
     </header>
+
+    <div id="lawFloatingBar" class="law-floating-bar">
+  <div class="law-floating-bar-inner">
+    <span id="lawFloatingBarTitle"></span>
+  </div>
+</div>
 
   <nav id="navMenu">
 
@@ -693,6 +758,9 @@ const closeReply = document.getElementById('closeReply');
 const replyText = document.getElementById('replyText');
 const sendReplyBtn = document.getElementById('sendReplyBtn');
 
+const lawFloatingBar = document.getElementById('lawFloatingBar');
+const lawFloatingBarTitle = document.getElementById('lawFloatingBarTitle');
+
 let currentReplyFeedbackId = null;
 
     const lawSections = [
@@ -721,14 +789,11 @@ let currentReplyFeedbackId = null;
 
     let articles = [
       {section:"Закон про державну службу", law: "Мова спілкування державного службовця – українська", short:"Це передбачає Закон про державну службу Стаття 2", details:"Витяг з статті: державна мова є українська мова, якій Конституцією України надано статус мови офіційного спілкування посадових осіб державних органів та органів місцевого самоврядування під час виконання посадових обов'язків, а також мови діловодства і документації цих органів та посадових осіб.", link:""},
-      {section:"Закон України «Про Національну поліцію»", law:"Працівник поліції є державним службовцем", short:"Згідно з Закону про державну службу та Закону про поліцію", details:"Стаття 2 Закону про державну службу поширюється на працівників поліції.", link:""},
-      {section:"Конституція України", law:"Право на свободу особистої думки", short:"Це передбачає Стаття 34 Конституції України", details:"Кожному гарантується право на свободу думки і слова, на вільне вираження своїх поглядів і переконань", link:""},
-      {section:"Конституція України", law:"Право мовчати", short:"Ви маєте право відмовитися давати свідчення", details:"Витяг з статті: Особа не несе відповІдальностІ за вІдмову давати показання щодо себе, членIв сIм'Ї чи близьких родичIв.\nПоправка: ВІдмова свIдчити можлива, коли йде обвинувачення вас, членIв сIм'Ї або ваших близьких родичIв.", link:""},
-      {section:"Закон України «Про НацІональну полIцIю»", law:"Пред’явлення документIв та ідентифІкацIя полIцейського", short:"Це передбачає Стаття 18 Закону про НацІональну полIцIю", details:"Витяг з статтI: полIцейський повинен назвати своє прІзвище, посаду, спецIальне звання та пред’явити службове посвIdчення.\nПоправка: ПолIцейський зобов'язаний мати нагрудний знак (жетон) і не може його приховувати.", link:""},
-      {section:"Закон України «Про НацІональну полIcIю»", law:"ПІdстави для перевІрки документIв", short:"Регулює Стаття 32 Закону про НацІональну полIcIю", details:"ПолIcейський має право вимагати пред’явлення документIв, якщо є пІdстави вважати, що особа вчинила або має намІр вчинити правопорушеннЯ.\nПоправка: ПолIcейський не може перевІряти документи без причини.", link:""},
-      {section:"Кодекс УкраЇни про адмІnISTRATивнИ правопорушеннЯ", law:"ДрĪbне хулĪганство", short:"Стаття 173 КУpАП", details:"Витяг з статтī: ДрĪbне хулĪганство тягне за собою накладення штрафу, громадські роботи або вiправні роботи, або адмΙnISTRATивний арешт.", link:""}
-    ];
-
+      {section:"Закон України «Про Національну поліцію»", law:"Почекайте завантаження статтей", short:"Якщо статті не завантажуються, оновіть сторінку або спробуйте пізніше", details:"Можливо тимчасові технічні проблеми або оновлення бази даних. Ми працюємо над вирішенням цієї проблеми якнайшвидше.", link:""},
+      {section:"Конституція України", law:"Почекайте завантаження статтей", short:"Якщо статті не завантажуються, оновіть сторінку або спробуйте пізніше", details:"Можливо тимчасові технічні проблеми або оновлення бази даних. Ми працюємо над вирішенням цієї проблеми якнайшвидше.", link:""},
+      {section:"Конституція України", law:"Почекайте завантаження статтей", short:"Якщо статті не завантажуються, оновіть сторінку або спробуйте пізніше", details:"Можливо тимчасові технічні проблеми або оновлення бази даних. Ми працюємо над вирішенням цієї проблеми якнайшвидше.", link:""},
+      {section:"Закон України «Про НацІональну полIцIю»", law:"Почекайте завантаження статтей", short:"Якщо статті не завантажуються, оновіть сторінку або спробуйте пізніше", details:"Можливо тимчасові технічні проблеми або оновлення бази даних. Ми працюємо над вирішенням цієї проблеми якнайшвидше.", link:""},
+  ];
     let editIndex = null;
     let deleteIndex = null;
 
@@ -1201,6 +1266,16 @@ div.appendChild(moreBtn);
   }
 
   }
+
+homeBtn.addEventListener('click', () => {
+  currentSection = null;
+  searchInput.value = '';
+  renderArticles();
+  window.scrollTo(0, 0);
+  nav.style.display = 'none';
+  refreshLawFloatingBarImmediately();
+});
+
   function openEditModal(index){
       editIndex=index;
       const articleSection = document.getElementById('articleSection');
@@ -1915,6 +1990,35 @@ card.innerHTML = `
   }
 }
 
+function updateLawFloatingBar() {
+  if (!lawFloatingBar || !lawFloatingBarTitle) return;
+
+  if (!currentSection) {
+    lawFloatingBar.classList.remove('show');
+    lawFloatingBarTitle.textContent = '';
+    return;
+  }
+
+  lawFloatingBarTitle.textContent = currentSection;
+
+  const triggerPoint = 140;
+  const shouldShow = window.scrollY > triggerPoint;
+
+  lawFloatingBar.classList.toggle('show', shouldShow);
+}
+
+function refreshLawFloatingBarImmediately() {
+  if (!lawFloatingBar || !lawFloatingBarTitle) return;
+
+  if (!currentSection) {
+    lawFloatingBar.classList.remove('show');
+    lawFloatingBarTitle.textContent = '';
+  } else {
+    lawFloatingBarTitle.textContent = currentSection;
+    updateLawFloatingBar();
+  }
+}
+
     function openDeleteModal(index){ deleteIndex=index; deleteModal.style.display='flex'; deleteModal.classList.add('show'); }
     closeDelete.addEventListener('click',()=>{deleteModal.style.display='none'; deleteModal.classList.remove('show');});
     cancelDelete.addEventListener('click',()=>{deleteModal.style.display='none'; deleteModal.classList.remove('show');});
@@ -2117,6 +2221,10 @@ replyModal.addEventListener('click', (e) => {
     details.style.maxHeight = details.scrollHeight + 'px';
   });
 });
+
+window.addEventListener('scroll', () => {
+  updateLawFloatingBar();
+}, { passive: true });
 
     </script>
 
