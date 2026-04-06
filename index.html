@@ -826,13 +826,15 @@ cleanBody = articleBody
   .trim();
     }
 
-    generatedItems.push({
-      section: currentSection,
-      law: `Стаття ${item.articleNumber}`,
-      short: item.articleTitle || `Стаття ${item.articleNumber}`,
-      details: `*${item.articleTitle || `Стаття ${item.articleNumber}`}*\n\n${cleanBody}`,
-      link: lawLink || ''
-    });
+const formattedNumber = item.articleNumber.replace(/-/g, '.');
+
+generatedItems.push({
+  section: currentSection,
+  law: `Стаття ${formattedNumber}`,
+  short: item.articleTitle || `Стаття ${formattedNumber}`,
+  details: `*${item.articleTitle || `Стаття ${formattedNumber}`}*\n\n${cleanBody}`,
+  link: lawLink || ''
+});
   }
 
   await addManyArticlesToDB(generatedItems);
@@ -1056,7 +1058,7 @@ function toggleDetailsBlock(detailsDiv, button) {
         div.className = "article";
 
         div.innerHTML = `
-          <h2>${escapeHtml(a.law)}</h2>
+          <h2>${escapeHtml(a.law.replace(/-/g, '.'))}</h2>
           <p><b>${escapeHtml(a.section || "Без назви закону")}</b></p>
           <p>${escapeHtml(a.short || "")}</p>
         `;
@@ -1163,7 +1165,7 @@ div.appendChild(moreBtn);
       const div = document.createElement("div");
       div.className = "article";
 
-      div.innerHTML = `<h2>${escapeHtml(a.law)}</h2><p>${escapeHtml(a.short || "")}</p>`;
+      div.innerHTML = `<h2>${escapeHtml(a.law.replace(/-/g, '.'))}</h2>`;
 
       const detailsDiv = document.createElement("div");
       detailsDiv.className = "details";
@@ -1301,20 +1303,23 @@ div.appendChild(moreBtn);
       }
     });
 
-  function getArticleNumber(title) {
-    const match = title.match(/Стаття\s*(\d+(?:-\d+)*)/i);
+function getArticleNumber(title) {
+  const match = title.match(/Стаття\s*(\d+(?:[.-]\d+)*)/i);
 
-    if (!match) {
-      return { main: 999999, sub: 999999 };
-    }
-
-    const parts = match[1].split('-').map(n => parseInt(n, 10));
-
-    return {
-      main: parts[0] ?? 999999,
-      sub: parts[1] ?? 0
-    };
+  if (!match) {
+    return { main: 999999, sub: 999999 };
   }
+
+  const parts = match[1]
+    .replace(/-/g, '.') // поддержка старых данных
+    .split('.')
+    .map(n => parseInt(n, 10));
+
+  return {
+    main: parts[0] ?? 999999,
+    sub: parts[1] ?? 0
+  };
+}
 
   function showAddButton() {
     const adminMenu = document.getElementById('adminMenu');
