@@ -1230,14 +1230,15 @@ filteredArticles.forEach((a) => {
   const div = document.createElement("div");
   div.className = "article";
 
+let shortText = a.short;
 
-    if (!shortText) {
-    shortText = (a.details || '')
-      .replace(/\*(.*?)\*/g, '$1')
-      .split('\n')
-      .map(line => line.trim())
-      .find(line => line.length > 0) || 'Короткий опис відсутній';
-  }
+if (!shortText) {
+  shortText = (a.details || '')
+    .replace(/\*(.*?)\*/g, '$1')
+    .split('\n')
+    .map(line => line.trim())
+    .find(line => line.length > 0) || 'Короткий опис відсутній';
+}
 
   div.innerHTML = `<h2>${escapeHtml(a.law.replace(/-/g, '.'))}</h2>`;
 
