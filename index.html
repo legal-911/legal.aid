@@ -1021,6 +1021,20 @@ function toggleDetailsBlock(detailsDiv, button) {
   const articleCard = button.closest('.article');
   const isOpen = detailsDiv.classList.contains('open');
 
+  function getTopOffset() {
+    const header = document.querySelector('header');
+    const floatingBar = document.getElementById('lawFloatingBar');
+
+    const headerHeight = header ? header.offsetHeight : 0;
+
+    let floatingHeight = 0;
+    if (floatingBar && floatingBar.classList.contains('show')) {
+      floatingHeight = floatingBar.offsetHeight;
+    }
+
+    return headerHeight + floatingHeight + 16; // 16px запас
+  }
+
   if (isOpen) {
     const articleTop = articleCard.getBoundingClientRect().top + window.scrollY;
 
@@ -1034,7 +1048,7 @@ function toggleDetailsBlock(detailsDiv, button) {
 
     setTimeout(() => {
       window.scrollTo({
-        top: articleTop - 70,
+        top: articleTop - getTopOffset(),
         behavior: 'smooth'
       });
     }, 220);
