@@ -955,7 +955,7 @@ html, body {
   </div>
 </div>
 
-<div class="featured-topic-card" id="featuredTopicCard">
+<div class="featured-topic" id="featuredTopicCard">
   <div class="topic-badge" id="featuredTopicBadge">Важлива тема</div>
   <h3 id="featuredTopicTitle">Постанова Верховної Ради України від 26.03.2026 № 4829-IX</h3>
   <p id="featuredTopicText">
@@ -2851,17 +2851,20 @@ async function loadFeaturedTopic() {
     const snap = await getDoc(ref);
 
     if (snap.exists()) {
-      currentFeaturedTopic = applyFeaturedTopic(snap.data());
-      return currentFeaturedTopic;
+      featuredTopic = snap.data(); // ВАЖНО
+      applyFeaturedTopic(featuredTopic);
+      return featuredTopic;
     } else {
-      currentFeaturedTopic = applyFeaturedTopic(FEATURED_TOPIC_DEFAULT);
+      featuredTopic = FEATURED_TOPIC_DEFAULT;
       await setDoc(ref, FEATURED_TOPIC_DEFAULT);
-      return currentFeaturedTopic;
+      applyFeaturedTopic(featuredTopic);
+      return featuredTopic;
     }
   } catch (error) {
-    console.error("Помилка завантаження featured topic:", error);
-    currentFeaturedTopic = applyFeaturedTopic(FEATURED_TOPIC_DEFAULT);
-    return currentFeaturedTopic;
+    console.error("Помилка:", error);
+    featuredTopic = FEATURED_TOPIC_DEFAULT;
+    applyFeaturedTopic(featuredTopic);
+    return featuredTopic;
   }
 }
 
@@ -3079,10 +3082,6 @@ topicsGrid.innerHTML = importantTopics.length
 
 
     initApp();
-
-    window.addEventListener("DOMContentLoaded", async () => {
-  await loadFeaturedTopic();
-});
 
     window.addEventListener('resize', () => {
   document.querySelectorAll('.details.open').forEach(details => {
