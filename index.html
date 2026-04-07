@@ -955,21 +955,22 @@ html, body {
   </div>
 </div>
 
-<div class="modal" id="topicsAdminModal">
-  <div class="modal-content" style="width:800px; max-width:95%;">
-    <span class="close" id="closeTopicsAdmin">&times;</span>
-    <h2>Редагування важливих тем</h2>
+<div class="featured-topic-card" id="featuredTopicCard">
+  <div class="topic-badge" id="featuredTopicBadge">Важлива тема</div>
+  <h3 id="featuredTopicTitle">Постанова Верховної Ради України від 26.03.2026 № 4829-IX</h3>
+  <p id="featuredTopicText">
+    Про прийняття за основу проекту Закону України про внесення змін до деяких законів України щодо збереження цінної історичної забудови в населених пунктах
+  </p>
+</div>
 
-    <input type="text" id="topicTitleInput" placeholder="Заголовок теми">
-    <textarea id="topicTextInput" rows="5" placeholder="Опис теми"></textarea>
-    <input type="text" id="topicImageInput" placeholder="Посилання на фото (https://...)">
-    <img id="topicPreviewImage" class="topic-preview-image" style="display:none;" alt="Попередній перегляд">
-    <button id="saveTopicBtn">Додати тему</button>
+<div class="admin-featured-topic-box" id="adminFeaturedTopicBox" style="display:none;">
+  <h3>Редагування важливої теми</h3>
 
-    <hr style="margin:14px 0;">
+  <input type="text" id="featuredTopicBadgeInput" placeholder="Напис на бейджі">
+  <input type="text" id="featuredTopicTitleInput" placeholder="Заголовок теми">
+  <textarea id="featuredTopicTextInput" placeholder="Опис теми"></textarea>
 
-    <div id="topicsAdminList" style="max-height:320px; overflow:auto;"></div>
-  </div>
+  <button id="saveFeaturedTopicBtn">Зберегти важливу тему</button>
 </div>
 
     <footer>
@@ -1355,6 +1356,41 @@ generatedItems.push({
       .replace(/~~(.*?)~~/g, "<s>$1</s>")
       .replace(/\n/g, "<br>");
   }
+
+  const FEATURED_TOPIC_DEFAULT = {
+  badge: "Важлива тема",
+  title: "Права людини у повсякденних ситуаціях",
+  text: "Дізнайтеся про право на мовчання, перевірку документів, огляд речей, права при спілкуванні з поліцією та інші важливі юридичні питання."
+};
+
+const featuredTopicEls = {
+  badge: document.getElementById("featuredTopicBadge"),
+  title: document.getElementById("featuredTopicTitle"),
+  text: document.getElementById("featuredTopicText"),
+  badgeInput: document.getElementById("featuredTopicBadgeInput"),
+  titleInput: document.getElementById("featuredTopicTitleInput"),
+  textInput: document.getElementById("featuredTopicTextInput"),
+  saveBtn: document.getElementById("saveFeaturedTopicBtn")
+};
+
+function applyFeaturedTopic(data = {}) {
+  const topic = {
+    badge: data.badge?.trim() || FEATURED_TOPIC_DEFAULT.badge,
+    title: data.title?.trim() || FEATURED_TOPIC_DEFAULT.title,
+    text: data.text?.trim() || FEATURED_TOPIC_DEFAULT.text
+  };
+
+  if (featuredTopicEls.badge) featuredTopicEls.badge.textContent = topic.badge;
+  if (featuredTopicEls.title) featuredTopicEls.title.textContent = topic.title;
+  if (featuredTopicEls.text) featuredTopicEls.text.textContent = topic.text;
+
+  if (featuredTopicEls.badgeInput) featuredTopicEls.badgeInput.value = topic.badge;
+  if (featuredTopicEls.titleInput) featuredTopicEls.titleInput.value = topic.title;
+  if (featuredTopicEls.textInput) featuredTopicEls.textInput.value = topic.text;
+
+  return topic;
+}
+
 
 function toggleDetailsBlock(detailsDiv, button) {
   const articleCard = button.closest('.article');
@@ -2803,16 +2839,57 @@ async function loadImportantTopics() {
   });
 }
 
+function isSameFeaturedTopic(a, b) {
+  return a?.badge === b?.badge &&
+         a?.title === b?.title &&
+         a?.text === b?.text;
+}
+
 async function loadFeaturedTopic() {
-  const snapshot = await getDocs(collection(db, "featuredTopic"));
+  try {
+    const ref = doc(db, "featured_topic", "main");
+    const snap = await getDoc(ref);
 
-  featuredTopic = null;
-
-  snapshot.forEach(docItem => {
-    if (!featuredTopic) {
-      featuredTopic = { id: docItem.id, ...docItem.data() };
+    if (snap.exists()) {
+      currentFeaturedTopic = applyFeaturedTopic(snap.data());
+      return currentFeaturedTopic;
+    } else {
+      currentFeaturedTopic = applyFeaturedTopic(FEATURED_TOPIC_DEFAULT);
+      await setDoc(ref, FEATURED_TOPIC_DEFAULT);
+      return currentFeaturedTopic;
     }
-  });
+  } catch (error) {
+    console.error("Помилка завантаження featured topic:", error);
+    currentFeaturedTopic = applyFeaturedTopic(FEATURED_TOPIC_DEFAULT);
+    return currentFeaturedTopic;
+  }
+}
+
+async function saveFeaturedTopic() {
+  try {
+    const newData = {
+      badge: featuredTopicEls.badgeInput?.value?.trim() || FEATURED_TOPIC_DEFAULT.badge,
+      title: featuredTopicEls.titleInput?.value?.trim() || FEATURED_TOPIC_DEFAULT.title,
+      text: featuredTopicEls.textInput?.value?.trim() || FEATURED_TOPIC_DEFAULT.text
+    };
+
+    if (isSameFeaturedTopic(currentFeaturedTopic, newData)) {
+      showToast("Змін немає");
+      return;
+    }
+
+    await setDoc(doc(db, "featured_topic", "main"), newData);
+    currentFeaturedTopic = applyFeaturedTopic(newData);
+
+    showToast("Важливу тему збережено");
+  } catch (error) {
+    console.error("Помилка збереження featured topic:", error);
+    alert("Не вдалося зберегти важливу тему");
+  }
+}
+
+if (featuredTopicEls.saveBtn) {
+  featuredTopicEls.saveBtn.addEventListener("click", saveFeaturedTopic);
 }
 
 async function seedHomeContentIfEmpty() {
@@ -3003,9 +3080,14 @@ topicsGrid.innerHTML = importantTopics.length
 
     initApp();
 
+    window.addEventListener("DOMContentLoaded", async () => {
+  await loadFeaturedTopic();
+});
+
     window.addEventListener('resize', () => {
   document.querySelectorAll('.details.open').forEach(details => {
     details.style.maxHeight = details.scrollHeight + 'px';
+
   });
 });
 
