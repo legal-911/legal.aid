@@ -554,17 +554,31 @@ html, body {
   min-height: 280px;
   border-radius: 12px;
   overflow: hidden;
-  background: linear-gradient(135deg, #1b4d96, #0a5bb5);
   color: white;
   display: flex;
   align-items: flex-end;
   box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+  cursor: pointer;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  text-decoration: none;
+}
+
+.featured-topic::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top, rgba(0,0,0,0.68), rgba(0,0,0,0.18)),
+    linear-gradient(135deg, #1b4d96, #0a5bb5);
 }
 
 .featured-topic-content {
+  position: relative;
+  z-index: 2;
   padding: 20px;
   width: 100%;
-  background: linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0.08));
 }
 
 .featured-topic-label {
@@ -659,21 +673,17 @@ html, body {
   color: #0f172a;
 }
 
-@media (max-width: 950px) {
-  .home-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .important-topics-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .home-hero-title {
-    font-size: 28px;
+@media (max-width: 700px) {
+  .featured-topic {
+    min-height: 240px;
   }
 
   .featured-topic-title {
-    font-size: 24px;
+    font-size: 22px;
+  }
+
+  .featured-topic-text {
+    font-size: 14px;
   }
 }
 
@@ -972,6 +982,31 @@ html, body {
   </div>
 </div>
 
+<div class="modal" id="featuredTopicAdminModal">
+  <div class="modal-content" style="width:800px; max-width:95%;">
+    <span class="close" id="closeFeaturedTopicAdmin">&times;</span>
+    <h2>Редагування важливої теми</h2>
+
+    <input type="text" id="featuredTopicBadgeInput" placeholder="Напис на бейджі, наприклад: Важлива тема">
+    <input type="text" id="featuredTopicTitleInput" placeholder="Заголовок">
+    <textarea id="featuredTopicTextInput" rows="4" placeholder="Короткий опис"></textarea>
+    <input type="text" id="featuredTopicImageInput" placeholder="Посилання на фото">
+    <input type="text" id="featuredTopicLinkInput" placeholder="Посилання, куди перекидати при натисканні">
+    <input type="number" id="featuredTopicOrderInput" placeholder="Порядок (1, 2, 3...)">
+
+    <label style="display:flex; gap:8px; align-items:center; margin-bottom:10px;">
+      <input type="checkbox" id="featuredTopicActiveInput">
+      <span>Активна тема</span>
+    </label>
+
+    <button id="saveFeaturedTopicBtn">Додати / зберегти тему</button>
+
+    <hr style="margin:14px 0;">
+
+    <div id="featuredTopicsAdminList" style="max-height:320px; overflow:auto;"></div>
+  </div>
+</div>
+
     <footer>
       Інформація від "Офіційний вебпортал парламенту України"<br>©2026
     </footer>
@@ -1094,6 +1129,16 @@ const topicImageInput = document.getElementById('topicImageInput');
 const topicPreviewImage = document.getElementById('topicPreviewImage');
 const saveTopicBtn = document.getElementById('saveTopicBtn');
 const topicsAdminList = document.getElementById('topicsAdminList');
+const featuredTopicAdminModal = document.getElementById('featuredTopicAdminModal');
+const closeFeaturedTopicAdmin = document.getElementById('closeFeaturedTopicAdmin');
+const featuredTopicBadgeInput = document.getElementById('featuredTopicBadgeInput');
+const featuredTopicTitleInput = document.getElementById('featuredTopicTitleInput');
+const featuredTopicTextInput = document.getElementById('featuredTopicTextInput');
+const featuredTopicImageInput = document.getElementById('featuredTopicImageInput');
+const featuredTopicLinkInput = document.getElementById('featuredTopicLinkInput');
+const featuredTopicOrderInput = document.getElementById('featuredTopicOrderInput');
+const featuredTopicActiveInput = document.getElementById('featuredTopicActiveInput');
+const featuredTopicsAdminList = document.getElementById('featuredTopicsAdminList');
 
 let currentReplyFeedbackId = null;
 
@@ -1121,6 +1166,8 @@ let currentReplyFeedbackId = null;
   let aiSearchCache = new Map();
   let aiSearchTimer = null;
 
+let editingFeaturedTopicId = null;
+
     let articles = [
       {section:"Закон про державну службу", law: "Мова спілкування державного службовця – українська", short:"Це передбачає Закон про державну службу Стаття 2", details:"Витяг з статті: державна мова є українська мова, якій Конституцією України надано статус мови офіційного спілкування посадових осіб державних органів та органів місцевого самоврядування під час виконання посадових обов'язків, а також мови діловодства і документації цих органів та посадових осіб.", link:""},
       {section:"Закон України «Про Національну поліцію»", law:"Права та обов'язки поліцейського", short:"Основні права та обов'язки поліцейського визначені в Законі України «Про Національну поліцію» Стаття 12", details:"Витяг з статті: поліцейський має право застосовувати фізичну силу, спеціальні засоби та вогнепальну зброю у випадках, передбачених законом. Він зобов'язаний дотримуватися Конституції України, законів України, міжнародних договорів України, а також виконувати свої службові обов'язки сумлінно та неупереджено.", link:""},
@@ -1129,7 +1176,6 @@ let currentReplyFeedbackId = null;
     ];
 
 let homeNews = [];
-let importantTopics = [];
 let featuredTopic = null;
 
     let editIndex = null;
@@ -1344,6 +1390,44 @@ generatedItems.push({
       updateAdminUI();
       await checkMaintenanceMode();
     });
+
+    async function loadFeaturedTopic() {
+  try {
+    const snapshot = await getDocs(query(
+      collection(db, "featuredTopics"),
+      orderBy("order", "asc")
+    ));
+
+    const allTopics = [];
+    snapshot.forEach(docItem => {
+      allTopics.push({ id: docItem.id, ...docItem.data() });
+    });
+
+    const activeTopic = allTopics.find(item => item.isActive === true);
+
+    featuredTopic = activeTopic || {
+      badge: "Важлива тема",
+      title: "Юридична допомога онлайн",
+      text: "Оберіть законодавство, знайдіть потрібну статтю або перегляньте важливі юридичні матеріали.",
+      image: "",
+      link: ""
+    };
+
+    return featuredTopic;
+  } catch (error) {
+    console.error("Помилка завантаження featured topic:", error);
+
+    featuredTopic = {
+      badge: "Важлива тема",
+      title: "Юридична допомога онлайн",
+      text: "Оберіть законодавство, знайдіть потрібну статтю або перегляньте важливі юридичні матеріали.",
+      image: "",
+      link: ""
+    };
+
+    return featuredTopic;
+  }
+}
 
   function formatText(text) {
     if (!text) return "";
@@ -1771,11 +1855,11 @@ newsBtn.onclick = async () => {
   await openNewsAdminModal();
 };
 
-const topicsBtn = document.createElement('button');
-topicsBtn.textContent = 'Редагувати важливі теми';
-topicsBtn.onclick = async () => {
+const featuredTopicBtn = document.createElement('button');
+featuredTopicBtn.textContent = 'Редагувати важливу тему';
+featuredTopicBtn.onclick = async () => {
   nav.style.display = 'none';
-  await openTopicsAdminModal();
+  await openFeaturedTopicAdminModal();
 };
 
     const maintenanceOn = document.createElement('button');
@@ -1797,8 +1881,8 @@ topicsBtn.onclick = async () => {
     adminMenu.appendChild(feedbackAdminBtn);
     adminMenu.appendChild(maintenanceOn);
     adminMenu.appendChild(maintenanceOff);
-    adminMenu.appendChild(newsBtn);
-adminMenu.appendChild(topicsBtn);
+    adminMenu.appendChild(newsBtn);    
+    adminMenu.appendChild(featuredTopicBtn);
   }
 
     function openBulkImportModal(){
@@ -2627,7 +2711,6 @@ async function initApp(){
   await seedHomeContentIfEmpty();
 
   await loadHomeNews();
-  await loadImportantTopics();
   await loadFeaturedTopic();
   await loadArticles();
 
@@ -2643,30 +2726,6 @@ async function initApp(){
   homeNews = [];
   snapshot.forEach(docItem => {
     homeNews.push({ id: docItem.id, ...docItem.data() });
-  });
-}
-
-async function loadImportantTopics() {
-  const snapshot = await getDocs(query(
-    collection(db, "importantTopics"),
-    orderBy("createdAt", "desc")
-  ));
-
-  importantTopics = [];
-  snapshot.forEach(docItem => {
-    importantTopics.push({ id: docItem.id, ...docItem.data() });
-  });
-}
-
-async function loadFeaturedTopic() {
-  const snapshot = await getDocs(collection(db, "featuredTopic"));
-
-  featuredTopic = null;
-
-  snapshot.forEach(docItem => {
-    if (!featuredTopic) {
-      featuredTopic = { id: docItem.id, ...docItem.data() };
-    }
   });
 }
 
@@ -2688,27 +2747,6 @@ async function seedHomeContentIfEmpty() {
     });
   }
 
-  const topicsSnap = await getDocs(collection(db, "importantTopics"));
-  if (topicsSnap.empty) {
-    await addDoc(collection(db, "importantTopics"), {
-      title: "Перевірка документів",
-      text: "Пояснення щодо підстав перевірки документів, прав громадянина та обов’язків поліцейського.",
-      createdAt: serverTimestamp()
-    });
-
-    await addDoc(collection(db, "importantTopics"), {
-      title: "Право на мовчання",
-      text: "Коротке пояснення, коли особа має право не свідчити проти себе та близьких родичів.",
-      createdAt: serverTimestamp()
-    });
-
-    await addDoc(collection(db, "importantTopics"), {
-      title: "Огляд речей",
-      text: "Що потрібно знати про перевірку сумки, рюкзака та особистих речей у різних ситуаціях.",
-      createdAt: serverTimestamp()
-    });
-  }
-
   const featuredSnap = await getDocs(collection(db, "featuredTopic"));
   if (featuredSnap.empty) {
     await addDoc(collection(db, "featuredTopic"), {
@@ -2718,6 +2756,105 @@ async function seedHomeContentIfEmpty() {
       createdAt: serverTimestamp()
     });
   }
+}
+
+async function openFeaturedTopicAdminModal() {
+  featuredTopicAdminModal.style.display = 'flex';
+  featuredTopicAdminModal.classList.add('show');
+
+  editingFeaturedTopicId = null;
+  featuredTopicBadgeInput.value = 'Важлива тема';
+  featuredTopicTitleInput.value = '';
+  featuredTopicTextInput.value = '';
+  featuredTopicImageInput.value = '';
+  featuredTopicLinkInput.value = '';
+  featuredTopicOrderInput.value = '';
+  featuredTopicActiveInput.checked = true;
+
+  await renderFeaturedTopicsAdminList();
+}
+
+async function renderFeaturedTopicsAdminList() {
+  featuredTopicsAdminList.innerHTML = 'Завантаження...';
+
+  const snapshot = await getDocs(query(
+    collection(db, "featuredTopics"),
+    orderBy("order", "asc")
+  ));
+
+  const items = [];
+  snapshot.forEach(docItem => {
+    items.push({ id: docItem.id, ...docItem.data() });
+  });
+
+  if (!items.length) {
+    featuredTopicsAdminList.innerHTML = '<p>Тем поки немає.</p>';
+    return;
+  }
+
+  featuredTopicsAdminList.innerHTML = '';
+
+  items.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'admin-list-card';
+
+    card.innerHTML = `
+      ${item.image ? `<img src="${item.image}" class="important-topic-image" alt="${escapeHtml(item.title || '')}">` : ''}
+      <h4>${escapeHtml(item.title || '')}</h4>
+      <p><b>${escapeHtml(item.badge || '')}</b></p>
+      <p>${escapeHtml(item.text || '')}</p>
+      <p><b>Порядок:</b> ${escapeHtml(String(item.order || 0))}</p>
+      <p><b>Активна:</b> ${item.isActive ? 'Так' : 'Ні'}</p>
+    `;
+
+    const actions = document.createElement('div');
+    actions.className = 'admin-actions';
+
+    const editBtn = document.createElement('button');
+    editBtn.textContent = 'Редагувати';
+    editBtn.onclick = () => {
+      editingFeaturedTopicId = item.id;
+      featuredTopicBadgeInput.value = item.badge || '';
+      featuredTopicTitleInput.value = item.title || '';
+      featuredTopicTextInput.value = item.text || '';
+      featuredTopicImageInput.value = item.image || '';
+      featuredTopicLinkInput.value = item.link || '';
+      featuredTopicOrderInput.value = item.order || '';
+      featuredTopicActiveInput.checked = !!item.isActive;
+    };
+
+    const activateBtn = document.createElement('button');
+    activateBtn.textContent = 'Зробити активною';
+    activateBtn.onclick = async () => {
+      const allSnap = await getDocs(collection(db, "featuredTopics"));
+      for (const docItem of allSnap.docs) {
+        await updateDoc(doc(db, "featuredTopics", docItem.id), { isActive: false });
+      }
+
+      await updateDoc(doc(db, "featuredTopics", item.id), { isActive: true });
+
+      showToast('Тему активовано', 'success');
+      await loadFeaturedTopic();
+      renderArticles();
+      await renderFeaturedTopicsAdminList();
+    };
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = 'Видалити';
+    deleteBtn.onclick = async () => {
+      await deleteDoc(doc(db, "featuredTopics", item.id));
+      showToast('Тему видалено', 'success');
+      await loadFeaturedTopic();
+      renderArticles();
+      await renderFeaturedTopicsAdminList();
+    };
+
+    actions.appendChild(editBtn);
+    actions.appendChild(activateBtn);
+    actions.appendChild(deleteBtn);
+    card.appendChild(actions);
+    featuredTopicsAdminList.appendChild(card);
+  });
 }
 
 function renderHomePage() {
@@ -2748,16 +2885,27 @@ function renderHomePage() {
   const grid = document.createElement("div");
   grid.className = "home-grid";
 
-  const left = document.createElement("div");
-  left.innerHTML = `
-    <div class="featured-topic">
-      <div class="featured-topic-content">
-        <div class="featured-topic-label">${escapeHtml(featured.label || "Важлива тема")}</div>
-        <div class="featured-topic-title">${escapeHtml(featured.title || "")}</div>
-        <div class="featured-topic-text">${escapeHtml(featured.text || "")}</div>
-      </div>
+const left = document.createElement("div");
+
+const bgImage = featured.image
+  ? `background-image: url('${featured.image}');`
+  : "";
+
+const linkStart = featured.link
+  ? `<a class="featured-topic" href="${featured.link}" target="_blank" rel="noopener noreferrer" style="${bgImage}">`
+  : `<div class="featured-topic" style="${bgImage}">`;
+
+const linkEnd = featured.link ? `</a>` : `</div>`;
+
+left.innerHTML = `
+  ${linkStart}
+    <div class="featured-topic-content">
+      <div class="featured-topic-label">${escapeHtml(featured.badge || "Важлива тема")}</div>
+      <div class="featured-topic-title">${escapeHtml(featured.title || "")}</div>
+      <div class="featured-topic-text">${escapeHtml(featured.text || "")}</div>
     </div>
-  `;
+  ${linkEnd}
+`;
 
   const right = document.createElement("div");
   right.className = "home-card";
@@ -2785,29 +2933,6 @@ function renderHomePage() {
   grid.appendChild(left);
   grid.appendChild(right);
   articlesDiv.appendChild(grid);
-
-  const topicsTitle = document.createElement("h2");
-  topicsTitle.className = "home-section-title";
-  topicsTitle.textContent = "Важливі теми";
-  articlesDiv.appendChild(topicsTitle);
-
-  const topicsGrid = document.createElement("div");
-  topicsGrid.className = "important-topics-grid";
-topicsGrid.innerHTML = importantTopics.length
-  ? importantTopics.map(item => `
-    <div class="important-topic-card">
-      ${
-        item.image
-          ? `<img src="${item.image}" alt="${escapeHtml(item.title || "Тема")}" class="important-topic-image">`
-          : ''
-      }
-      <h4>${escapeHtml(item.title || "")}</h4>
-      <p>${escapeHtml(item.text || "")}</p>
-    </div>
-  `).join("")
-    : `<div class="important-topic-card"><h4>Немає тем</h4><p>Додайте важливі теми через адмін-панель.</p></div>`;
-
-  articlesDiv.appendChild(topicsGrid);
 
   const lawsTitle = document.createElement("h2");
   lawsTitle.className = "home-section-title";
@@ -2854,7 +2979,76 @@ topicsGrid.innerHTML = importantTopics.length
   }
 }
 
+saveFeaturedTopicBtn.addEventListener('click', async () => {
+  const badge = featuredTopicBadgeInput.value.trim() || 'Важлива тема';
+  const title = featuredTopicTitleInput.value.trim();
+  const text = featuredTopicTextInput.value.trim();
+  const image = featuredTopicImageInput.value.trim();
+  const link = featuredTopicLinkInput.value.trim();
+  const order = Number(featuredTopicOrderInput.value) || 0;
+  const isActive = featuredTopicActiveInput.checked;
 
+  if (!title || !text) {
+    showToast('Заповніть заголовок і текст', 'error');
+    return;
+  }
+
+  try {
+    if (isActive) {
+      const allSnap = await getDocs(collection(db, "featuredTopics"));
+      for (const docItem of allSnap.docs) {
+        await updateDoc(doc(db, "featuredTopics", docItem.id), { isActive: false });
+      }
+    }
+
+    const payload = {
+      badge,
+      title,
+      text,
+      image,
+      link,
+      order,
+      isActive,
+      createdAt: serverTimestamp()
+    };
+
+    if (editingFeaturedTopicId) {
+      await updateDoc(doc(db, "featuredTopics", editingFeaturedTopicId), payload);
+      showToast('Тему оновлено', 'success');
+    } else {
+      await addDoc(collection(db, "featuredTopics"), payload);
+      showToast('Тему додано', 'success');
+    }
+
+    editingFeaturedTopicId = null;
+    featuredTopicBadgeInput.value = 'Важлива тема';
+    featuredTopicTitleInput.value = '';
+    featuredTopicTextInput.value = '';
+    featuredTopicImageInput.value = '';
+    featuredTopicLinkInput.value = '';
+    featuredTopicOrderInput.value = '';
+    featuredTopicActiveInput.checked = true;
+
+    await loadFeaturedTopic();
+    renderArticles();
+    await renderFeaturedTopicsAdminList();
+  } catch (error) {
+    console.error(error);
+    showToast('Помилка збереження теми', 'error');
+  }
+});
+
+closeFeaturedTopicAdmin.addEventListener('click', () => {
+  featuredTopicAdminModal.style.display = 'none';
+  featuredTopicAdminModal.classList.remove('show');
+});
+
+featuredTopicAdminModal.addEventListener('click', (e) => {
+  if (e.target === featuredTopicAdminModal) {
+    featuredTopicAdminModal.style.display = 'none';
+    featuredTopicAdminModal.classList.remove('show');
+  }
+});
 
     initApp();
 
