@@ -2888,8 +2888,12 @@ function renderHomePage() {
 const left = document.createElement("div");
 
 const bgImage = featured.image
-  ? `background-image: url('${featured.image}');`
-  : "";
+  ? `
+    background-image: 
+      linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.2)),
+      url('${featured.image}');
+  `
+  : "background: linear-gradient(135deg, #1b4d96, #0a5bb5);";
 
 const linkStart = featured.link
   ? `<a class="featured-topic" href="${featured.link}" target="_blank" rel="noopener noreferrer" style="${bgImage}">`
