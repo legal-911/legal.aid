@@ -677,6 +677,57 @@ html, body {
   }
 }
 
+.important-topic-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  display: block;
+  background: #dbeafe;
+}
+
+.admin-list-card {
+  background: #f8fafc;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.admin-list-card h4 {
+  margin: 0 0 8px 0;
+  color: #004080;
+  font-size: 18px;
+}
+
+.admin-list-card p {
+  margin: 0 0 8px 0;
+  white-space: pre-line;
+  line-height: 1.5;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.admin-actions button {
+  width: auto;
+  margin-bottom: 0;
+}
+
+.topic-preview-image {
+  width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-top: 10px;
+  border: 1px solid #dbeafe;
+}
+
     </style>
     </head>
     <body>
@@ -888,6 +939,39 @@ html, body {
   </div>
 </div>
 
+<div class="modal" id="newsAdminModal">
+  <div class="modal-content" style="width:800px; max-width:95%;">
+    <span class="close" id="closeNewsAdmin">&times;</span>
+    <h2>Редагування новин</h2>
+
+    <input type="text" id="newsTitleInput" placeholder="Заголовок новини">
+    <textarea id="newsTextInput" rows="5" placeholder="Текст новини"></textarea>
+    <input type="text" id="newsDateInput" placeholder="Дата (наприклад: 06.04.2026)">
+    <button id="saveNewsBtn">Додати новину</button>
+
+    <hr style="margin:14px 0;">
+
+    <div id="newsAdminList" style="max-height:320px; overflow:auto;"></div>
+  </div>
+</div>
+
+<div class="modal" id="topicsAdminModal">
+  <div class="modal-content" style="width:800px; max-width:95%;">
+    <span class="close" id="closeTopicsAdmin">&times;</span>
+    <h2>Редагування важливих тем</h2>
+
+    <input type="text" id="topicTitleInput" placeholder="Заголовок теми">
+    <textarea id="topicTextInput" rows="5" placeholder="Опис теми"></textarea>
+    <input type="text" id="topicImageInput" placeholder="Посилання на фото (https://...)">
+    <img id="topicPreviewImage" class="topic-preview-image" style="display:none;" alt="Попередній перегляд">
+    <button id="saveTopicBtn">Додати тему</button>
+
+    <hr style="margin:14px 0;">
+
+    <div id="topicsAdminList" style="max-height:320px; overflow:auto;"></div>
+  </div>
+</div>
+
     <footer>
       Інформація від "Офіційний вебпортал парламенту України"<br>©2026
     </footer>
@@ -993,6 +1077,23 @@ const sendReplyBtn = document.getElementById('sendReplyBtn');
 
 const lawFloatingBar = document.getElementById('lawFloatingBar');
 const lawFloatingBarTitle = document.getElementById('lawFloatingBarTitle');
+
+const newsAdminModal = document.getElementById('newsAdminModal');
+const closeNewsAdmin = document.getElementById('closeNewsAdmin');
+const newsTitleInput = document.getElementById('newsTitleInput');
+const newsTextInput = document.getElementById('newsTextInput');
+const newsDateInput = document.getElementById('newsDateInput');
+const saveNewsBtn = document.getElementById('saveNewsBtn');
+const newsAdminList = document.getElementById('newsAdminList');
+
+const topicsAdminModal = document.getElementById('topicsAdminModal');
+const closeTopicsAdmin = document.getElementById('closeTopicsAdmin');
+const topicTitleInput = document.getElementById('topicTitleInput');
+const topicTextInput = document.getElementById('topicTextInput');
+const topicImageInput = document.getElementById('topicImageInput');
+const topicPreviewImage = document.getElementById('topicPreviewImage');
+const saveTopicBtn = document.getElementById('saveTopicBtn');
+const topicsAdminList = document.getElementById('topicsAdminList');
 
 let currentReplyFeedbackId = null;
 
@@ -1663,6 +1764,20 @@ feedbackAdminBtn.onclick = () => {
   openFeedbackListModal();
 };
 
+const newsBtn = document.createElement('button');
+newsBtn.textContent = 'Редагувати новини';
+newsBtn.onclick = async () => {
+  nav.style.display = 'none';
+  await openNewsAdminModal();
+};
+
+const topicsBtn = document.createElement('button');
+topicsBtn.textContent = 'Редагувати важливі теми';
+topicsBtn.onclick = async () => {
+  nav.style.display = 'none';
+  await openTopicsAdminModal();
+};
+
     const maintenanceOn = document.createElement('button');
     maintenanceOn.textContent = 'Увімкнути технічні роботи';
     maintenanceOn.onclick = async () => {
@@ -1682,6 +1797,8 @@ feedbackAdminBtn.onclick = () => {
     adminMenu.appendChild(feedbackAdminBtn);
     adminMenu.appendChild(maintenanceOn);
     adminMenu.appendChild(maintenanceOff);
+    adminMenu.appendChild(newsBtn);
+adminMenu.appendChild(topicsBtn);
   }
 
     function openBulkImportModal(){
@@ -2067,6 +2184,112 @@ item.appendChild(replyBtn);
       .sort((a, b) => b.aiScore - a.aiScore);
   }
 
+  async function openNewsAdminModal() {
+  newsAdminModal.style.display = 'flex';
+  newsAdminModal.classList.add('show');
+
+  newsTitleInput.value = '';
+  newsTextInput.value = '';
+  newsDateInput.value = '';
+
+  await renderNewsAdminList();
+}
+
+async function renderNewsAdminList() {
+  newsAdminList.innerHTML = 'Завантаження...';
+
+  await loadHomeNews();
+
+  if (!homeNews.length) {
+    newsAdminList.innerHTML = '<p>Новин поки немає.</p>';
+    return;
+  }
+
+  newsAdminList.innerHTML = '';
+
+  homeNews.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'admin-list-card';
+
+    card.innerHTML = `
+      <h4>${escapeHtml(item.title || '')}</h4>
+      <p><b>${escapeHtml(item.dateText || '')}</b></p>
+      <p>${escapeHtml(item.text || '')}</p>
+    `;
+
+    const actions = document.createElement('div');
+    actions.className = 'admin-actions';
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = 'Видалити';
+    deleteBtn.onclick = async () => {
+      await deleteDoc(doc(db, 'homeNews', item.id));
+      showToast('Новину видалено', 'success');
+      await renderNewsAdminList();
+      await loadHomeNews();
+      renderArticles();
+    };
+
+    actions.appendChild(deleteBtn);
+    card.appendChild(actions);
+    newsAdminList.appendChild(card);
+  });
+}
+
+async function openTopicsAdminModal() {
+  topicsAdminModal.style.display = 'flex';
+  topicsAdminModal.classList.add('show');
+
+  topicTitleInput.value = '';
+  topicTextInput.value = '';
+  topicImageInput.value = '';
+  topicPreviewImage.style.display = 'none';
+  topicPreviewImage.src = '';
+
+  await renderTopicsAdminList();
+}
+
+async function renderTopicsAdminList() {
+  topicsAdminList.innerHTML = 'Завантаження...';
+
+  await loadImportantTopics();
+
+  if (!importantTopics.length) {
+    topicsAdminList.innerHTML = '<p>Тем поки немає.</p>';
+    return;
+  }
+
+  topicsAdminList.innerHTML = '';
+
+  importantTopics.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'admin-list-card';
+
+    card.innerHTML = `
+      ${item.image ? `<img src="${item.image}" class="important-topic-image" alt="${escapeHtml(item.title || '')}">` : ''}
+      <h4>${escapeHtml(item.title || '')}</h4>
+      <p>${escapeHtml(item.text || '')}</p>
+    `;
+
+    const actions = document.createElement('div');
+    actions.className = 'admin-actions';
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = 'Видалити';
+    deleteBtn.onclick = async () => {
+      await deleteDoc(doc(db, 'importantTopics', item.id));
+      showToast('Тему видалено', 'success');
+      await renderTopicsAdminList();
+      await loadImportantTopics();
+      renderArticles();
+    };
+
+    actions.appendChild(deleteBtn);
+    card.appendChild(actions);
+    topicsAdminList.appendChild(card);
+  });
+}
+
   async function rankArticlesWithAI(query, candidates) {
     const fallbackRanked = fallbackRankArticles(query, candidates);
     const fallbackMap = new Map(
@@ -2449,6 +2672,97 @@ replyModal.addEventListener('click', (e) => {
   }
 });
 
+saveNewsBtn.addEventListener('click', async () => {
+  const title = newsTitleInput.value.trim();
+  const text = newsTextInput.value.trim();
+  const dateText = newsDateInput.value.trim();
+
+  if (!title || !text) {
+    showToast('Заповніть заголовок і текст новини', 'error');
+    return;
+  }
+
+  await addDoc(collection(db, 'homeNews'), {
+    title,
+    text,
+    dateText: dateText || new Date().toLocaleDateString('uk-UA'),
+    createdAt: serverTimestamp()
+  });
+
+  newsTitleInput.value = '';
+  newsTextInput.value = '';
+  newsDateInput.value = '';
+
+  showToast('Новину додано', 'success');
+  await renderNewsAdminList();
+  await loadHomeNews();
+  renderArticles();
+});
+
+saveTopicBtn.addEventListener('click', async () => {
+  const title = topicTitleInput.value.trim();
+  const text = topicTextInput.value.trim();
+  const image = topicImageInput.value.trim();
+
+  if (!title || !text) {
+    showToast('Заповніть заголовок і текст теми', 'error');
+    return;
+  }
+
+  await addDoc(collection(db, 'importantTopics'), {
+    title,
+    text,
+    image,
+    createdAt: serverTimestamp()
+  });
+
+  topicTitleInput.value = '';
+  topicTextInput.value = '';
+  topicImageInput.value = '';
+  topicPreviewImage.style.display = 'none';
+  topicPreviewImage.src = '';
+
+  showToast('Тему додано', 'success');
+  await renderTopicsAdminList();
+  await loadImportantTopics();
+  renderArticles();
+});
+
+topicImageInput.addEventListener('input', () => {
+  const value = topicImageInput.value.trim();
+
+  if (value) {
+    topicPreviewImage.src = value;
+    topicPreviewImage.style.display = 'block';
+  } else {
+    topicPreviewImage.src = '';
+    topicPreviewImage.style.display = 'none';
+  }
+});
+
+closeNewsAdmin.addEventListener('click', () => {
+  newsAdminModal.style.display = 'none';
+  newsAdminModal.classList.remove('show');
+});
+
+newsAdminModal.addEventListener('click', (e) => {
+  if (e.target === newsAdminModal) {
+    newsAdminModal.style.display = 'none';
+    newsAdminModal.classList.remove('show');
+  }
+});
+
+closeTopicsAdmin.addEventListener('click', () => {
+  topicsAdminModal.style.display = 'none';
+  topicsAdminModal.classList.remove('show');
+});
+
+topicsAdminModal.addEventListener('click', (e) => {
+  if (e.target === topicsAdminModal) {
+    topicsAdminModal.style.display = 'none';
+    topicsAdminModal.classList.remove('show');
+  }
+});
 
 async function initApp(){
   fillSearchSectionOptions();
@@ -2624,13 +2938,18 @@ function renderHomePage() {
 
   const topicsGrid = document.createElement("div");
   topicsGrid.className = "important-topics-grid";
-  topicsGrid.innerHTML = importantTopics.length
-    ? importantTopics.map(item => `
-      <div class="important-topic-card">
-        <h4>${escapeHtml(item.title || "")}</h4>
-        <p>${escapeHtml(item.text || "")}</p>
-      </div>
-    `).join("")
+topicsGrid.innerHTML = importantTopics.length
+  ? importantTopics.map(item => `
+    <div class="important-topic-card">
+      ${
+        item.image
+          ? `<img src="${item.image}" alt="${escapeHtml(item.title || "Тема")}" class="important-topic-image">`
+          : ''
+      }
+      <h4>${escapeHtml(item.title || "")}</h4>
+      <p>${escapeHtml(item.text || "")}</p>
+    </div>
+  `).join("")
     : `<div class="important-topic-card"><h4>Немає тем</h4><p>Додайте важливі теми через адмін-панель.</p></div>`;
 
   articlesDiv.appendChild(topicsGrid);
