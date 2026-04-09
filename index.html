@@ -551,18 +551,78 @@ html, body {
 
 .featured-topic {
   position: relative;
-  min-height: 280px;
-  border-radius: 12px;
+  min-height: 320px;
+  border-radius: 14px;
   overflow: hidden;
-  color: white;
   display: flex;
   align-items: flex-end;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
   cursor: pointer;
+  text-decoration: none;
+
   background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;
-  text-decoration: none;
+
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
+.featured-topic-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,0.75),
+    rgba(0,0,0,0.2)
+  );
+  z-index: 1;
+}
+
+.featured-topic-content {
+  position: relative;
+  z-index: 2;
+  padding: 22px;
+  width: 100%;
+  color: white;
+}
+
+.featured-topic-label {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(255,255,255,0.15);
+  padding: 6px 10px;
+  border-radius: 999px;
+  margin-bottom: 10px;
+}
+
+.featured-topic-title {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.25;
+  margin-bottom: 8px;
+}
+
+.featured-topic-text {
+  font-size: 14px;
+  opacity: 0.95;
+  line-height: 1.5;
+}
+
+/* полоски как в новостях */
+.featured-topic-progress {
+  display: flex;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.featured-topic-progress div {
+  flex: 1;
+  height: 4px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 3px;
+}
+
+.featured-topic-progress .active {
+  background: #ffd700;
 }
 
 .featured-topic::before {
@@ -2999,10 +3059,26 @@ const linkEnd = featured.link ? `</a>` : `</div>`;
 
 left.innerHTML = `
   ${linkStart}
+    <div class="featured-topic-overlay"></div>
+
     <div class="featured-topic-content">
-      <div class="featured-topic-label">${escapeHtml(featured.badge || "Важлива тема")}</div>
-      <div class="featured-topic-title">${escapeHtml(featured.title || "")}</div>
-      <div class="featured-topic-text">${escapeHtml(featured.text || "")}</div>
+      <div class="featured-topic-label">
+        ${escapeHtml(featured.badge || "Важлива тема")}
+      </div>
+
+      <div class="featured-topic-title">
+        ${escapeHtml(featured.title || "")}
+      </div>
+
+      <div class="featured-topic-text">
+        ${escapeHtml(featured.text || "")}
+      </div>
+
+      <div class="featured-topic-progress">
+        <div></div>
+        <div></div>
+        <div class="active"></div>
+      </div>
     </div>
   ${linkEnd}
 `;
