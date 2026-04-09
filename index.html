@@ -1168,6 +1168,7 @@ const featuredTopicActiveInput = document.getElementById('featuredTopicActiveInp
 const featuredTopicsAdminList = document.getElementById('featuredTopicsAdminList');
 
 let currentReplyFeedbackId = null;
+let appReady = false;
 
     const lawSections = [
       "Закон України «Про Національну поліцію»",
@@ -1421,7 +1422,7 @@ generatedItems.push({
     async function loadFeaturedTopic() {
   try {
     const snapshot = await getDocs(query(
-      collection(db, "featuredTopics"),
+      collection(db, "featuredTopic"),
       orderBy("order", "asc")
     ));
 
@@ -2822,7 +2823,7 @@ async function initApp() {
 
 async function seedHomeContentIfEmpty() {
 
-  collection(db, "featuredTopics")
+  collection(db, "featuredTopic")
 
   const newsSnap = await getDocs(collection(db, "homeNews"));
   if (newsSnap.empty) {
@@ -2872,7 +2873,7 @@ async function renderFeaturedTopicsAdminList() {
   featuredTopicsAdminList.innerHTML = 'Завантаження...';
 
   const snapshot = await getDocs(query(
-    collection(db, "featuredTopics"),
+    collection(db, "featuredTopic"),
     orderBy("order", "asc")
   ));
 
@@ -2920,7 +2921,7 @@ async function renderFeaturedTopicsAdminList() {
     const activateBtn = document.createElement('button');
     activateBtn.textContent = 'Зробити активною';
     activateBtn.onclick = async () => {
-      const allSnap = await getDocs(collection(db, "featuredTopics"));
+      const allSnap = await getDocs(collection(db, "featuredTopic"));
       for (const docItem of allSnap.docs) {
         await updateDoc(doc(db, "featuredTopics", docItem.id), { isActive: false });
       }
@@ -3093,7 +3094,7 @@ saveFeaturedTopicBtn.addEventListener('click', async () => {
 
   try {
     if (isActive) {
-      const allSnap = await getDocs(collection(db, "featuredTopics"));
+      const allSnap = await getDocs(collection(db, "featuredTopic"));
       for (const docItem of allSnap.docs) {
         await updateDoc(doc(db, "featuredTopics", docItem.id), { isActive: false });
       }
@@ -3114,7 +3115,7 @@ saveFeaturedTopicBtn.addEventListener('click', async () => {
       await updateDoc(doc(db, "featuredTopics", editingFeaturedTopicId), payload);
       showToast('Тему оновлено', 'success');
     } else {
-      await addDoc(collection(db, "featuredTopics"), payload);
+      await addDoc(collection(db, "featuredTopic"), payload);
       showToast('Тему додано', 'success');
     }
 
