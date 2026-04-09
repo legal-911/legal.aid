@@ -1232,14 +1232,6 @@ const sendReplyBtn = document.getElementById('sendReplyBtn');
 const lawFloatingBar = document.getElementById('lawFloatingBar');
 const lawFloatingBarTitle = document.getElementById('lawFloatingBarTitle');
 
-const newsAdminModal = document.getElementById('newsAdminModal');
-const closeNewsAdmin = document.getElementById('closeNewsAdmin');
-const newsTitleInput = document.getElementById('newsTitleInput');
-const newsTextInput = document.getElementById('newsTextInput');
-const newsDateInput = document.getElementById('newsDateInput');
-const saveNewsBtn = document.getElementById('saveNewsBtn');
-const newsAdminList = document.getElementById('newsAdminList');
-
 const topicsAdminModal = document.getElementById('topicsAdminModal');
 const closeTopicsAdmin = document.getElementById('closeTopicsAdmin');
 const topicTitleInput = document.getElementById('topicTitleInput');
@@ -1998,7 +1990,6 @@ nav.classList.remove('show');
     adminMenu.appendChild(feedbackAdminBtn);
     adminMenu.appendChild(maintenanceOn);
     adminMenu.appendChild(maintenanceOff);
-    adminMenu.appendChild(newsBtn);    
     adminMenu.appendChild(featuredTopicBtn);
   }
 
@@ -2384,87 +2375,6 @@ item.appendChild(replyBtn);
       .filter(article => article.aiScore > 0)
       .sort((a, b) => b.aiScore - a.aiScore);
   }
-
-async function renderNewsAdminList() {
-  newsAdminList.innerHTML = 'Завантаження...';
-
-  await loadHomeNews();
-
-  if (!homeNews.length) {
-    newsAdminList.innerHTML = '<p>Новин поки немає.</p>';
-    return;
-  }
-
-  newsAdminList.innerHTML = '';
-
-  homeNews.forEach(item => {
-    const card = document.createElement('div');
-    card.className = 'admin-list-card';
-
-    card.innerHTML = `
-      <h4>${escapeHtml(item.title || '')}</h4>
-      <p><b>${escapeHtml(item.dateText || '')}</b></p>
-      <p>${escapeHtml(item.text || '')}</p>
-    `;
-
-    const actions = document.createElement('div');
-    actions.className = 'admin-actions';
-
-    const deleteBtn = document.createElement('button');
-    deleteBtn.textContent = 'Видалити';
-    deleteBtn.onclick = async () => {
-      await deleteDoc(doc(db, 'homeNews', item.id));
-      showToast('Новину видалено', 'success');
-      await renderNewsAdminList();
-      await loadHomeNews();
-      renderArticles();
-    };
-
-    actions.appendChild(deleteBtn);
-    card.appendChild(actions);
-    newsAdminList.appendChild(card);
-  });
-}
-
-saveNewsBtn.addEventListener('click', async () => {
-  const title = newsTitleInput.value.trim();
-  const text = newsTextInput.value.trim();
-  const dateText = newsDateInput.value.trim();
-
-  if (!title || !text) {
-    showToast('Заповніть заголовок і текст новини', 'error');
-    return;
-  }
-
-  try {
-    saveNewsBtn.disabled = true;
-    saveNewsBtn.textContent = 'Збереження...';
-
-    await addDoc(collection(db, 'homeNews'), {
-      title,
-      text,
-      dateText: dateText || new Date().toLocaleDateString('uk-UA'),
-      createdAt: serverTimestamp()
-    });
-
-    newsTitleInput.value = '';
-    newsTextInput.value = '';
-    newsDateInput.value = '';
-
-    showToast('Новину додано', 'success');
-
-    await renderNewsAdminList();
-    await loadHomeNews();
-    renderArticles();
-
-  } catch (error) {
-    console.error(error);
-    showToast('Помилка додавання новини', 'error');
-  } finally {
-    saveNewsBtn.disabled = false;
-    saveNewsBtn.textContent = 'Додати новину';
-  }
-});
 
   async function rankArticlesWithAI(query, candidates) {
     const fallbackRanked = fallbackRankArticles(query, candidates);
@@ -2876,22 +2786,6 @@ async function initApp() {
 }
 
 async function seedHomeContentIfEmpty() {
-  const newsSnap = await getDocs(collection(db, "homeNews"));
-  if (newsSnap.empty) {
-    await addDoc(collection(db, "homeNews"), {
-      title: "На сайті додано новий розділ юридичних матеріалів",
-      text: "Тепер користувачі можуть швидше знаходити потрібні статті та юридичні пояснення.",
-      dateText: "Сьогодні",
-      createdAt: serverTimestamp()
-    });
-
-    await addDoc(collection(db, "homeNews"), {
-      title: "Оновлено блок пошуку по законодавству",
-      text: "Пошук працює по ключових словах та опису ситуації, щоб швидше знаходити потрібні статті.",
-      dateText: "Сьогодні",
-      createdAt: serverTimestamp()
-    });
-  }
 
   const featuredSnap = await getDocs(collection(db, "featuredTopic"));
   if (featuredSnap.empty) {
