@@ -3235,15 +3235,28 @@ if (featuredCard) {
     articlesDiv.appendChild(div);
   });
 
-  const goToLawsBtn = document.getElementById("goToLawsBtn");
-  if (goToLawsBtn) {
-    goToLawsBtn.onclick = () => {
-      const target = document.querySelector(".section-header");
-      if (target) {
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    };
-  }
+const goToLawsBtn = document.getElementById("goToLawsBtn");
+if (goToLawsBtn) {
+  goToLawsBtn.onclick = () => {
+    const target = document.querySelector(".home-section-title");
+    if (!target) return;
+
+    const header = document.querySelector("header");
+    const headerHeight = header ? header.offsetHeight : 0;
+
+    const extraOffset = 18; // поменяй число, если надо выше/ниже
+    const top =
+      target.getBoundingClientRect().top +
+      window.scrollY -
+      headerHeight -
+      extraOffset;
+
+    window.scrollTo({
+      top,
+      behavior: "smooth"
+    });
+  };
+}
 
   const goToConsultBtn = document.getElementById("goToConsultBtn");
   if (goToConsultBtn) {
