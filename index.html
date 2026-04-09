@@ -3074,6 +3074,9 @@ const featured = featuredTopics[featuredTopicIndex] || {
 
 const left = document.createElement("div");
 
+grid.appendChild(left);
+articlesDiv.appendChild(grid);
+
 const bgImage = featured.image
   ? `
     background-image: 
