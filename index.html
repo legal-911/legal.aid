@@ -113,7 +113,6 @@ header h1 {
     }
 
 nav {
-  display: none;
   position: fixed;
   top: 55px;
   left: 0;
@@ -123,7 +122,23 @@ nav {
   padding: 10px;
   z-index: 5000;
   box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+
+  display: flex;
   flex-direction: column;
+
+  transform: translateX(-110%);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    transform 0.32s ease,
+    opacity 0.25s ease,
+    visibility 0.32s ease;
+}
+
+nav.show {
+  transform: translateX(0);
+  opacity: 1;
+  visibility: visible;
 }
 
 .menu-top {
@@ -1470,9 +1485,9 @@ generatedItems.push({
       }
     }
 
-  menu.addEventListener('click', () => {
-    nav.style.display = nav.style.display === 'flex' ? 'none' : 'flex';
-  });
+menu.addEventListener('click', () => {
+  nav.classList.toggle('show');
+});
 
     loginBtn.addEventListener('click', () => { loginModal.style.display='flex'; loginModal.classList.add('show'); });
     closeLogin.addEventListener('click', () => { loginModal.style.display='none'; loginModal.classList.remove('show'); });
@@ -1828,7 +1843,7 @@ homeBtn.addEventListener('click', () => {
   searchInput.value = '';
   renderArticles();
   window.scrollTo(0, 0);
-  nav.style.display = 'none';
+nav.classList.remove('show');
   refreshLawFloatingBarImmediately();
 });
 
@@ -1971,21 +1986,21 @@ function getArticleNumber(title) {
     const feedbackAdminBtn = document.createElement('button');
 feedbackAdminBtn.textContent = 'Переглянути відгуки';
 feedbackAdminBtn.onclick = () => {
-  nav.style.display = 'none';
+nav.classList.remove('show');
   openFeedbackListModal();
 };
 
 const newsBtn = document.createElement('button');
 newsBtn.textContent = 'Редагувати новини';
 newsBtn.onclick = async () => {
-  nav.style.display = 'none';
+nav.classList.remove('show');
   await openNewsAdminModal();
 };
 
 const featuredTopicBtn = document.createElement('button');
 featuredTopicBtn.textContent = 'Редагувати важливу тему';
 featuredTopicBtn.onclick = async () => {
-  nav.style.display = 'none';
+nav.classList.remove('show');
   await openFeaturedTopicAdminModal();
 };
 
@@ -2580,7 +2595,7 @@ saveNewsBtn.addEventListener('click', async () => {
   });
 
   feedbackBtn.onclick = async () => {
-  nav.style.display = 'none';
+nav.classList.remove('show');
   await openFeedbackListModal();
 };
 
@@ -2753,7 +2768,7 @@ function refreshLawFloatingBarImmediately() {
     searchInput.value = '';
     renderArticles();
     window.scrollTo(0, 0);
-    nav.style.display = 'none';
+nav.classList.remove('show');
   });
 
 closeFeedbackList.addEventListener('click', () => {
