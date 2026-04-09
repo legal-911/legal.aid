@@ -2770,6 +2770,27 @@ replyModal.addEventListener('click', (e) => {
   }
 });
 
+async function loadHomeNews() {
+  try {
+    const snapshot = await getDocs(query(
+      collection(db, "homeNews"),
+      orderBy("createdAt", "desc")
+    ));
+
+    homeNews = [];
+
+    snapshot.forEach(docItem => {
+      homeNews.push({
+        id: docItem.id,
+        ...docItem.data()
+      });
+    });
+
+  } catch (error) {
+    console.error("Помилка завантаження новин:", error);
+    homeNews = [];
+  }
+}
 
 async function initApp() {
   const appLoader = document.getElementById('appLoader');
@@ -2800,6 +2821,9 @@ async function initApp() {
 }
 
 async function seedHomeContentIfEmpty() {
+
+  collection(db, "featuredTopics")
+
   const newsSnap = await getDocs(collection(db, "homeNews"));
   if (newsSnap.empty) {
     await addDoc(collection(db, "homeNews"), {
