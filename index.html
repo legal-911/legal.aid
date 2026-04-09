@@ -1311,7 +1311,6 @@ let editingFeaturedTopicId = null;
       {section:"Закон України «Про НацІональну полIцIю»", law:"Пред'явлення документів поліцейському", short:"Громадянин зобов'язаний пред'явити документи поліцейському за його законною вимогою, відповідно до Статті 14 Закону України «Про Національну поліцію»", details:"Витяг з статті: громадянин зобов'язаний пред'явити документи, що посвідчують особу, поліцейському за його законною вимогою. Вимога про пред'явлення документів може бути висунута поліцейським у випадках, передбачених законом, зокрема для встановлення особи, перевірки документів, запобігання або припинення правопорушення.", link:""}
     ];
 
-let homeNews = [];
 let featuredTopics = [];
 let featuredTopicIndex = 0;
 
@@ -1989,13 +1988,6 @@ nav.classList.remove('show');
   openFeedbackListModal();
 };
 
-const newsBtn = document.createElement('button');
-newsBtn.textContent = 'Редагувати новини';
-newsBtn.onclick = async () => {
-nav.classList.remove('show');
-  await openNewsAdminModal();
-};
-
 const featuredTopicBtn = document.createElement('button');
 featuredTopicBtn.textContent = 'Редагувати важливу тему';
 featuredTopicBtn.onclick = async () => {
@@ -2408,17 +2400,6 @@ item.appendChild(replyBtn);
       .filter(article => article.aiScore > 0)
       .sort((a, b) => b.aiScore - a.aiScore);
   }
-
-  async function openNewsAdminModal() {
-  newsAdminModal.style.display = 'flex';
-  newsAdminModal.classList.add('show');
-
-  newsTitleInput.value = '';
-  newsTextInput.value = '';
-  newsDateInput.value = '';
-
-  await renderNewsAdminList();
-}
 
 async function renderNewsAdminList() {
   newsAdminList.innerHTML = 'Завантаження...';
