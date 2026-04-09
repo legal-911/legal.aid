@@ -853,6 +853,178 @@ html, body {
   to { transform: rotate(360deg); }
 }
 
+.portal-hero {
+  background: linear-gradient(135deg, #1f56b5, #12479d);
+  color: white;
+  border-radius: 0;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.14);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.portal-hero-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  padding: 28px 26px 22px 26px;
+}
+
+.portal-brand {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+.portal-brand-mark {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 0 0 auto;
+}
+
+.portal-brand-line {
+  width: 4px;
+  height: 78px;
+  background: linear-gradient(to bottom, #ffd700 50%, #0057b7 50%);
+  border-radius: 2px;
+}
+
+.portal-brand-trident {
+  font-size: 42px;
+  line-height: 1;
+  opacity: 0.95;
+}
+
+.portal-brand-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.portal-brand-title {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.5px;
+}
+
+.portal-brand-badge {
+  background: #ffd700;
+  color: #111827;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 6px 10px;
+  border-radius: 4px;
+}
+
+.portal-brand-subtitle {
+  font-size: 16px;
+  line-height: 1.5;
+  opacity: 0.95;
+  max-width: 760px;
+}
+
+.portal-side-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 220px;
+}
+
+.portal-side-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 12px 14px;
+  cursor: pointer;
+  font-weight: 700;
+  font-family: 'Roboto', sans-serif;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  text-align: left;
+  backdrop-filter: blur(4px);
+}
+
+.portal-side-btn-light {
+  background: white;
+  color: #004080;
+}
+
+.portal-hero-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  background: rgba(0,0,0,0.12);
+  padding: 0;
+}
+
+.portal-nav-link {
+  flex: 1 1 180px;
+  border: none;
+  background: rgba(0,0,0,0.08);
+  color: white;
+  padding: 16px 18px;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Roboto', sans-serif;
+  transition: background 0.2s ease;
+}
+
+.portal-nav-link:hover {
+  background: rgba(255,255,255,0.12);
+}
+
+@media (max-width: 900px) {
+  .portal-hero-top {
+    flex-direction: column;
+  }
+
+  .portal-side-actions {
+    width: 100%;
+    min-width: 0;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .portal-side-btn {
+    flex: 1 1 220px;
+  }
+}
+
+@media (max-width: 700px) {
+  .portal-hero-top {
+    padding: 22px 16px 18px 16px;
+  }
+
+  .portal-brand {
+    gap: 12px;
+  }
+
+  .portal-brand-line {
+    height: 58px;
+  }
+
+  .portal-brand-trident {
+    font-size: 30px;
+  }
+
+  .portal-brand-title {
+    font-size: 22px;
+  }
+
+  .portal-brand-subtitle {
+    font-size: 14px;
+  }
+
+  .portal-nav-link {
+    font-size: 15px;
+    padding: 14px 12px;
+  }
+}
+
     </style>
     </head>
     <body>
@@ -2912,23 +3084,41 @@ const featured = featuredTopics[featuredTopicIndex] || {
   link: ""
 };
 
-  const hero = document.createElement("div");
-  hero.className = "home-hero";
-  hero.innerHTML = `
-    <div class="home-hero-top">
-      <div>
-        <div class="home-hero-title">Юридична допомога</div>
-        <div class="home-hero-subtitle">
-          Актуальні правові матеріали, пошук по законодавству, важливі теми та базова юридична консультація в одному місці.
+
+
+const hero = document.createElement("div");
+hero.className = "portal-hero";
+hero.innerHTML = `
+  <div class="portal-hero-top">
+    <div class="portal-brand">
+      <div class="portal-brand-mark">
+        <span class="portal-brand-line"></span>
+        <span class="portal-brand-trident">⚖</span>
+      </div>
+
+      <div class="portal-brand-text">
+        <div class="portal-brand-title-row">
+          <div class="portal-brand-title">ЮРИДИЧНА ДОПОМОГА</div>
+          <div class="portal-brand-badge">ONLINE</div>
         </div>
-        <div class="home-hero-actions">
-          <button class="home-nav-btn" id="goToLawsBtn">Законодавство</button>
-          <button class="home-nav-btn" id="goToConsultBtn">Юридична консультація</button>
-        </div>
+        <div class="portal-brand-subtitle">Правові матеріали, пошук по законодавству та базова юридична консультація</div>
       </div>
     </div>
-  `;
-  articlesDiv.appendChild(hero);
+
+    <div class="portal-side-actions">
+      <button class="portal-side-btn" id="goToConsultBtnTop">Юридична консультація</button>
+      <button class="portal-side-btn portal-side-btn-light" id="goToSearchBtnTop">Пошук</button>
+    </div>
+  </div>
+
+  <div class="portal-hero-nav">
+    <button class="portal-nav-link" id="goToLawsBtn">Законодавство</button>
+    <button class="portal-nav-link" id="goToFeaturedBtn">Важлива тема</button>
+    <button class="portal-nav-link" id="goToConsultBtn">Юридична консультація</button>
+    <button class="portal-nav-link" id="goToFeedbackBtn">Відгуки</button>
+  </div>
+`;
+articlesDiv.appendChild(hero);
 
   const grid = document.createElement("div");
   grid.className = "home-grid";
@@ -3074,7 +3264,7 @@ if (goToLawsBtn) {
     const header = document.querySelector("header");
     const headerHeight = header ? header.offsetHeight : 0;
 
-    const extraOffset = 18; // поменяй число, если надо выше/ниже
+    const extraOffset = 18;
     const top =
       target.getBoundingClientRect().top +
       window.scrollY -
@@ -3085,6 +3275,49 @@ if (goToLawsBtn) {
       top,
       behavior: "smooth"
     });
+  };
+}
+
+const goToFeaturedBtn = document.getElementById("goToFeaturedBtn");
+if (goToFeaturedBtn) {
+  goToFeaturedBtn.onclick = () => {
+    const target = document.querySelector(".featured-topic");
+    if (!target) return;
+
+    const header = document.querySelector("header");
+    const headerHeight = header ? header.offsetHeight : 0;
+
+    const top =
+      target.getBoundingClientRect().top +
+      window.scrollY -
+      headerHeight -
+      12;
+
+    window.scrollTo({
+      top,
+      behavior: "smooth"
+    });
+  };
+}
+
+const goToFeedbackBtn = document.getElementById("goToFeedbackBtn");
+if (goToFeedbackBtn) {
+  goToFeedbackBtn.onclick = async () => {
+    await openFeedbackListModal();
+  };
+}
+
+const goToConsultBtnTop = document.getElementById("goToConsultBtnTop");
+if (goToConsultBtnTop) {
+  goToConsultBtnTop.onclick = () => {
+    openSearchModal();
+  };
+}
+
+const goToSearchBtnTop = document.getElementById("goToSearchBtnTop");
+if (goToSearchBtnTop) {
+  goToSearchBtnTop.onclick = () => {
+    openSearchModal();
   };
 }
 
