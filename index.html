@@ -2320,6 +2320,46 @@ async function renderNewsAdminList() {
   });
 }
 
+saveNewsBtn.addEventListener('click', async () => {
+  const title = newsTitleInput.value.trim();
+  const text = newsTextInput.value.trim();
+  const dateText = newsDateInput.value.trim();
+
+  if (!title || !text) {
+    showToast('Заповніть заголовок і текст новини', 'error');
+    return;
+  }
+
+  try {
+    saveNewsBtn.disabled = true;
+    saveNewsBtn.textContent = 'Збереження...';
+
+    await addDoc(collection(db, 'homeNews'), {
+      title,
+      text,
+      dateText: dateText || new Date().toLocaleDateString('uk-UA'),
+      createdAt: serverTimestamp()
+    });
+
+    newsTitleInput.value = '';
+    newsTextInput.value = '';
+    newsDateInput.value = '';
+
+    showToast('Новину додано', 'success');
+
+    await renderNewsAdminList();
+    await loadHomeNews();
+    renderArticles();
+
+  } catch (error) {
+    console.error(error);
+    showToast('Помилка додавання новини', 'error');
+  } finally {
+    saveNewsBtn.disabled = false;
+    saveNewsBtn.textContent = 'Додати новину';
+  }
+});
+
   async function rankArticlesWithAI(query, candidates) {
     const fallbackRanked = fallbackRankArticles(query, candidates);
     const fallbackMap = new Map(
