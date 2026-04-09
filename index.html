@@ -607,62 +607,102 @@ html, body {
   line-height: 1.5;
 }
 
-/* полоски как в новостях */
-.featured-topic-progress {
+.featured-topic {
+  position: relative;
+  min-height: 320px;
+  border-radius: 14px;
+  overflow: hidden;
   display: flex;
-  gap: 6px;
-  margin-top: 14px;
+  align-items: flex-end;
+  cursor: pointer;
+  text-decoration: none;
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
 }
 
-.featured-topic-progress div {
-  flex: 1;
-  height: 4px;
-  background: rgba(255,255,255,0.3);
-  border-radius: 3px;
-}
-
-.featured-topic-progress .active {
-  background: #ffd700;
-}
-
-.featured-topic::before {
-  content: "";
+.featured-topic-overlay {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(to top, rgba(0,0,0,0.68), rgba(0,0,0,0.18)),
-    linear-gradient(135deg, #1b4d96, #0a5bb5);
+  background: linear-gradient(to top, rgba(0,0,0,0.78), rgba(0,0,0,0.15));
+  z-index: 1;
 }
 
 .featured-topic-content {
   position: relative;
   z-index: 2;
-  padding: 20px;
+  padding: 22px;
   width: 100%;
+  color: white;
 }
 
 .featured-topic-label {
   display: inline-block;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
-  background: rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.15);
   padding: 6px 10px;
   border-radius: 999px;
   margin-bottom: 10px;
 }
 
 .featured-topic-title {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 700;
-  line-height: 1.2;
-  margin-bottom: 10px;
+  line-height: 1.25;
+  margin-bottom: 8px;
 }
 
 .featured-topic-text {
-  font-size: 15px;
+  font-size: 14px;
+  opacity: 0.95;
   line-height: 1.5;
-  opacity: 0.96;
 }
+
+.featured-topic-progress {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.featured-topic-progress div {
+  flex: 1;
+  height: 5px;
+  background: rgba(255,255,255,0.25);
+  border-radius: 999px;
+}
+
+.featured-topic-progress div.active {
+  background: #ffd700;
+}
+
+.featured-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.18);
+  color: white;
+  font-size: 28px;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+
+.featured-arrow:hover {
+  background: rgba(255,255,255,0.28);
+}
+
+.featured-arrow-left {
+  left: 14px;
+}
+
+.featured-arrow-right {
+  right: 14px;
+} 
 
 .news-list {
   display: flex;
@@ -1264,7 +1304,8 @@ let editingFeaturedTopicId = null;
     ];
 
 let homeNews = [];
-let featuredTopic = null;
+let featuredTopics = [];
+let featuredTopicIndex = 0;
 
     let editIndex = null;
     let deleteIndex = null;
@@ -1486,34 +1527,37 @@ async function loadFeaturedTopic() {
       orderBy("order", "asc")
     ));
 
-    const allTopics = [];
+    featuredTopics = [];
+
     snapshot.forEach(docItem => {
-      allTopics.push({ id: docItem.id, ...docItem.data() });
+      featuredTopics.push({ id: docItem.id, ...docItem.data() });
     });
 
-    const activeTopic = allTopics.find(item => item.isActive === true);
+    if (!featuredTopics.length) {
+      featuredTopics = [{
+        badge: "Важлива тема",
+        title: "Юридична допомога онлайн",
+        text: "Оберіть законодавство, знайдіть потрібну статтю або перегляньте важливі юридичні матеріали.",
+        image: "",
+        link: ""
+      }];
+    }
 
-    featuredTopic = activeTopic || {
-      badge: "Важлива тема",
-      title: "Юридична допомога онлайн",
-      text: "Оберіть законодавство, знайдіть потрібну статтю або перегляньте важливі юридичні матеріали.",
-      image: "",
-      link: ""
-    };
-
-    return featuredTopic;
+    featuredTopicIndex = 0;
+    return featuredTopics;
   } catch (error) {
     console.error("Помилка завантаження featured topic:", error);
 
-    featuredTopic = {
+    featuredTopics = [{
       badge: "Важлива тема",
       title: "Юридична допомога онлайн",
       text: "Оберіть законодавство, знайдіть потрібну статтю або перегляньте важливі юридичні матеріали.",
       image: "",
       link: ""
-    };
+    }];
 
-    return featuredTopic;
+    featuredTopicIndex = 0;
+    return featuredTopics;
   }
 }
 
@@ -3014,11 +3058,13 @@ async function renderFeaturedTopicsAdminList() {
 }
 
 function renderHomePage() {
-  const featured = featuredTopic || {
-    label: "Важлива тема",
-    title: "Юридична допомога онлайн",
-    text: "Оберіть законодавство, знайдіть потрібну статтю або перегляньте важливі юридичні теми."
-  };
+const featured = featuredTopics[featuredTopicIndex] || {
+  badge: "Важлива тема",
+  title: "Юридична допомога онлайн",
+  text: "Оберіть законодавство, знайдіть потрібну статтю або перегляньте важливі юридичні теми.",
+  image: "",
+  link: ""
+};
 
   const hero = document.createElement("div");
   hero.className = "home-hero";
@@ -3051,37 +3097,67 @@ const bgImage = featured.image
   `
   : "background: linear-gradient(135deg, #1b4d96, #0a5bb5);";
 
-const linkStart = featured.link
-  ? `<a class="featured-topic" href="${featured.link}" target="_blank" rel="noopener noreferrer" style="${bgImage}">`
-  : `<div class="featured-topic" style="${bgImage}">`;
-
-const linkEnd = featured.link ? `</a>` : `</div>`;
+const linkStart = `<div class="featured-topic" style="${bgImage}">`;
+const linkEnd = `</div>`;
 
 left.innerHTML = `
   ${linkStart}
     <div class="featured-topic-overlay"></div>
 
+    <button class="featured-arrow featured-arrow-left" id="featuredPrevBtn" type="button">←</button>
+    <button class="featured-arrow featured-arrow-right" id="featuredNextBtn" type="button">→</button>
+
     <div class="featured-topic-content">
-      <div class="featured-topic-label">
-        ${escapeHtml(featured.badge || "Важлива тема")}
-      </div>
-
-      <div class="featured-topic-title">
-        ${escapeHtml(featured.title || "")}
-      </div>
-
-      <div class="featured-topic-text">
-        ${escapeHtml(featured.text || "")}
-      </div>
+      <div class="featured-topic-label">${escapeHtml(featured.badge || "Важлива тема")}</div>
+      <div class="featured-topic-title">${escapeHtml(featured.title || "")}</div>
+      <div class="featured-topic-text">${escapeHtml(featured.text || "")}</div>
 
       <div class="featured-topic-progress">
-        <div></div>
-        <div></div>
-        <div class="active"></div>
+        ${featuredTopics.map((_, i) => `
+          <div class="${i === featuredTopicIndex ? 'active' : ''}"></div>
+        `).join('')}
       </div>
     </div>
   ${linkEnd}
 `;
+
+const prevBtn = left.querySelector('#featuredPrevBtn');
+const nextBtn = left.querySelector('#featuredNextBtn');
+const clickableCard = left.querySelector('.featured-topic');
+
+if (prevBtn) {
+  prevBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!featuredTopics.length) return;
+
+    featuredTopicIndex =
+      (featuredTopicIndex - 1 + featuredTopics.length) % featuredTopics.length;
+
+    renderArticles();
+  });
+}
+
+if (nextBtn) {
+  nextBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!featuredTopics.length) return;
+
+    featuredTopicIndex =
+      (featuredTopicIndex + 1) % featuredTopics.length;
+
+    renderArticles();
+  });
+}
+
+if (clickableCard && featured.link) {
+  clickableCard.addEventListener('click', () => {
+    window.open(featured.link, '_blank', 'noopener,noreferrer');
+  });
+}
 
   const right = document.createElement("div");
   right.className = "home-card";
