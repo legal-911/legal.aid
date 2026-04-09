@@ -249,7 +249,3198 @@ nav button {
       color: white;
       padding: 22px;
       margin-bottom: 18px;
-      border-radius: 10px;
+      border-radius: 0px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+    }
+
+    .section-header h2{
+      margin: 0 0 8px 0;
+      font-size: 26px;
+      font-weight: 700;
+    }
+
+    .section-header p{
+      margin: 0 0 14px 0;
+      font-size: 15px;
+      opacity: 0.95;
+    }
+
+    .section-header button{
+      background: white;
+      color: #004080;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    footer { 
+      text-align:center; 
+      padding:15px 0; 
+      background:#004080; 
+      color:white; 
+      font-family: 'Roboto', sans-serif; 
+      font-weight:500;
+      line-height:1.5;
+    }
+
+    .modal input, .modal textarea, .modal button {
+      margin-bottom: 10px;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    #bulkImportText {
+      min-height: 260px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .example-btn {
+    background: #e8f0ff;
+    color: #004080;
+    border: 1px solid #bfd3f5;
+    border-radius: 16px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: 'Roboto', sans-serif;
+  }
+
+  .example-btn:hover {
+    background: #dbeafe;
+  }
+
+  #feedbackText {
+    min-height: 140px;
+    resize: vertical;
+    line-height: 1.5;
+  }
+
+  #adminFeedbackModal .close {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 10;
+  }
+
+  .feedback-card {
+  background: #ffffff;
+  border: 1px solid #cfd8e3;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.feedback-name {
+  font-weight: 700;
+  color: #004080;
+  margin-bottom: 6px;
+  font-size: 16px;
+}
+
+.feedback-date {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 10px;
+}
+
+.feedback-text {
+  white-space: pre-line;
+  line-height: 1.6;
+  color: #111827;
+}
+
+.admin-reply-wrap {
+  position: relative;
+  margin-top: 14px;
+  margin-left: 36px;
+}
+
+.admin-reply-curve {
+  position: absolute;
+  left: -28px;
+  top: -8px;
+  font-size: 42px;
+  line-height: 1;
+  color: #0a5bb5;
+  font-weight: bold;
+}
+
+.admin-reply {
+  background: #eef6ff;
+  border: 1px solid #bcd3f3;
+  border-right: 4px solid #0a5bb5;
+  border-radius: 10px;
+  padding: 12px 14px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.admin-reply-title {
+  font-weight: 700;
+  color: #004080;
+  margin-bottom: 6px;
+  font-size: 15px;
+}
+
+.admin-reply-date {
+  font-size: 13px;
+  color: #5b6b7f;
+  margin-bottom: 8px;
+}
+
+.admin-reply-text {
+  white-space: pre-line;
+  line-height: 1.6;
+  color: #111827;
+}
+
+html, body {
+  overflow-x: hidden;
+}
+
+.law-floating-bar {
+  position: fixed;
+  top: 56px;
+  left: 0;
+  right: 0;
+  z-index: 9990;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+
+  opacity: 0;
+  transform: translateY(-12px);
+  transition:
+    opacity 0.28s ease,
+    transform 0.28s ease;
+}
+
+.law-floating-bar.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.law-floating-bar-inner {
+  margin: 8px 14px 0;
+  width: min(900px, calc(100% - 28px));
+  background: rgba(0, 64, 128, 0.96);
+  color: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 10px 16px;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.2px;
+  pointer-events: auto;
+  box-sizing: border-box;
+}
+
+#lawFloatingBarTitle {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 700px) {
+  .law-floating-bar {
+    top: 56px;
+  }
+
+  .law-floating-bar-inner {
+    margin-top: 6px;
+    padding: 9px 12px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
+}
+
+.site-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.ua-flag {
+  width: 28px;
+  height: 18px;
+  border-radius: 2px;
+  overflow: hidden;
+  display: inline-block;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.25);
+  background: linear-gradient(to bottom, #0057b7 50%, #ffd700 50%);
+  flex: 0 0 auto;
+}
+
+.home-hero {
+  background: linear-gradient(135deg, #114c96, #0a5bb5);
+  color: white;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.16);
+  padding: 26px;
+  margin-bottom: 22px;
+  overflow: hidden;
+}
+
+.home-hero-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.home-hero-title {
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.15;
+  margin-bottom: 10px;
+}
+
+.home-hero-subtitle {
+  font-size: 16px;
+  opacity: 0.95;
+  max-width: 700px;
+  line-height: 1.5;
+}
+
+.home-hero-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.home-nav-btn {
+  background: white;
+  color: #004080;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Roboto', sans-serif;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.home-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.home-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.10);
+  overflow: hidden;
+}
+
+.home-card-header {
+  background: linear-gradient(135deg, #004080, #0a5bb5);
+  color: white;
+  padding: 16px 18px;
+}
+
+.home-card-header h3 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.home-card-body {
+  padding: 18px;
+}
+
+.featured-topic {
+  position: relative;
+  min-height: 320px;
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  cursor: pointer;
+  text-decoration: none;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  margin-bottom: 30px;
+}
+
+.featured-topic-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,0.78) 0%,
+    rgba(0,0,0,0.38) 38%,
+    rgba(0,0,0,0.12) 100%
+  );
+  z-index: 1;
+}
+
+.featured-topic-content {
+  position: relative;
+  z-index: 2;
+  padding: 22px;
+  width: 100%;
+  color: white;
+}
+
+.featured-topic-label {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(255,255,255,0.16);
+  padding: 6px 10px;
+  border-radius: 999px;
+  margin-bottom: 10px;
+  backdrop-filter: blur(4px);
+}
+
+.featured-topic-title {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.23;
+  margin-bottom: 8px;
+  max-width: 92%;
+}
+
+.featured-topic-text {
+  font-size: 14px;
+  opacity: 0.96;
+  line-height: 1.5;
+  max-width: 92%;
+}
+
+.featured-topic-progress {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.featured-topic-progress div {
+  flex: 1;
+  height: 5px;
+  background: rgba(255,255,255,0.22);
+  border-radius: 999px;
+  transition: background 0.25s ease;
+}
+
+.featured-topic-progress div.active {
+  background: #ffd700;
+}
+
+.featured-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%) scale(0.92);
+  z-index: 3;
+  width: 52px;
+  height: 52px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.14);
+  color: white;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease,
+    background 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.featured-arrow span {
+  display: block;
+  font-size: 28px;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
+.featured-topic:hover .featured-arrow {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(-50%) scale(1);
+}
+
+.featured-arrow:hover {
+  background: rgba(255,255,255,0.24);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.24);
+}
+
+.featured-arrow-left {
+  left: 14px;
+}
+
+.featured-arrow-right {
+  right: 14px;
+}
+
+@media (max-width: 700px) {
+  .featured-topic {
+    min-height: 260px;
+  }
+
+  .featured-topic-title {
+    font-size: 22px;
+    max-width: 100%;
+  }
+
+  .featured-topic-text {
+    font-size: 14px;
+    max-width: 100%;
+  }
+
+  .featured-arrow {
+    display: none;
+  }
+}
+
+.news-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.news-item {
+  padding-bottom: 14px;
+  border-bottom: 1px solid #dbe4f0;
+}
+
+.news-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.news-date {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 5px;
+}
+
+.news-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 6px;
+}
+
+.news-text {
+  font-size: 14px;
+  color: #334155;
+  line-height: 1.5;
+}
+
+.important-topics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.important-topic-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.10);
+  padding: 18px;
+}
+
+.important-topic-card h4 {
+  margin: 0 0 10px 0;
+  font-size: 18px;
+  color: #004080;
+}
+
+.important-topic-card p {
+  margin: 0;
+  line-height: 1.5;
+  color: #334155;
+  font-size: 14px;
+}
+
+.home-section-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 30px 0 16px 0;
+  color: #0f172a;
+}
+
+@media (max-width: 700px) {
+  .featured-topic {
+    min-height: 240px;
+  }
+
+  .featured-topic-title {
+    font-size: 22px;
+  }
+
+  .featured-topic-text {
+    font-size: 14px;
+  }
+}
+
+.important-topic-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  display: block;
+  background: #dbeafe;
+}
+
+.admin-list-card {
+  background: #f8fafc;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.admin-list-card h4 {
+  margin: 0 0 8px 0;
+  color: #004080;
+  font-size: 18px;
+}
+
+.admin-list-card p {
+  margin: 0 0 8px 0;
+  white-space: pre-line;
+  line-height: 1.5;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.admin-actions button {
+  width: auto;
+  margin-bottom: 0;
+}
+
+.topic-preview-image {
+  width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-top: 10px;
+  border: 1px solid #dbeafe;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+    </style>
+    </head>
+    <body>
+
+    <header>
+      <div class="menu">&#9776;</div>
+      <h1 class="site-title">
+  <span>Юридична допомога</span>
+  <span class="ua-flag" aria-hidden="true"></span>
+</h1>
+
+      <div class="search-box">
+        <button id="searchToggle" class="search-btn">&#128269;</button>
+        <input type="text" id="searchInput" placeholder="Опишіть ситуацію..." style="display:none;">
+      </div>
+    </header>
+
+    <div id="lawFloatingBar" class="law-floating-bar">
+  <div class="law-floating-bar-inner">
+    <span id="lawFloatingBarTitle"></span>
+  </div>
+</div>
+
+  <nav id="navMenu">
+
+    <!-- 🔝 Верх -->
+    <div class="menu-top">
+      <button id="homeBtn">Головна</button>
+    </div>
+
+    <!-- 📦 Центр -->
+    <div class="menu-middle" id="adminMenu"></div>
+
+    <!-- 🔻 Низ -->
+    <div class="menu-bottom">
+      <button id="feedbackBtn" type="button">Відгуки/Надіслати відгук</button>
+      <button id="loginBtn">Увійти</button>
+      <button id="logoutBtn" style="display:none;">Вийти</button>
+    </div>
+
+  </nav>
+
+<div class="articles" id="articles" style="display:none;"></div>
+
+<div id="appLoader" style="
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  min-height:60vh;
+  color:#004080;
+  font-family:'Roboto', sans-serif;
+">
+  <div style="
+    width:42px;
+    height:42px;
+    border:4px solid #cfe0ff;
+    border-top:4px solid #004080;
+    border-radius:50%;
+    animation:spin 0.8s linear infinite;
+    margin-bottom:14px;
+  "></div>
+  <div style="font-size:22px; font-weight:700;">Завантаження...</div>
+</div>
+
+    <div id="maintenanceScreen" style="display:none; padding:40px; text-align:center;">
+      <h2>Сайт тимчасово недоступний</h2>
+      <p>⚠Проводяться технічні роботи. Спробуйте пізніше⚠</p>
+    </div>
+
+    <!-- Модальні вікна -->
+    <div class="modal" id="loginModal">
+      <div class="modal-content">
+        <span class="close" id="closeLogin">&times;</span>
+        <h2>Вхід</h2>
+        <input type="text" id="loginField" placeholder="Логін">
+        <input type="password" id="passwordField" placeholder="Пароль">
+        <button id="submitLogin">Увійти</button>
+      </div>
+    </div>
+
+    <div class="modal" id="editModal">
+      <div class="modal-content">
+        <span class="close" id="closeEdit">&times;</span>
+        <h2 id="editTitle">Додати/Редагувати статтю</h2>
+        <input type="text" id="articleLaw" placeholder="Стаття / Закон">
+        <select id="articleSection">
+      <option value="Конституція України">Конституція України</option>
+      <option value="Цивільний кодекс України">Цивільний кодекс України</option>
+      <option value="Кримінальний кодекс України">Кримінальний кодекс України</option>
+      <option value="Кримінальний процесуальний кодекс України">Кримінальний процесуальний кодекс України</option>
+      <option value="Кодекс законів про працю України">Кодекс законів про працю України</option>
+      <option value="Кодекс України про адміністративні правопорушення">Кодекс України про адміністративні правопорушення</option>
+      <option value="Кодекс адміністративного судочинства України">Кодекс адміністративного судочинства України</option>
+      <option value="Закон України «Про адвокатуру та адвокатську діяльність»">Закон України «Про адвокатуру та адвокатську діяльність»</option>
+      <option value="Закон України «Про звернення громадян»">Закон України «Про звернення громадян»</option>
+      <option value="Закон України «Про захист прав споживачів»">Закон України «Про захист прав споживачів»</option>
+      <option value="Сімейний кодекс України">Сімейний кодекс України</option>
+      <option value="Закон України «Про судоустрій і статус суддів»">Закон України «Про судоустрій і статус суддів»</option>
+      <option value="Закон України «Про Національну поліцію»">Закон України «Про Національну поліцію»</option>
+      <option value="Господарський процесуальний кодекс України">Господарський процесуальний кодекс України</option>
+      <option value="Цивільний процесуальний кодекс України">Цивільний процесуальний кодекс України</option>
+      <option value="Земельний кодекс України">Земельний кодекс України</option>
+    </select>
+        <input type="text" id="articleShort" placeholder="Малий опис">
+        <textarea id="articleDetails" placeholder="Додаткова інформація" rows="5"></textarea>
+        <input type="text" id="articleLink" placeholder="Посилання (https://...)">
+        <button id="saveArticle">Зберегти</button>
+      </div>
+    </div>
+
+    <div class="modal" id="deleteModal">
+      <div class="modal-content">
+        <span class="close" id="closeDelete">&times;</span>
+        <h2>Видалити статтю?</h2>
+        <button id="confirmDelete">Підтвердити</button>
+        <button id="cancelDelete">Відміна</button>
+      </div>
+    </div>
+
+  <div class="modal" id="bulkImportModal">
+    <div class="modal-content">
+      <span class="close" id="closeBulkImport">&times;</span>
+      <h2>Масове додавання статей</h2>
+
+      <p style="font-size:14px; margin-bottom:10px;">
+        Вставте одразу багато статей у форматі:
+        <br><b>Стаття 1. Назва</b>
+        <br>Текст статті...
+      </p>
+
+      <textarea id="bulkImportText" rows="12" placeholder="Вставте текст закону тут..."></textarea>
+
+      <input type="text" id="bulkImportLink" placeholder="Посилання на закон (https://...)">
+
+      <button id="startBulkImport">Імпортувати статті</button>
+    </div>
+  </div>
+
+    <div style="flex:1"></div>
+
+    <div id="toast" style="
+      display:none;
+      position:fixed;
+      right:20px;
+      bottom:20px;
+      padding:14px 18px;
+      border-radius:12px;
+      box-shadow:0 6px 20px rgba(0,0,0,0.25);
+      z-index:9999;
+      font-family:'Roboto', Arial, sans-serif;
+      max-width:320px;
+      opacity:0;
+      transform:translateY(15px) scale(0.95);
+      transition:all 0.3s ease;
+      color:white;
+      font-size:14px;
+    "></div>
+
+  <div class="modal" id="searchModal">
+    <div class="modal-content" style="max-width:520px; width:92%; transform:none;">
+      <span class="close" id="closeSearch">&times;</span>
+      <h2>Пошук по сайту</h2>
+      <p style="font-size:14px; margin-bottom:12px;">
+        Знайдіть потрібну статтю за описом ситуації або ключовими словами
+      </p>
+
+      <select id="searchSection">
+        <option value="all">Шукати по всіх законах</option>
+      </select>
+
+      <textarea
+        id="searchModalInput"
+        rows="5"
+        placeholder="Опишіть ситуацію або введіть ключові слова..."
+        style="resize:vertical; min-height:120px;"
+      ></textarea>
+
+      <p style="font-size:13px; color:#555; margin-top:-2px; margin-bottom:10px;">
+        Наприклад: право на мовчання, перевірка документів, дрібне хуліганство, тощо..
+      </p>
+
+      <button id="runSearchBtn">Пошук</button>
+      <button id="clearSearchBtn" style="background:#6b7280;">Очистити</button>
+      <button id="closeSearchBtn" style="background:#9ca3af;">Закрити</button>
+    </div>
+  </div>
+
+  <div class="modal" id="feedbackModal">
+    <div class="modal-content">
+      <span class="close" id="closeFeedback">&times;</span>
+      <h2>Залишити відгук</h2>
+      <input type="text" id="feedbackName" placeholder="Ваше ім'я (не обов'язково)">
+      <textarea id="feedbackText" rows="6" placeholder="Напишіть ваш відгук або пропозицію..."></textarea>
+      <p style="font-size:13px; color:#555; margin-top:-2px; margin-bottom:10px;">
+        Ваші відгуки допомагають нам покращувати сайт. Дякуємо за допомогу!
+      </p>
+      <button id="sendFeedbackBtn">Надіслати</button>
+    </div>
+  </div>
+
+  <div class="modal" id="adminFeedbackModal">
+    <div class="modal-content" style="width:700px; max-width:95%;">
+      <span class="close" id="closeAdminFeedback">&times;</span>
+      <h2>Відгуки користувачів</h2>
+      <div id="adminFeedbackList" style="max-height:420px; overflow:auto;"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="feedbackListModal">
+  <div class="modal-content" style="width:700px; max-width:95%;">
+    <span class="close" id="closeFeedbackList">&times;</span>
+    <h2>Відгуки</h2>
+
+    <div style="margin-bottom:12px;">
+      <button id="openSendFeedbackModalBtn">Надіслати відгук</button>
+    </div>
+
+    <div id="feedbackList" style="max-height:420px; overflow:auto;"></div>
+  </div>
+</div>
+
+<div class="modal" id="replyModal">
+  <div class="modal-content">
+    <span class="close" id="closeReply">&times;</span>
+    <h2>Відповідь на відгук</h2>
+
+    <textarea id="replyText" rows="5" placeholder="Напишіть відповідь..."></textarea>
+
+    <button id="sendReplyBtn">Надіслати відповідь</button>
+  </div>
+</div>
+
+<div class="modal" id="topicsAdminModal">
+  <div class="modal-content" style="width:800px; max-width:95%;">
+    <span class="close" id="closeTopicsAdmin">&times;</span>
+    <h2>Редагування важливих тем</h2>
+
+    <input type="text" id="topicTitleInput" placeholder="Заголовок теми">
+    <textarea id="topicTextInput" rows="5" placeholder="Опис теми"></textarea>
+    <input type="text" id="topicImageInput" placeholder="Посилання на фото (https://...)">
+    <img id="topicPreviewImage" class="topic-preview-image" style="display:none;" alt="Попередній перегляд">
+    <button id="saveTopicBtn">Додати тему</button>
+
+    <hr style="margin:14px 0;">
+
+    <div id="topicsAdminList" style="max-height:320px; overflow:auto;"></div>
+  </div>
+</div>
+
+<div class="modal" id="featuredTopicAdminModal">
+  <div class="modal-content" style="width:800px; max-width:95%;">
+    <span class="close" id="closeFeaturedTopicAdmin">&times;</span>
+    <h2>Редагування важливої теми</h2>
+
+    <input type="text" id="featuredTopicBadgeInput" placeholder="Напис на бейджі, наприклад: Важлива тема">
+    <input type="text" id="featuredTopicTitleInput" placeholder="Заголовок">
+    <textarea id="featuredTopicTextInput" rows="4" placeholder="Короткий опис"></textarea>
+    <input type="text" id="featuredTopicImageInput" placeholder="Посилання на фото">
+    <input type="text" id="featuredTopicLinkInput" placeholder="Посилання, куди перекидати при натисканні">
+    <input type="number" id="featuredTopicOrderInput" placeholder="Порядок (1, 2, 3...)">
+
+    <label style="display:flex; gap:8px; align-items:center; margin-bottom:10px;">
+      <input type="checkbox" id="featuredTopicActiveInput">
+      <span>Активна тема</span>
+    </label>
+
+    <button id="saveFeaturedTopicBtn">Додати / зберегти тему</button>
+
+    <hr style="margin:14px 0;">
+
+    <div id="featuredTopicsAdminList" style="max-height:320px; overflow:auto;"></div>
+  </div>
+</div>
+
+    <footer>
+      Інформація від "Офіційний вебпортал парламенту України"<br>©2026
+    </footer>
+
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+ import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc,
+  updateDoc,
+  getDoc,
+  setDoc,
+  serverTimestamp,
+  query,
+  orderBy
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC1eGjYHzLhZOMp-FTw19lWb0FehZa_dg",
+      authDomain: "legal-and-aid.firebaseapp.com",
+      projectId: "legal-and-aid",
+      storageBucket: "legal-and-aid.firebasestorage.app",
+      messagingSenderId: "665556934402",
+      appId: "1:665556934402:web:2a862e1688be429b852c1b",
+      measurementId: "G-G3YPZN159E"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    let isAdmin = localStorage.getItem('isAdmin') === 'true';
+    const menu = document.querySelector('.menu');
+    const nav = document.getElementById('navMenu');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const homeBtn = document.getElementById('homeBtn');
+  const feedbackBtn = document.getElementById('feedbackBtn');
+    const loginModal = document.getElementById('loginModal');
+    const closeLogin = document.getElementById('closeLogin');
+    const submitLogin = document.getElementById('submitLogin');
+    const editModal = document.getElementById('editModal');
+    const closeEdit = document.getElementById('closeEdit');
+    const saveArticle = document.getElementById('saveArticle');
+
+    closeEdit.addEventListener('click', () => {
+      editModal.style.display = 'none';
+      editModal.classList.remove('show');
+    });
+
+    const articleLaw = document.getElementById('articleLaw');
+    const articleShort = document.getElementById('articleShort');
+    const articleDetails = document.getElementById('articleDetails');
+    const articleLink = document.getElementById('articleLink');
+
+    const deleteModal = document.getElementById('deleteModal');
+    const bulkImportModal = document.getElementById('bulkImportModal');
+    const closeBulkImport = document.getElementById('closeBulkImport');
+    const startBulkImport = document.getElementById('startBulkImport');
+    const bulkImportText = document.getElementById('bulkImportText');
+    const closeDelete = document.getElementById('closeDelete');
+    const confirmDelete = document.getElementById('confirmDelete');
+    const cancelDelete = document.getElementById('cancelDelete');
+
+    const searchInput = document.getElementById('searchInput');
+    const articlesDiv = document.getElementById('articles');
+    const maintenanceScreen = document.getElementById('maintenanceScreen');
+
+  const searchModal = document.getElementById('searchModal');
+  const closeSearch = document.getElementById('closeSearch');
+  const closeSearchBtn = document.getElementById('closeSearchBtn');
+  const clearSearchBtn = document.getElementById('clearSearchBtn');
+  const runSearchBtn = document.getElementById('runSearchBtn');
+  const searchModalInput = document.getElementById('searchModalInput');
+  const searchSection = document.getElementById('searchSection');
+
+    const searchToggle = document.getElementById('searchToggle');
+    const searchBox = document.querySelector('.search-box');
+
+    const toast = document.getElementById('toast');
+
+    const bulkImportLink = document.getElementById('bulkImportLink');
+  const feedbackModal = document.getElementById('feedbackModal');
+  const closeFeedback = document.getElementById('closeFeedback');
+  const sendFeedbackBtn = document.getElementById('sendFeedbackBtn');
+  const feedbackName = document.getElementById('feedbackName');
+  const feedbackText = document.getElementById('feedbackText');
+  const adminFeedbackModal = document.getElementById('adminFeedbackModal');
+  const closeAdminFeedback = document.getElementById('closeAdminFeedback');
+  const adminFeedbackList = document.getElementById('adminFeedbackList');
+
+const feedbackListModal = document.getElementById('feedbackListModal');
+const closeFeedbackList = document.getElementById('closeFeedbackList');
+const feedbackList = document.getElementById('feedbackList');
+const openSendFeedbackModalBtn = document.getElementById('openSendFeedbackModalBtn');
+const replyModal = document.getElementById('replyModal');
+const closeReply = document.getElementById('closeReply');
+const replyText = document.getElementById('replyText');
+const sendReplyBtn = document.getElementById('sendReplyBtn');
+
+const lawFloatingBar = document.getElementById('lawFloatingBar');
+const lawFloatingBarTitle = document.getElementById('lawFloatingBarTitle');
+
+const topicsAdminModal = document.getElementById('topicsAdminModal');
+const closeTopicsAdmin = document.getElementById('closeTopicsAdmin');
+const topicTitleInput = document.getElementById('topicTitleInput');
+const topicTextInput = document.getElementById('topicTextInput');
+const topicImageInput = document.getElementById('topicImageInput');
+const topicPreviewImage = document.getElementById('topicPreviewImage');
+const saveTopicBtn = document.getElementById('saveTopicBtn');
+const topicsAdminList = document.getElementById('topicsAdminList');
+const featuredTopicAdminModal = document.getElementById('featuredTopicAdminModal');
+const closeFeaturedTopicAdmin = document.getElementById('closeFeaturedTopicAdmin');
+const featuredTopicBadgeInput = document.getElementById('featuredTopicBadgeInput');
+const featuredTopicTitleInput = document.getElementById('featuredTopicTitleInput');
+const featuredTopicTextInput = document.getElementById('featuredTopicTextInput');
+const featuredTopicImageInput = document.getElementById('featuredTopicImageInput');
+const featuredTopicLinkInput = document.getElementById('featuredTopicLinkInput');
+const featuredTopicOrderInput = document.getElementById('featuredTopicOrderInput');
+const featuredTopicActiveInput = document.getElementById('featuredTopicActiveInput');
+const featuredTopicsAdminList = document.getElementById('featuredTopicsAdminList');
+
+let currentReplyFeedbackId = null;
+let appReady = false;
+
+    const lawSections = [
+      "Закон України «Про Національну поліцію»",
+      "Кримінальний процесуальний кодекс України",
+      "Кримінальний кодекс України",
+      "Цивільний кодекс України",
+      "Кодекс України про адміністративні правопорушення",
+      "Конституція України",
+      "Цивільний процесуальний кодекс України",
+      "Господарський процесуальний кодекс України",
+      "Кодекс адміністративного судочинства України",
+      "Кодекс законів про працю України",
+      "Сімейний кодекс України",
+      "Земельний кодекс України",
+      "Закон України «Про захист прав споживачів»",
+      "Закон України «Про звернення громадян»",
+      "Закон України «Про адвокатуру та адвокатську діяльність»",
+      "Закон України «Про судоустрій і статус суддів»"
+    ];
+
+    let currentSection = null;
+  let savedScroll = 0;
+  let aiSearchCache = new Map();
+  let aiSearchTimer = null;
+
+let editingFeaturedTopicId = null;
+
+    let articles = [
+      {section:"Закон про державну службу", law: "Мова спілкування державного службовця – українська", short:"Це передбачає Закон про державну службу Стаття 2", details:"Витяг з статті: державна мова є українська мова, якій Конституцією України надано статус мови офіційного спілкування посадових осіб державних органів та органів місцевого самоврядування під час виконання посадових обов'язків, а також мови діловодства і документації цих органів та посадових осіб.", link:""},
+      {section:"Закон України «Про Національну поліцію»", law:"Права та обов'язки поліцейського", short:"Основні права та обов'язки поліцейського визначені в Законі України «Про Національну поліцію» Стаття 12", details:"Витяг з статті: поліцейський має право застосовувати фізичну силу, спеціальні засоби та вогнепальну зброю у випадках, передбачених законом. Він зобов'язаний дотримуватися Конституції України, законів України, міжнародних договорів України, а також виконувати свої службові обов'язки сумлінно та неупереджено.", link:""},
+      {section:"Конституція України", law:"Право на свободу слова", short:"Право на свободу слова гарантовано Конституцією України Стаття 34", details:"Витяг з статті: кожен має право на свободу думки і слова, на вільне вираження своїх поглядів і переконань. Це право включає свободу шукати, отримувати і поширювати інформацію та ідеї будь-якими засобами без втручання державних органів та незалежно від державних кордонів.", link:""},
+      {section:"Закон України «Про НацІональну полIцIю»", law:"Пред'явлення документів поліцейському", short:"Громадянин зобов'язаний пред'явити документи поліцейському за його законною вимогою, відповідно до Статті 14 Закону України «Про Національну поліцію»", details:"Витяг з статті: громадянин зобов'язаний пред'явити документи, що посвідчують особу, поліцейському за його законною вимогою. Вимога про пред'явлення документів може бути висунута поліцейським у випадках, передбачених законом, зокрема для встановлення особи, перевірки документів, запобігання або припинення правопорушення.", link:""}
+    ];
+
+let featuredTopics = [];
+let featuredTopicIndex = 0;
+
+    let editIndex = null;
+    let deleteIndex = null;
+
+    function fillSearchSectionOptions() {
+    searchSection.innerHTML = '<option value="all">Шукати по всіх законах</option>';
+
+    lawSections.forEach(section => {
+      const option = document.createElement('option');
+      option.value = section;
+      option.textContent = section;
+      searchSection.appendChild(option);
+    });
+  }
+
+  function openSearchModal() {
+    searchModal.style.display = 'flex';
+    searchModal.classList.add('show');
+    searchModalInput.focus();
+  }
+
+  function closeSearchModal() {
+    searchModal.style.display = 'none';
+    searchModal.classList.remove('show');
+  }
+
+    async function seedArticlesIfEmpty(){
+      const querySnapshot = await getDocs(collection(db, "Юридична допомога"));
+      if (querySnapshot.empty) {
+        for (const article of articles) {
+          await addDoc(collection(db, "Юридична допомога"), {
+            section: article.section || "",
+            law: article.law,
+            short: article.short,
+            details: article.details,
+            link: article.link || ""
+          });
+        }
+      }
+    }
+
+    async function addArticleToDB(section, law, short, details, link){
+      await addDoc(collection(db, "Юридична допомога"), {
+        section,
+        law,
+        short,
+        details,
+        link
+      });
+      await loadArticles();
+    }
+
+  startBulkImport.addEventListener('click', async () => {
+    const rawText = bulkImportText.value.trim();
+    const lawLink = bulkImportLink.value.trim();
+
+    if (!currentSection) {
+      showToast('Розділ не вибрано', 'error');
+      return;
+    }
+
+    if (!rawText) {
+      showToast('Вставте текст зі статтями', 'error');
+      return;
+    }
+
+    const rawArticles = splitArticlesFromRawText(rawText);
+
+    if (rawArticles.length === 0) {
+      showToast('Не знайдено жодної статті', 'error');
+      return;
+    }
+
+    try {
+      startBulkImport.disabled = true;
+      startBulkImport.textContent = 'Імпорт...';
+
+  const generatedItems = [];
+
+  for (const item of rawArticles) {
+const articleBody = item.rawText
+  .replace(/\{[^}]*\}/g, '')
+  .replace(/\r/g, '')
+  .replace(/\n{2,}/g, '\n')
+  .replace(/[ \t]+/g, ' ')
+  .trim();
+
+    const firstLineEnd = articleBody.indexOf('\n');
+    let cleanBody = '';
+
+    if (firstLineEnd !== -1) {
+cleanBody = articleBody
+  .slice(firstLineEnd + 1)
+  .replace(/\n{2,}/g, '\n')
+  .replace(/[ \t]+/g, ' ')
+  .trim();
+    }
+
+const formattedNumber = item.articleNumber.replace(/-/g, '.');
+
+generatedItems.push({
+  section: currentSection,
+  law: `Стаття ${formattedNumber}`,
+  short: item.articleTitle || `Стаття ${formattedNumber}`,
+  details: `*${item.articleTitle || `Стаття ${formattedNumber}`}*\n\n${cleanBody}`,
+  link: lawLink || ''
+});
+  }
+
+  await addManyArticlesToDB(generatedItems);
+
+  bulkImportModal.style.display = 'none';
+  bulkImportModal.classList.remove('show');
+
+  bulkImportText.value = '';
+  bulkImportLink.value = '';
+
+  showToast(`Додано ${generatedItems.length} статей`, 'success');
+    } catch (error) {
+      console.error(error);
+      showToast('Помилка імпорту', 'error');
+    } finally {
+      startBulkImport.disabled = false;
+      startBulkImport.textContent = 'Імпортувати статті';
+    }
+  });
+
+    async function updateArticleInDB(id, section, law, short, details, link){
+      await updateDoc(doc(db, "Юридична допомога", id), {
+        section,
+        law,
+        short,
+        details,
+        link
+      });
+      await loadArticles();
+    }
+
+    async function deleteArticleFromDB(id){
+      await deleteDoc(doc(db, "Юридична допомога", id));
+      await loadArticles();
+    }
+
+    async function setMaintenanceMode(value){
+      await setDoc(doc(db, "siteSettings", "main"), {
+        maintenance: value
+      }, { merge: true });
+
+      await checkMaintenanceMode();
+    }
+
+    async function checkMaintenanceMode(){
+      const settingsRef = doc(db, "siteSettings", "main");
+      const settingsSnap = await getDoc(settingsRef);
+
+      let maintenance = false;
+
+      if(settingsSnap.exists()){
+        maintenance = settingsSnap.data().maintenance === true;
+      }
+
+      if(maintenance && !isAdmin){
+        articlesDiv.style.display = 'none';
+        maintenanceScreen.style.display = 'block';
+      } else {
+        articlesDiv.style.display = 'block';
+        maintenanceScreen.style.display = 'none';
+      }
+    }
+
+menu.addEventListener('click', () => {
+  nav.classList.toggle('show');
+});
+
+    loginBtn.addEventListener('click', () => { loginModal.style.display='flex'; loginModal.classList.add('show'); });
+    closeLogin.addEventListener('click', () => { loginModal.style.display='none'; loginModal.classList.remove('show'); });
+
+    submitLogin.addEventListener('click', async () => {
+      const login = document.getElementById('loginField').value.trim();
+      const password = document.getElementById('passwordField').value.trim();
+
+      try {
+        const adminRef = doc(db, "siteSettings", "admin");
+        const adminSnap = await getDoc(adminRef);
+
+        if (adminSnap.exists()) {
+          const adminData = adminSnap.data();
+
+          if (login === adminData.login && password === adminData.password) {
+            isAdmin = true;
+            localStorage.setItem('isAdmin', 'true');
+            loginModal.style.display = 'none';
+            loginModal.classList.remove('show');
+            updateAdminUI();
+            showToast('Вхід виконано', 'success');
+          } else {
+            showToast('Невірний логін або пароль', 'error');
+          }
+        } else {
+          showToast('Документ admin не знайдено', 'error');
+        }
+      } catch (error) {
+        console.error(error);
+        showToast('Помилка входу', 'error');
+      }
+    });
+
+    logoutBtn.addEventListener('click', async ()=>{
+      isAdmin = false;
+      localStorage.removeItem('isAdmin');
+      updateAdminUI();
+      await checkMaintenanceMode();
+    });
+
+async function loadFeaturedTopic() {
+  try {
+    const snapshot = await getDocs(query(
+      collection(db, "featuredTopic"),
+      orderBy("order", "asc")
+    ));
+
+    featuredTopics = [];
+
+    snapshot.forEach(docItem => {
+      featuredTopics.push({ id: docItem.id, ...docItem.data() });
+    });
+
+    if (!featuredTopics.length) {
+      featuredTopics = [{
+        badge: "Важлива тема",
+        title: "Юридична допомога онлайн",
+        text: "Оберіть законодавство, знайдіть потрібну статтю або перегляньте важливі юридичні матеріали.",
+        image: "",
+        link: ""
+      }];
+    }
+
+    featuredTopicIndex = 0;
+    return featuredTopics;
+  } catch (error) {
+    console.error("Помилка завантаження featured topic:", error);
+
+    featuredTopics = [{
+      badge: "Важлива тема",
+      title: "Юридична допомога онлайн",
+      text: "Оберіть законодавство, знайдіть потрібну статтю або перегляньте важливі юридичні матеріали.",
+      image: "",
+      link: ""
+    }];
+
+    featuredTopicIndex = 0;
+    return featuredTopics;
+  }
+}
+
+  function formatText(text) {
+    if (!text) return "";
+
+    return escapeHtml(text)
+      .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")
+      .replace(/\*(.*?)\*/g, "<i>$1</i>")
+      .replace(/__(.*?)__/g, "<u>$1</u>")
+      .replace(/~~(.*?)~~/g, "<s>$1</s>")
+      .replace(/\n/g, "<br>");
+  }
+
+function toggleDetailsBlock(detailsDiv, button) {
+  const articleCard = button.closest('.article');
+  const isOpen = detailsDiv.classList.contains('open');
+
+  function getTopOffset() {
+    const header = document.querySelector('header');
+    const floatingBar = document.getElementById('lawFloatingBar');
+
+    const headerHeight = header ? header.offsetHeight : 0;
+
+    let floatingHeight = 0;
+    if (floatingBar && floatingBar.classList.contains('show')) {
+      floatingHeight = floatingBar.offsetHeight;
+    }
+
+    return headerHeight + floatingHeight + 16; // 16px запас
+  }
+
+  if (isOpen) {
+    const articleTop = articleCard.getBoundingClientRect().top + window.scrollY;
+
+    detailsDiv.style.maxHeight = detailsDiv.scrollHeight + 'px';
+
+    requestAnimationFrame(() => {
+      detailsDiv.style.maxHeight = '0px';
+      detailsDiv.classList.remove('open');
+      button.textContent = 'Докладніше';
+    });
+
+    setTimeout(() => {
+      window.scrollTo({
+        top: articleTop - getTopOffset(),
+        behavior: 'smooth'
+      });
+    }, 220);
+  } else {
+    detailsDiv.classList.add('open');
+    detailsDiv.style.maxHeight = detailsDiv.scrollHeight + 'px';
+    button.textContent = 'Згорнути';
+
+    setTimeout(() => {
+      if (detailsDiv.classList.contains('open')) {
+        detailsDiv.style.maxHeight = detailsDiv.scrollHeight + 'px';
+      }
+    }, 50);
+  }
+}
+
+  async function renderArticles() {
+    if (!appReady) return;
+    articlesDiv.innerHTML = "";
+    const query = searchInput.value.trim().toLowerCase();
+
+          if (currentSection === null) {
+  if (!query) {
+    renderHomePage();
+    return;
+  }
+      }
+
+      articlesDiv.innerHTML = `
+        <div class="section-header">
+          <h2>Пошук...</h2>
+          <p>Шукаю по всіх законах... Це може зайняти деякий час
+            <br>*Не оновлюйте сторінку*</br> 
+            </p>
+        </div>
+      `;
+
+      const prefilteredArticles = articles.map((a, index) => ({
+        ...a,
+        originalIndex: index
+      }));
+
+      const filteredGlobalArticles = await rankArticlesWithAI(query, prefilteredArticles);
+
+      articlesDiv.innerHTML = "";
+
+  articlesDiv.innerHTML = `
+    <div class="section-header">
+      <h2>Результати пошуку</h2>
+      <p>По запиту: "${escapeHtml(query)}"</p>
+    </div>
+  `;
+
+      if (filteredGlobalArticles.length === 0) {
+        articlesDiv.innerHTML = `
+          <div class="section-header">
+            <h2>Нічого не знайдено</h2>
+            <p>Спробуйте інше ключове слово</p>
+          </div>
+        `;
+        return;
+
+      filteredGlobalArticles.forEach((a) => {
+        const index = a.originalIndex;
+        const div = document.createElement("div");
+        div.className = "article";
+
+        div.innerHTML = `
+          <h2>${escapeHtml(a.law.replace(/-/g, '.'))}</h2>
+          <p><b>${escapeHtml(a.section || "Без назви закону")}</b></p>
+          <p>${escapeHtml(a.short || "")}</p>
+        `;
+
+        const detailsDiv = document.createElement("div");
+        detailsDiv.className = "details";
+
+        detailsDiv.innerHTML = `
+          <div style="line-height:1.6;">
+            ${formatText(a.details)}
+            ${a.link ? `<a href="${a.link}" target="_blank" style="display:block; margin-top:10px; color:#004080;">Посилання</a>` : ""}
+          </div>
+        `;
+
+        div.appendChild(detailsDiv);
+
+const moreBtn = document.createElement("button");
+moreBtn.textContent = "Докладніше";
+moreBtn.onclick = () => toggleDetailsBlock(detailsDiv, moreBtn);
+div.appendChild(moreBtn);
+
+        const openLawBtn = document.createElement("button");
+        openLawBtn.textContent = "Відкрити закон";
+        openLawBtn.onclick = () => {
+          currentSection = a.section;
+          renderArticles();
+        };
+        div.appendChild(openLawBtn);
+
+        if (isAdmin) {
+          const editBtn = document.createElement("button");
+          editBtn.textContent = "Редагувати";
+          editBtn.onclick = () => openEditModal(index);
+
+          const delBtn = document.createElement("button");
+          delBtn.textContent = "Видалити";
+          delBtn.onclick = () => openDeleteModal(index);
+
+          div.appendChild(editBtn);
+          div.appendChild(delBtn);
+        }
+
+        articlesDiv.appendChild(div);
+      });
+
+      return;
+    }
+
+  const backDiv = document.createElement("div");
+  backDiv.className = "section-header";
+  backDiv.innerHTML = `
+    <h2>${escapeHtml(currentSection)}</h2>
+    <p>
+      ${query
+        ? `Результати пошуку в ${escapeHtml(currentSection)}`
+        : "Список статей розділу"
+      }
+    </p>
+  `;
+
+  const backBtn = document.createElement("button");
+  backBtn.textContent = "Назад до розділів";
+  backBtn.onclick = () => {
+    currentSection = null;
+    renderArticles();
+
+    setTimeout(() => {
+      window.scrollTo(0, savedScroll);
+    }, 50);
+  };
+
+  backDiv.appendChild(backBtn);
+  articlesDiv.appendChild(backDiv);
+
+    let filteredArticles = articles
+      .map((a, index) => ({ ...a, originalIndex: index }))
+      .filter(a => a.section === currentSection);
+
+if (query) {
+  const sectionCandidates = filteredArticles.map((a, index) => ({
+    ...a,
+    originalIndex: a.originalIndex ?? index
+  }));
+
+  filteredArticles = await rankArticlesWithAI(query, sectionCandidates);
+
+  if (filteredArticles.length === 0) {
+    filteredArticles = fallbackRankArticles(query, sectionCandidates);
+  }
+} else {
+  filteredArticles = filteredArticles.sort((a, b) => {
+    const aNum = getArticleNumber(a.law);
+    const bNum = getArticleNumber(b.law);
+
+    if (aNum.main !== bNum.main) {
+      return aNum.main - bNum.main;
+    }
+
+    return aNum.sub - bNum.sub;
+  });
+}
+
+filteredArticles.forEach((a) => {
+  const index = a.originalIndex;
+  const div = document.createElement("div");
+  div.className = "article";
+
+  let shortText = (a.short || '').trim();
+
+  if (!shortText) {
+    shortText = (a.details || '')
+      .replace(/\*(.*?)\*/g, '$1')
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .split('\n')
+      .map(line => line.trim())
+      .find(line => line.length > 0) || 'Короткий опис відсутній';
+  }
+
+  div.innerHTML = `
+    <h2>${escapeHtml((a.law || '').replace(/-/g, '.'))}</h2>
+    <p>${escapeHtml(shortText)}</p>
+  `;
+
+  const detailsDiv = document.createElement("div");
+  detailsDiv.className = "details";
+  detailsDiv.innerHTML = `
+    <div style="line-height:1.6; white-space:pre-line;">
+      ${formatText(a.details)}
+      ${a.link ? `<a href="${a.link}" target="_blank" style="display:block; margin-top:10px; color:#004080; font-weight:500;">Посилання на статтю</a>` : ""}
+    </div>
+  `;
+
+  div.appendChild(detailsDiv);
+
+  const moreBtn = document.createElement("button");
+  moreBtn.textContent = "Докладніше";
+  moreBtn.onclick = () => toggleDetailsBlock(detailsDiv, moreBtn);
+  div.appendChild(moreBtn);
+
+  if (isAdmin) {
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "Редагувати";
+    editBtn.onclick = () => openEditModal(index);
+
+    const delBtn = document.createElement("button");
+    delBtn.textContent = "Видалити";
+    delBtn.onclick = () => openDeleteModal(index);
+
+    div.appendChild(editBtn);
+    div.appendChild(delBtn);
+  }
+
+  articlesDiv.appendChild(div);
+});
+    }
+
+homeBtn.addEventListener('click', () => {
+  currentSection = null;
+  searchInput.value = '';
+  renderArticles();
+  window.scrollTo(0, 0);
+nav.classList.remove('show');
+  refreshLawFloatingBarImmediately();
+});
+
+  function openEditModal(index){
+      editIndex=index;
+      const articleSection = document.getElementById('articleSection');
+
+      if(index!==null){
+        articleSection.value = articles[index].section || lawSections[0];
+        articleLaw.value=articles[index].law;
+        articleShort.value=articles[index].short;
+        articleDetails.value=articles[index].details;
+        articleLink.value = articles[index].link || '';
+      }else{
+        articleSection.value = currentSection || lawSections[0];
+        articleLaw.value='';
+        articleShort.value='';
+        articleDetails.value='';
+        articleLink.value = '';
+      }
+
+      editModal.style.display='flex';
+      editModal.classList.add('show');
+    }
+
+  function updateAdminUI() {
+    if (isAdmin) {
+      loginBtn.style.display = 'none';
+      logoutBtn.style.display = 'block';
+    } else {
+      loginBtn.style.display = 'block';
+      logoutBtn.style.display = 'none';
+    }
+
+    showAddButton();
+    renderArticles();
+  }
+
+    function showToast(message, type = 'info'){
+      const colors = {
+        success: '#22c55e',
+        error: '#ef4444',
+        info: '#3b82f6',
+        warning: '#f59e0b'
+      };
+
+      const icons = {
+        success: '✔',
+        error: '✖',
+        info: 'ℹ',
+        warning: '⚠'
+      };
+
+      toast.innerHTML = `
+        <span style="margin-right:8px;">${icons[type]}</span>
+        <span>${message}</span>
+      `;
+
+      toast.style.background = colors[type] || colors.info;
+      toast.style.display = 'flex';
+      toast.style.alignItems = 'center';
+
+      requestAnimationFrame(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0)';
+      });
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(15px)';
+        setTimeout(() => {
+          toast.style.display = 'none';
+        }, 300);
+      }, 2500);
+    }
+
+    saveArticle.addEventListener('click', async ()=>{
+      const section = document.getElementById('articleSection').value;
+      const law = articleLaw.value.trim();
+      const short = articleShort.value.trim();
+      const details = articleDetails.value.trim();
+      const link = articleLink.value.trim();
+
+      if(section && law && short){
+        if(editIndex !== null){
+          if(articles[editIndex].id){
+            await updateArticleInDB(articles[editIndex].id, section, law, short, details, link);
+          } else {
+            articles[editIndex] = {section, law, short, details, link};
+            renderArticles();
+          }
+          showToast('Статтю змінено', 'info');
+        } else {
+          await addArticleToDB(section, law, short, details, link);
+          showToast('Статтю додано', 'success');
+        }
+
+        currentSection = section;
+        editModal.style.display = 'none';
+        editModal.classList.remove('show');
+      } else {
+        showToast('Заповніть потрібні поля', 'error');
+      }
+    });
+
+function getArticleNumber(title) {
+  const match = title.match(/Стаття\s*(\d+(?:[.-]\d+)*)/i);
+
+  if (!match) {
+    return { main: 999999, sub: 999999 };
+  }
+
+  const parts = match[1]
+    .replace(/-/g, '.') // поддержка старых данных
+    .split('.')
+    .map(n => parseInt(n, 10));
+
+  return {
+    main: parts[0] ?? 999999,
+    sub: parts[1] ?? 0
+  };
+}
+
+  function showAddButton() {
+    const adminMenu = document.getElementById('adminMenu');
+    adminMenu.innerHTML = '';
+
+    if (!isAdmin) return;
+
+    const addBtn = document.createElement('button');
+    addBtn.id = 'addBtn';
+    addBtn.textContent = 'Додати статтю';
+    addBtn.onclick = () => openEditModal(null);
+
+    const bulkBtn = document.createElement('button');
+    bulkBtn.id = 'bulkImportBtn';
+    bulkBtn.textContent = 'Масово додати статті';
+    bulkBtn.onclick = () => openBulkImportModal();
+
+    const feedbackAdminBtn = document.createElement('button');
+feedbackAdminBtn.textContent = 'Переглянути відгуки';
+feedbackAdminBtn.onclick = () => {
+nav.classList.remove('show');
+  openFeedbackListModal();
+};
+
+const featuredTopicBtn = document.createElement('button');
+featuredTopicBtn.textContent = 'Редагувати важливу тему';
+featuredTopicBtn.onclick = async () => {
+nav.classList.remove('show');
+  await openFeaturedTopicAdminModal();
+};
+
+    const maintenanceOn = document.createElement('button');
+    maintenanceOn.textContent = 'Увімкнути технічні роботи';
+    maintenanceOn.onclick = async () => {
+      await setMaintenanceMode(true);
+      showToast('Технічні роботи увімкнено', 'warning');
+    };
+
+    const maintenanceOff = document.createElement('button');
+    maintenanceOff.textContent = 'Вимкнути технічні роботи';
+    maintenanceOff.onclick = async () => {
+      await setMaintenanceMode(false);
+      showToast('Технічні роботи вимкнено', 'success');
+    };
+
+    adminMenu.appendChild(addBtn);
+    adminMenu.appendChild(bulkBtn);
+    adminMenu.appendChild(feedbackAdminBtn);
+    adminMenu.appendChild(maintenanceOn);
+    adminMenu.appendChild(maintenanceOff);
+    adminMenu.appendChild(featuredTopicBtn);
+  }
+
+    function openBulkImportModal(){
+      if(!currentSection){
+        showToast('Спочатку відкрий потрібний розділ', 'warning');
+        return;
+      }
+
+      bulkImportText.value = '';
+      bulkImportModal.style.display = 'flex';
+      bulkImportModal.classList.add('show');
+    }
+
+    closeBulkImport.addEventListener('click', () => {
+      bulkImportModal.style.display = 'none';
+      bulkImportModal.classList.remove('show');
+    });
+
+  function normalizeSearchText(text) {
+    return (text || "")
+      .toLowerCase()
+      .replace(/[‘’‚‛'`"]/g, "")
+      .replace(/[іїёєґ]/g, ch => ({
+        "і": "и",
+        "ї": "и",
+        "ё": "е",
+        "є": "е",
+        "ґ": "г"
+      }[ch] || ch))
+      .replace(/a/g, "а")
+      .replace(/b/g, "в")
+      .replace(/c/g, "с")
+      .replace(/e/g, "е")
+      .replace(/h/g, "н")
+      .replace(/i/g, "і")
+      .replace(/k/g, "к")
+      .replace(/m/g, "м")
+      .replace(/o/g, "о")
+      .replace(/p/g, "р")
+      .replace(/t/g, "т")
+      .replace(/x/g, "х")
+      .replace(/y/g, "у")
+      .replace(/0/g, "о")
+      .replace(/1/g, "і")
+      .replace(/3/g, "з")
+      .replace(/6/g, "б")
+      .replace(/[^а-яa-z0-9\s]/gi, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function getQueryTerms(query) {
+    const q = normalizeSearchText(query);
+    if (!q) return [];
+
+    const words = q.split(" ").filter(word => word.length >= 2);
+    const extra = [];
+
+    for (const word of words) {
+      extra.push(word);
+
+      if (word.startsWith("затрим")) {
+        extra.push("затримання", "затримали", "затримати", "обмеження свободи");
+      }
+
+      if (word.startsWith("президент")) {
+        extra.push("президент україни", "глава держави", "недоторканність", "імунітет");
+      }
+
+      if (word.startsWith("мовч")) {
+        extra.push("право на мовчання", "не свідчити", "не давати показання", "проти себе");
+      }
+
+      if (word.startsWith("документ")) {
+        extra.push("перевірка документів", "предявлення документів", "посвідчення");
+      }
+
+      if (word.startsWith("обш") || word.startsWith("огляд")) {
+        extra.push("обшук", "огляд речей", "перевірка речей", "рюкзак", "сумка");
+      }
+
+      if (word.startsWith("поліц") || word.startsWith("полиц")) {
+        extra.push("поліція", "поліцейський", "правоохоронець");
+      }
+    }
+
+    return [...new Set([q, ...words, ...extra].map(normalizeSearchText).filter(Boolean))];
+  }
+
+  function escapeHtml(text) {
+    return (text || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  async function openAdminFeedbackModal() {
+    adminFeedbackModal.style.display = 'flex';
+    adminFeedbackModal.classList.add('show');
+    adminFeedbackList.innerHTML = '<p>Завантаження...</p>';
+
+    try {
+      const q = query(
+        collection(db, "feedbacks"),
+        orderBy("createdAt", "desc")
+      );
+
+      const snapshot = await getDocs(q);
+
+      if (snapshot.empty) {
+        adminFeedbackList.innerHTML = '<p>Відгуків поки немає.</p>';
+        return;
+      }
+
+      adminFeedbackList.innerHTML = '';
+
+      snapshot.forEach((docItem) => {
+        const data = docItem.data();
+
+        const item = document.createElement('div');
+        item.style.background = '#f8fafc';
+        item.style.border = '1px solid #dbeafe';
+        item.style.borderRadius = '10px';
+        item.style.padding = '12px';
+        item.style.marginBottom = '12px';
+
+        let dateText = 'Невідомо';
+        if (data.createdAt?.toDate) {
+          dateText = data.createdAt.toDate().toLocaleString('uk-UA');
+        }
+
+        item.innerHTML = `
+          <div style="font-weight:700; margin-bottom:6px; color:#004080;">
+            ${escapeHtml(data.name || 'Анонімно')}
+          </div>
+          <div style="font-size:13px; color:#64748b; margin-bottom:8px;">
+            ${escapeHtml(dateText)}
+          </div>
+          <div style="white-space:pre-line; line-height:1.5; color:#111827;">
+            ${escapeHtml(data.text || '')}
+          </div>
+        `;
+
+        if (isAdmin) {
+  const replyBtn = document.createElement('button');
+  replyBtn.textContent = 'Відповісти';
+  replyBtn.style.marginTop = '10px';
+
+  replyBtn.onclick = () => {
+    currentReplyFeedbackId = docItem.id;
+    replyModal.style.display = 'flex';
+    replyModal.classList.add('show');
+    replyText.value = data.reply || '';
+  };
+
+item.appendChild(replyBtn);
+}
+
+        adminFeedbackList.appendChild(item);
+      });
+    } catch (error) {
+      console.error('Помилка завантаження відгуків:', error);
+      adminFeedbackList.innerHTML = '<p>Не вдалося завантажити відгуки.</p>';
+    }
+  }
+
+  async function expandQueryWithAI(query) {
+    const cleanQuery = normalizeSearchText(query);
+    return cleanQuery ? [cleanQuery] : [];
+  }
+
+  function scoreArticle(article, terms) {
+    const law = normalizeSearchText(article.law);
+    const short = normalizeSearchText(article.short);
+    const details = normalizeSearchText(article.details);
+    const section = normalizeSearchText(article.section);
+
+    let score = 0;
+
+    for (const term of terms) {
+      if (!term) continue;
+
+      if (law.includes(term)) score += 8;
+      if (short.includes(term)) score += 6;
+      if (details.includes(term)) score += 4;
+      if (section.includes(term)) score += 3;
+
+      const words = term.split(" ").filter(Boolean);
+      for (const word of words) {
+        if (word.length < 3) continue;
+        if (law.includes(word)) score += 3;
+        if (short.includes(word)) score += 2;
+        if (details.includes(word)) score += 1;
+        if (section.includes(word)) score += 1;
+      }
+    }
+
+    return score;
+  }
+
+  function buildGlobalSearchResults(query, expandedTerms) {
+    const q = normalizeSearchText(query);
+
+    return articles
+      .map((a, index) => {
+        const law = normalizeSearchText(a.law);
+        const short = normalizeSearchText(a.short);
+        const details = normalizeSearchText(a.details);
+        const section = normalizeSearchText(a.section);
+
+        let relevanceScore = 0;
+
+        for (const term of expandedTerms) {
+          if (!term) continue;
+
+          if (law.includes(term)) relevanceScore += 8;
+          if (short.includes(term)) relevanceScore += 12;
+          if (details.includes(term)) relevanceScore += 7;
+          if (section.includes(term)) relevanceScore += 4;
+        }
+
+        if (short.includes(q)) relevanceScore += 30;
+        if (details.includes(q)) relevanceScore += 20;
+
+        return {
+          ...a,
+          originalIndex: index,
+          relevanceScore
+        };
+      })
+      .filter(a => a.relevanceScore > 0)
+      .sort((a, b) => b.relevanceScore - a.relevanceScore);
+  }
+
+  function splitArticlesFromRawText(text) {
+    text = text
+    .split('\n')
+    .filter(line => !/^Розділ\s+[IVXLCDM]+/i.test(line.trim()))
+    .join('\n');
+    text = text.replace(/\{[^}]*\}/g, '');
+    text = text.replace(/\r/g, '').trim();
+
+    const regex = /Стаття\s+(\d+(?:-\d+)*)\.?\s*([^\n]*)/gi;    
+    const matches = [...text.matchAll(regex)];
+    const result = [];
+
+    if (matches.length === 0) return result;
+
+    for (let i = 0; i < matches.length; i++) {
+      const start = matches[i].index;
+      const end = i + 1 < matches.length ? matches[i + 1].index : text.length;
+
+      const fullBlock = text.slice(start, end).trim();
+      const articleNumber = matches[i][1].trim();
+      const articleTitle = (matches[i][2] || '').trim();
+
+      result.push({
+        articleNumber,
+        articleTitle,
+        rawText: fullBlock
+      });
+    }
+
+    return result;
+  }
+
+  async function addManyArticlesToDB(articlesArray) {
+    try {
+      for (const article of articlesArray) {
+        await addDoc(collection(db, "Юридична допомога"), {
+          law: article.law,
+          short: article.short,
+          details: article.details,
+          section: article.section,
+          link: article.link || ""
+        });
+      }
+
+      await loadArticles();
+    } catch (error) {
+      console.error("Помилка додавання:", error);
+      throw error;
+    }
+  }
+
+  function fallbackRankArticles(query, candidates) {
+    const q = normalizeSearchText(query);
+    const terms = getQueryTerms(query);
+
+    const conceptMap = [
+      {
+        triggers: ["право на мовчання", "мовчати", "не свідчити", "не давати показання", "проти себе", "відмова давати показання"],
+        boosts: ["стаття 63", "не несе відповідальності за відмову давати показання", "щодо себе", "членів сімї", "близьких родичів"]
+      },
+      {
+        triggers: ["перевірка документів", "документи", "вимагають документи", "поліція перевіряє документи"],
+        boosts: ["стаття 32", "перевірка документів", "предявлення документів", "поліцейський має право вимагати"]
+      },
+      {
+        triggers: ["жетон", "посвідчення поліцейського", "предяви посвідчення", "назви своє прізвище"],
+        boosts: ["стаття 18", "службове посвідчення", "нагрудний знак", "поліцейський повинен назвати"]
+      },
+      {
+        triggers: ["обшук рюкзака", "огляд речей", "перевірка речей", "школа перевіряє рюкзак"],
+        boosts: ["особисте життя", "приватне життя", "огляд речей", "конфіденційна інформація", "стаття 32"]
+      }
+    ];
+
+    function scoreText(article) {
+      const law = normalizeSearchText(article.law);
+      const short = normalizeSearchText(article.short);
+      const details = normalizeSearchText(article.details);
+      const section = normalizeSearchText(article.section);
+      const whole = `${law} ${short} ${details} ${section}`;
+
+  let score = 0;
+
+  for (const term of terms) {
+    if (!term) continue;
+
+    if (law.includes(term)) score += 18;
+    if (short.includes(term)) score += 18;
+    if (details.includes(term)) score += 18;
+    if (section.includes(term)) score += 18;
+  }
+  for (const term of terms) {
+    if (!term) continue;
+
+    if (law.includes(term)) score += 18;
+    if (short.includes(term)) score += 18;
+    if (details.includes(term)) score += 18;
+    if (section.includes(term)) score += 18;
+  }
+
+  const queryWords = q.split(" ").filter(w => w.length >= 3);
+  for (const word of queryWords) {
+    if (law.includes(word)) score += 8;
+    if (short.includes(word)) score += 8;
+    if (details.includes(word)) score += 8;
+    if (section.includes(word)) score += 8;
+  }
+
+  let matchedFields = 0;
+  if (terms.some(term => law.includes(term))) matchedFields++;
+  if (terms.some(term => short.includes(term))) matchedFields++;
+  if (terms.some(term => details.includes(term))) matchedFields++;
+  if (terms.some(term => section.includes(term))) matchedFields++;
+
+  if (matchedFields >= 2) score += 20;
+  if (matchedFields >= 3) score += 35;
+  if (matchedFields === 4) score += 50;
+      if (whole.includes(q)) score += 40;
+
+      if (q.includes("мовч") && whole.includes("свідч")) score += 45;
+      if (q.includes("мовч") && whole.includes("показан")) score += 40;
+      if (q.includes("себе") && whole.includes("проти себе")) score += 35;
+      if (q.includes("себе") && whole.includes("щодо себе")) score += 35;
+      if (q.includes("родич") && whole.includes("близьких родичів")) score += 25;
+
+      for (const group of conceptMap) {
+        const triggered = group.triggers.some(t => q.includes(normalizeSearchText(t)));
+        if (triggered) {
+          for (const boost of group.boosts) {
+            if (whole.includes(normalizeSearchText(boost))) {
+              score += 30;
+            }
+          }
+        }
+      }
+
+      if (q.includes("документ") && whole.includes("документ")) score += 25;
+      if (q.includes("поліц") && section.includes("національну поліцію")) score += 20;
+
+      return score;
+    }
+
+    return candidates
+      .map(article => ({
+        ...article,
+        aiScore: scoreText(article)
+      }))
+      .filter(article => article.aiScore > 0)
+      .sort((a, b) => b.aiScore - a.aiScore);
+  }
+
+  async function rankArticlesWithAI(query, candidates) {
+    const fallbackRanked = fallbackRankArticles(query, candidates);
+    const fallbackMap = new Map(
+      fallbackRanked.map(item => [item.originalIndex, item.aiScore || 0])
+    );
+
+    try {
+      const response = await fetch('/api/search-ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, candidates })
+      });
+
+      const raw = await response.text();
+
+      let data;
+      try {
+        data = JSON.parse(raw);
+      } catch (error) {
+        console.error("Server returned invalid JSON:", raw);
+        return fallbackRanked;
+      }
+
+      if (!response.ok || !Array.isArray(data.results)) {
+        console.error("AI rank error:", data);
+        return fallbackRanked;
+      }
+
+      const aiMap = new Map();
+      for (const item of data.results) {
+        if (typeof item.index !== "number") continue;
+        aiMap.set(item.index, {
+          score: Number(item.score) || 0,
+          reason: item.reason || ""
+        });
+      }
+
+      const merged = candidates
+        .map(item => {
+          const ai = aiMap.get(item.originalIndex);
+          const fallbackScore = fallbackMap.get(item.originalIndex) || 0;
+          const aiScore = ai ? ai.score : 0;
+
+          return {
+            ...item,
+            aiScore: Math.max(aiScore, fallbackScore),
+            aiReason: ai?.reason || (fallbackScore > 0 ? "fallback" : "")
+          };
+        })
+        .filter(item => item.aiScore > 0)
+        .sort((a, b) => b.aiScore - a.aiScore);
+
+      return merged.length ? merged : fallbackRanked;
+    } catch (error) {
+      console.error("AI rank failed:", error);
+      return fallbackRanked;
+    }
+  }
+
+  function runModalSearch() {
+    const query = searchModalInput.value.trim();
+    const selectedSection = searchSection.value;
+
+    if (!query) {
+      showToast('Введіть запит для пошуку', 'error');
+      return;
+    }
+
+    searchInput.value = query;
+
+    if (selectedSection === 'all') {
+      currentSection = null;
+    } else {
+      currentSection = selectedSection;
+    }
+
+    closeSearchModal();
+    renderArticles();
+    window.scrollTo(0, 0);
+  }
+
+  runSearchBtn.addEventListener('click', () => {
+    runModalSearch();
+  });
+
+  searchModalInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      runModalSearch();
+    }
+  });
+
+  feedbackBtn.onclick = async () => {
+nav.classList.remove('show');
+  await openFeedbackListModal();
+};
+
+  async function openFeedbackListModal() {
+  feedbackListModal.style.display = 'flex';
+  feedbackListModal.classList.add('show');
+  feedbackList.innerHTML = '<p>Завантаження...</p>';
+
+  try {
+    const q = query(collection(db, "feedbacks"), orderBy("createdAt", "desc"));
+    const snapshot = await getDocs(q);
+
+    if (snapshot.empty) {
+      feedbackList.innerHTML = '<p>Відгуків поки немає.</p>';
+      return;
+    }
+
+    feedbackList.innerHTML = '';
+
+    snapshot.forEach((docItem) => {
+      const data = docItem.data();
+
+      const card = document.createElement('div');
+      card.className = 'feedback-card';
+
+      let dateText = 'Невідомо';
+      if (data.createdAt?.toDate) {
+        dateText = data.createdAt.toDate().toLocaleString('uk-UA');
+      }
+
+card.innerHTML = `
+  <div style="font-weight:700; margin-bottom:6px; color:#004080;">
+    ${escapeHtml(data.name || 'Анонімно')}
+  </div>
+
+  <div class="feedback-meta">
+    ${escapeHtml(dateText)}
+  </div>
+
+  <div style="white-space:pre-line; line-height:1.5;">
+    ${escapeHtml(data.text || '')}
+  </div>
+
+  ${
+    data.reply && data.reply.trim()
+      ? `
+        <div style="
+          margin-top:12px;
+          padding:10px;
+          background:#eef6ff;
+          border-left:4px solid #004080;
+          border-radius:6px;
+        ">
+          <div style="font-weight:700; margin-bottom:4px;">
+            Відповідь адміністратора:
+          </div>
+          <div style="white-space:pre-line;">
+            ${escapeHtml(data.reply)}
+          </div>
+        </div>
+      `
+      : ''
+  }
+`;
+
+      feedbackList.appendChild(card);
+    });
+  } catch (error) {
+    console.error('Помилка завантаження відгуків:', error);
+    feedbackList.innerHTML = '<p>Не вдалося завантажити відгуки.</p>';
+  }
+}
+
+function updateLawFloatingBar() {
+  if (!lawFloatingBar || !lawFloatingBarTitle) return;
+
+  if (!currentSection) {
+    lawFloatingBar.classList.remove('show');
+    lawFloatingBarTitle.textContent = '';
+    return;
+  }
+
+  lawFloatingBarTitle.textContent = currentSection;
+
+  const triggerPoint = 140;
+  const shouldShow = window.scrollY > triggerPoint;
+
+  lawFloatingBar.classList.toggle('show', shouldShow);
+}
+
+function refreshLawFloatingBarImmediately() {
+  if (!lawFloatingBar || !lawFloatingBarTitle) return;
+
+  if (!currentSection) {
+    lawFloatingBar.classList.remove('show');
+    lawFloatingBarTitle.textContent = '';
+  } else {
+    lawFloatingBarTitle.textContent = currentSection;
+    updateLawFloatingBar();
+  }
+}
+
+    function openDeleteModal(index){ deleteIndex=index; deleteModal.style.display='flex'; deleteModal.classList.add('show'); }
+    closeDelete.addEventListener('click',()=>{deleteModal.style.display='none'; deleteModal.classList.remove('show');});
+    cancelDelete.addEventListener('click',()=>{deleteModal.style.display='none'; deleteModal.classList.remove('show');});
+    confirmDelete.addEventListener('click', async ()=>{
+      if(deleteIndex!==null){
+        if(articles[deleteIndex].id){
+          await deleteArticleFromDB(articles[deleteIndex].id);
+        } else {
+          articles.splice(deleteIndex,1);
+        renderArticles();
+        }
+
+        deleteModal.style.display='none';
+        deleteModal.classList.remove('show');
+        showToast('Статтю видалено', 'error');
+      }
+    });
+    async function loadArticles(){
+  const querySnapshot = await getDocs(collection(db, "Юридична допомога"));
+      const loaded = [];
+
+      querySnapshot.forEach((docItem)=>{
+        loaded.push({ id: docItem.id, ...docItem.data() });
+      });
+
+      if(loaded.length > 0){
+        articles = loaded;
+      }
+
+      renderArticles();
+      await checkMaintenanceMode();
+    }
+
+    searchToggle.addEventListener('click', () => {
+    openSearchModal();
+  });
+
+  closeSearch.addEventListener('click', () => {
+    closeSearchModal();
+  });
+
+  closeSearchBtn.addEventListener('click', () => {
+    closeSearchModal();
+  });
+
+  clearSearchBtn.addEventListener('click', () => {
+    searchModalInput.value = '';
+    searchSection.value = 'all';
+    searchModalInput.focus();
+  });
+
+  searchModal.addEventListener('click', (e) => {
+    if (e.target === searchModal) {
+      closeSearchModal();
+    }
+  });
+
+  history.scrollRestoration = "manual";
+
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+    }, 50);
+  });
+
+  homeBtn.addEventListener('click', () => {
+    currentSection = null;
+    searchInput.value = '';
+    renderArticles();
+    window.scrollTo(0, 0);
+nav.classList.remove('show');
+  });
+
+closeFeedbackList.addEventListener('click', () => {
+  feedbackListModal.style.display = 'none';
+  feedbackListModal.classList.remove('show');
+});
+
+feedbackListModal.addEventListener('click', (e) => {
+  if (e.target === feedbackListModal) {
+    feedbackListModal.style.display = 'none';
+    feedbackListModal.classList.remove('show');
+  }
+});
+
+closeFeedback.addEventListener('click', () => {
+  feedbackModal.style.display = 'none';
+  feedbackModal.classList.remove('show');
+});
+
+feedbackModal.addEventListener('click', (e) => {
+  if (e.target === feedbackModal) {
+    feedbackModal.style.display = 'none';
+    feedbackModal.classList.remove('show');
+  }
+});
+
+  sendFeedbackBtn.addEventListener('click', async () => {
+  const name = feedbackName.value.trim();
+  const text = feedbackText.value.trim();
+
+  if (!text) {
+    showToast('Напишіть відгук', 'error');
+    return;
+  }
+
+  try {
+    sendFeedbackBtn.disabled = true;
+    sendFeedbackBtn.textContent = 'Надсилання...';
+
+    await addDoc(collection(db, "feedbacks"), {
+      name: name || "Анонімно",
+      text,
+      reply: "",
+      createdAt: serverTimestamp()
+    });
+
+    feedbackName.value = '';
+    feedbackText.value = '';
+
+    feedbackModal.style.display = 'none';
+    feedbackModal.classList.remove('show');
+
+    showToast('Відгук надіслано', 'success');
+
+    await openFeedbackListModal();
+  } catch (error) {
+    console.error('Помилка відправки відгуку:', error);
+    showToast('Не вдалося надіслати відгук', 'error');
+  } finally {
+    sendFeedbackBtn.disabled = false;
+    sendFeedbackBtn.textContent = 'Надіслати';
+  }
+});
+
+openSendFeedbackModalBtn.addEventListener('click', () => {
+  feedbackListModal.style.display = 'none';
+  feedbackListModal.classList.remove('show');
+
+  feedbackModal.style.display = 'flex';
+  feedbackModal.classList.add('show');
+});
+
+sendReplyBtn.addEventListener('click', async () => {
+  const text = replyText.value.trim();
+
+  if (!currentReplyFeedbackId) {
+    showToast('Не вибрано відгук', 'error');
+    return;
+  }
+
+  try {
+    sendReplyBtn.disabled = true;
+    sendReplyBtn.textContent = 'Надсилання...';
+
+    await updateDoc(doc(db, "feedbacks", currentReplyFeedbackId), {
+      reply: text,
+      replyCreatedAt: serverTimestamp()
+    });
+
+    replyModal.style.display = 'none';
+    replyModal.classList.remove('show');
+
+    showToast('Відповідь збережено', 'success');
+    await openAdminFeedbackModal();
+  } catch (error) {
+    console.error('Помилка відповіді:', error);
+    showToast('Не вдалося зберегти відповідь', 'error');
+  } finally {
+    sendReplyBtn.disabled = false;
+    sendReplyBtn.textContent = 'Надіслати відповідь';
+  }
+});
+
+closeReply.addEventListener('click', () => {
+  replyModal.style.display = 'none';
+  replyModal.classList.remove('show');
+});
+
+replyModal.addEventListener('click', (e) => {
+  if (e.target === replyModal) {
+    replyModal.style.display = 'none';
+    replyModal.classList.remove('show');
+  }
+});
+
+async function initApp() {
+  const appLoader = document.getElementById('appLoader');
+
+  try {
+    fillSearchSectionOptions();
+
+    await seedArticlesIfEmpty();
+    await seedHomeContentIfEmpty();
+
+    await loadFeaturedTopic();
+    await loadArticles();
+    await checkMaintenanceMode();
+
+    appReady = true;
+    updateAdminUI();
+
+    if (appLoader) appLoader.style.display = 'none';
+    articlesDiv.style.display = 'block';
+  } catch (error) {
+    console.error('Помилка запуску сайту:', error);
+
+    if (appLoader) {
+      appLoader.textContent = 'Помилка завантаження сайту';
+    }
+  }
+}
+
+async function seedHomeContentIfEmpty() {
+
+  const featuredSnap = await getDocs(collection(db, "featuredTopic"));
+  if (featuredSnap.empty) {
+    await addDoc(collection(db, "featuredTopic"), {
+      badge: "Важлива тема",
+      title: "Права людини у повсякденних ситуаціях",
+      text: "Дізнайтеся про право на мовчання, перевірку документів, огляд речей, права при спілкуванні з поліцією та інші важливі юридичні питання.",
+      image: "",
+      link: "",
+      order: 1,
+      isActive: true,
+      createdAt: serverTimestamp()
+    });
+  }
+}
+
+async function openFeaturedTopicAdminModal() {
+  featuredTopicAdminModal.style.display = 'flex';
+  featuredTopicAdminModal.classList.add('show');
+
+  editingFeaturedTopicId = null;
+  featuredTopicBadgeInput.value = 'Важлива тема';
+  featuredTopicTitleInput.value = '';
+  featuredTopicTextInput.value = '';
+  featuredTopicImageInput.value = '';
+  featuredTopicLinkInput.value = '';
+  featuredTopicOrderInput.value = '';
+  featuredTopicActiveInput.checked = true;
+
+  await renderFeaturedTopicsAdminList();
+}
+
+async function renderFeaturedTopicsAdminList() {
+  featuredTopicsAdminList.innerHTML = 'Завантаження...';
+
+  const snapshot = await getDocs(query(
+    collection(db, "featuredTopic"),
+    orderBy("order", "asc")
+  ));
+
+  const items = [];
+  snapshot.forEach(docItem => {
+    items.push({ id: docItem.id, ...docItem.data() });
+  });
+
+  if (!items.length) {
+    featuredTopicsAdminList.innerHTML = '<p>Тем поки немає.</p>';
+    return;
+  }
+
+  featuredTopicsAdminList.innerHTML = '';
+
+  items.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'admin-list-card';
+
+    card.innerHTML = `
+      ${item.image ? `<img src="${item.image}" class="important-topic-image" alt="${escapeHtml(item.title || '')}">` : ''}
+      <h4>${escapeHtml(item.title || '')}</h4>
+      <p><b>${escapeHtml(item.badge || '')}</b></p>
+      <p>${escapeHtml(item.text || '')}</p>
+      <p><b>Порядок:</b> ${escapeHtml(String(item.order || 0))}</p>
+      <p><b>Активна:</b> ${item.isActive ? 'Так' : 'Ні'}</p>
+    `;
+
+    const actions = document.createElement('div');
+    actions.className = 'admin-actions';
+
+    const editBtn = document.createElement('button');
+    editBtn.textContent = 'Редагувати';
+    editBtn.onclick = () => {
+      editingFeaturedTopicId = item.id;
+      featuredTopicBadgeInput.value = item.badge || '';
+      featuredTopicTitleInput.value = item.title || '';
+      featuredTopicTextInput.value = item.text || '';
+      featuredTopicImageInput.value = item.image || '';
+      featuredTopicLinkInput.value = item.link || '';
+      featuredTopicOrderInput.value = item.order || '';
+      featuredTopicActiveInput.checked = !!item.isActive;
+    };
+
+    const activateBtn = document.createElement('button');
+    activateBtn.textContent = 'Зробити активною';
+    activateBtn.onclick = async () => {
+      const allSnap = await getDocs(collection(db, "featuredTopic"));
+      for (const docItem of allSnap.docs) {
+        await updateDoc(doc(db, "featuredTopic", docItem.id), { isActive: false });
+      }
+
+      await updateDoc(doc(db, "featuredTopic", item.id), { isActive: true });
+
+      showToast('Тему активовано', 'success');
+      await loadFeaturedTopic();
+      renderArticles();
+      await renderFeaturedTopicsAdminList();
+    };
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = 'Видалити';
+    deleteBtn.onclick = async () => {
+      await deleteDoc(doc(db, "featuredTopic", item.id));
+      showToast('Тему видалено', 'success');
+      await loadFeaturedTopic();
+      renderArticles();
+      await renderFeaturedTopicsAdminList();
+    };
+
+    actions.appendChild(editBtn);
+    actions.appendChild(activateBtn);
+    actions.appendChild(deleteBtn);
+    card.appendChild(actions);
+    featuredTopicsAdminList.appendChild(card);
+  });
+}
+
+function renderHomePage() {
+const featured = featuredTopics[featuredTopicIndex] || {
+  badge: "Важлива тема",
+  title: "Юридична допомога онлайн",
+  text: "Оберіть законодавство, знайдіть потрібну статтю або перегляньте важливі юридичні теми.",
+  image: "",
+  link: ""
+};
+
+  const hero = document.createElement("div");
+  hero.className = "home-hero";
+  hero.innerHTML = `
+    <div class="home-hero-top">
+      <div>
+        <div class="home-hero-title">Юридична допомога</div>
+        <div class="home-hero-subtitle">
+          Актуальні правові матеріали, пошук по законодавству, важливі теми та базова юридична консультація в одному місці.
+        </div>
+        <div class="home-hero-actions">
+          <button class="home-nav-btn" id="goToLawsBtn">Законодавство</button>
+          <button class="home-nav-btn" id="goToConsultBtn">Юридична консультація</button>
+        </div>
+      </div>
+    </div>
+  `;
+  articlesDiv.appendChild(hero);
+
+  const grid = document.createElement("div");
+  grid.className = "home-grid";
+
+const left = document.createElement("div");
+
+grid.appendChild(left);
+articlesDiv.appendChild(grid);
+
+const bgImage = featured.image
+  ? `
+    background-image: 
+      linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.2)),
+      url('${featured.image}');
+  `
+  : "background: linear-gradient(135deg, #1b4d96, #0a5bb5);";
+
+const linkStart = `<div class="featured-topic" style="${bgImage}">`;
+const linkEnd = `</div>`;
+
+left.innerHTML = `
+  <div class="featured-topic" style="${bgImage}" id="featuredTopicCard">
+    <div class="featured-topic-overlay"></div>
+
+    <button class="featured-arrow featured-arrow-left" id="featuredPrevBtn" type="button" aria-label="Попередня тема">
+      <span>←</span>
+    </button>
+
+    <button class="featured-arrow featured-arrow-right" id="featuredNextBtn" type="button" aria-label="Наступна тема">
+      <span>→</span>
+    </button>
+
+    <div class="featured-topic-content">
+      <div class="featured-topic-label">${escapeHtml(featured.badge || "Важлива тема")}</div>
+      <div class="featured-topic-title">${escapeHtml(featured.title || "")}</div>
+      <div class="featured-topic-text">${escapeHtml(featured.text || "")}</div>
+
+      <div class="featured-topic-progress">
+        ${featuredTopics.map((_, i) => `
+          <div class="${i === featuredTopicIndex ? 'active' : ''}"></div>
+        `).join('')}
+      </div>
+    </div>
+  </div>
+`;
+
+const prevBtn = left.querySelector('#featuredPrevBtn');
+const nextBtn = left.querySelector('#featuredNextBtn');
+const featuredCard = left.querySelector('#featuredTopicCard');
+
+function goPrevFeaturedTopic() {
+  if (!featuredTopics.length) return;
+  featuredTopicIndex = (featuredTopicIndex - 1 + featuredTopics.length) % featuredTopics.length;
+  renderArticles();
+}
+
+function goNextFeaturedTopic() {
+  if (!featuredTopics.length) return;
+  featuredTopicIndex = (featuredTopicIndex + 1) % featuredTopics.length;
+  renderArticles();
+}
+
+if (prevBtn) {
+  prevBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    goPrevFeaturedTopic();
+  });
+}
+
+if (nextBtn) {
+  nextBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    goNextFeaturedTopic();
+  });
+}
+
+if (featuredCard) {
+  featuredCard.addEventListener('click', (e) => {
+    const isArrow = e.target.closest('.featured-arrow');
+    if (isArrow) return;
+
+    const rect = featuredCard.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const width = rect.width;
+
+    const isMobile = window.matchMedia('(max-width: 700px)').matches;
+
+    if (isMobile) {
+      if (x < width * 0.35) {
+        goPrevFeaturedTopic();
+        return;
+      }
+
+      if (x > width * 0.65) {
+        goNextFeaturedTopic();
+        return;
+      }
+    }
+
+    if (featured.link) {
+      window.open(featured.link, '_blank', 'noopener,noreferrer');
+    }
+  });
+}
+
+  grid.appendChild(left);
+
+  const lawsTitle = document.createElement("h2");
+  lawsTitle.className = "home-section-title";
+  lawsTitle.textContent = "Законодавство";
+  articlesDiv.appendChild(lawsTitle);
+
+  lawSections.forEach(section => {
+    const div = document.createElement("div");
+    div.className = "section-header";
+
+    div.innerHTML = `
+      <h2>${escapeHtml(section)}</h2>
+      <p>Перейти до статей розділу</p>
+    `;
+
+    const openBtn = document.createElement("button");
+    openBtn.textContent = "Відкрити";
+    openBtn.onclick = () => {
+      savedScroll = window.scrollY;
+      currentSection = section;
+      renderArticles();
+      window.scrollTo(0, 0);
+    };
+
+    div.appendChild(openBtn);
+    articlesDiv.appendChild(div);
+  });
+
+const goToLawsBtn = document.getElementById("goToLawsBtn");
+if (goToLawsBtn) {
+  goToLawsBtn.onclick = () => {
+    const target = document.querySelector(".home-section-title");
+    if (!target) return;
+
+    const header = document.querySelector("header");
+    const headerHeight = header ? header.offsetHeight : 0;
+
+    const extraOffset = 18; // поменяй число, если надо выше/ниже
+    const top =
+      target.getBoundingClientRect().top +
+      window.scrollY -
+      headerHeight -
+      extraOffset;
+
+    window.scrollTo({
+      top,
+      behavior: "smooth"
+    });
+  };
+}
+
+  const goToConsultBtn = document.getElementById("goToConsultBtn");
+  if (goToConsultBtn) {
+    goToConsultBtn.onclick = () => {
+      openSearchModal();
+    };
+  }
+}
+
+saveFeaturedTopicBtn.addEventListener('click', async () => {
+  const badge = featuredTopicBadgeInput.value.trim() || 'Важлива тема';
+  const title = featuredTopicTitleInput.value.trim();
+  const text = featuredTopicTextInput.value.trim();
+  const image = featuredTopicImageInput.value.trim();
+  const link = featuredTopicLinkInput.value.trim();
+  const order = Number(featuredTopicOrderInput.value) || 0;
+  const isActive = featuredTopicActiveInput.checked;
+
+  if (!title || !text) {
+    showToast('Заповніть заголовок і текст', 'error');
+    return;
+  }
+
+  try {
+    if (isActive) {
+      const allSnap = await getDocs(collection(db, "featuredTopic"));
+      for (const docItem of allSnap.docs) {
+        await updateDoc(doc(db, "featuredTopic", docItem.id), { isActive: false });
+      }
+    }
+
+    const payload = {
+      badge,
+      title,
+      text,
+      image,
+      link,
+      order,
+      isActive,
+      createdAt: serverTimestamp()
+    };
+
+    if (editingFeaturedTopicId) {
+      const ref = doc(db, "featuredTopic", editingFeaturedTopicId);
+      const snap = await getDoc(ref);
+
+      if (snap.exists()) {
+        await updateDoc(ref, payload);
+        showToast('Тему оновлено', 'success');
+      } else {
+        await addDoc(collection(db, "featuredTopic"), payload);
+        showToast('Тему не знайдено, створено нову', 'warning');
+      }
+    } else {
+      await addDoc(collection(db, "featuredTopic"), payload);
+      showToast('Тему додано', 'success');
+    }
+
+    editingFeaturedTopicId = null;
+    featuredTopicBadgeInput.value = 'Важлива тема';
+    featuredTopicTitleInput.value = '';
+    featuredTopicTextInput.value = '';
+    featuredTopicImageInput.value = '';
+    featuredTopicLinkInput.value = '';
+    featuredTopicOrderInput.value = '';
+    featuredTopicActiveInput.checked = true;
+
+    await loadFeaturedTopic();
+    renderArticles();
+    await renderFeaturedTopicsAdminList();
+  } catch (error) {
+    console.error(error);
+    showToast('Помилка збереження теми', 'error');
+  }
+});
+
+closeFeaturedTopicAdmin.addEventListener('click', () => {
+  featuredTopicAdminModal.style.display = 'none';
+  featuredTopicAdminModal.classList.remove('show');
+});
+
+featuredTopicAdminModal.addEventListener('click', (e) => {
+  if (e.target === featuredTopicAdminModal) {
+    featuredTopicAdminModal.style.display = 'none';
+    featuredTopicAdminModal.classList.remove('show');
+  }
+});
+
+    initApp();
+
+    window.addEventListener('resize', () => {
+  document.querySelectorAll('.details.open').forEach(details => {
+    details.style.maxHeight = details.scrollHeight + 'px';
+  });
+});
+
+window.addEventListener('scroll', () => {
+  updateLawFloatingBar();
+}, { passive: true });
+
+    </script>
+
+    </body> 
+    </html>  <!DOCTYPE html>
+    <html lang="uk">
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Юридична допомога</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+
+html {
+  scroll-behavior: smooth;
+}
+
+html, body {
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+    body { 
+  margin-top: 0 !important;
+  font-family: 'Roboto', Arial, sans-serif; 
+  background:#f5f5f5; 
+  display:flex; 
+  flex-direction:column; 
+  min-height:100vh;
+  padding-top: 56px;
+}
+
+header { 
+  background:#004080; 
+  color:white; 
+  padding:10px 20px; 
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10000;
+  
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
+  align-items: center;
+
+  box-sizing: border-box;
+}
+
+.menu {
+  font-size: 24px;
+  cursor: pointer;
+  width: 40px;
+  text-align: left;
+
+}
+
+header h1 { 
+  margin: 0; 
+  font-size: 22px; 
+  font-weight: 700;
+  text-align: center;
+}
+
+.search-box {
+  width: 40px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+    .search-btn {
+      background: white;
+      border: none;
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #searchInput {
+      width: 0;
+      opacity: 0;
+      padding: 8px 0;
+      border: none;
+      border-radius: 20px;
+      outline: none;
+      transition: all 0.3s ease;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .search-box.active #searchInput {
+      width: 260px;
+      opacity: 1;
+      padding: 8px 12px;
+    }
+
+    @media (max-width: 700px) {
+      header {
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .search-box.active #searchInput {
+        width: 180px;
+      }
+
+      header h1 {
+        font-size: 18px;
+      }
+    }
+
+nav {
+  position: fixed;
+  top: 55px;
+  left: 0;
+  bottom: 0;
+  width: 220px;
+  background: #003366;
+  padding: 10px;
+  z-index: 5000;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+
+  display: flex;
+  flex-direction: column;
+
+  transform: translateX(-110%);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    transform 0.32s ease,
+    opacity 0.25s ease,
+    visibility 0.32s ease;
+}
+
+nav.show {
+  transform: translateX(0);
+  opacity: 1;
+  visibility: visible;
+}
+
+.menu-top {
+  flex: 0 0 auto;
+}
+
+.menu-middle {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  margin-top: 10px;
+}
+
+.menu-bottom {
+  flex: 0 0 auto;
+  margin-top: 10px;
+  background: #003366;
+  position: relative;
+  z-index: 5001;
+}
+
+nav button {
+  display: block;
+  width: 100%;
+  margin-bottom: 5px;
+  padding: 10px;
+  color: white;
+  background: #0055a0;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  text-align: center;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+}
+
+  .menu-top {
+    margin-bottom: 10px;
+  }
+
+  .menu-middle {
+    flex: 1;
+  }
+
+  .menu-bottom {
+    margin-top: auto;
+  }
+
+    .articles { padding:20px; max-width:900px; margin:auto; flex:1;}
+.article {
+  background:white;
+  padding:15px;
+  margin-bottom:15px;
+  border-radius:5px;
+  box-shadow:0 1px 3px rgba(0,0,0,0.2);
+  position:relative;
+  scroll-margin-top: 80px;
+}
+    .article h2 { font-weight:700; margin-bottom:5px; font-size:18px; }
+    .article p { margin:0 0 10px 0; font-weight:400; font-size:14px; }
+    .article button { padding:5px 8px; font-size:12px; margin-right:5px; cursor:pointer; min-width:70px; border-radius:4px; font-family: 'Roboto', sans-serif; font-weight:500; }
+
+.details {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-4px);
+  background: #eef;
+  border-radius: 5px;
+  margin-top: 0;
+  padding: 0 10px;
+  font-size: 14px;
+  line-height: 1.5;
+  transition:
+    max-height 0.32s ease,
+    opacity 0.25s ease,
+    transform 0.25s ease,
+    margin-top 0.25s ease,
+    padding 0.25s ease;
+  will-change: max-height, opacity, transform;
+}
+
+.details.open {
+  opacity: 1;
+  transform: translateY(0);
+  margin-top: 10px;
+  padding: 10px;
+}
+
+    .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:2000; transition:all 0.3s ease; }
+    .modal-content { background:white; padding:20px; border-radius:6px; width:350px; max-width:90%; position:relative; transform:translateX(-100%); transition:transform 0.4s ease; display:flex; flex-direction:column; font-family: 'Roboto', sans-serif;}
+    .modal.show .modal-content { transform:translateX(0); }
+    .modal input, .modal textarea, .modal button { margin-bottom:10px; font-family: 'Roboto', sans-serif;}
+    .modal input, .modal textarea { display:block; width:100%; padding:8px; border-radius:4px; border:1px solid #ccc; font-size:14px; }
+    .modal button { padding:10px; background:#004080; color:white; border:none; cursor:pointer; border-radius:4px; width:100%; font-weight:500; }
+    .modal .close { position:absolute; top:5px; right:10px; font-size:18px; cursor:pointer; color:#333; }
+    .modal select {
+      display:block;
+      width:100%;
+      padding:8px;
+      border-radius:4px;
+      border:1px solid #ccc;
+      font-size:14px;
+      margin-bottom:10px;
+      font-family:'Roboto', sans-serif;
+    }
+    .section-header{
+      background: linear-gradient(135deg, #004080, #0a5bb5);
+      color: white;
+      padding: 22px;
+      margin-bottom: 18px;
+      border-radius: 0px;
       box-shadow: 0 4px 14px rgba(0,0,0,0.18);
     }
 
