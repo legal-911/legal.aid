@@ -3095,7 +3095,8 @@ if (goToLawsBtn) {
   }
 }
 
-saveFeaturedTopicBtn.addEventListener('click', async () => {
+if (saveFeaturedTopicBtn) {
+  saveFeaturedTopicBtn.addEventListener('click', async () => {
   const badge = featuredTopicBadgeInput.value.trim() || 'Важлива тема';
   const title = featuredTopicTitleInput.value.trim();
   const text = featuredTopicTextInput.value.trim();
@@ -3161,6 +3162,8 @@ saveFeaturedTopicBtn.addEventListener('click', async () => {
     showToast('Помилка збереження теми', 'error');
   }
 });
+}
+
 
 closeFeaturedTopicAdmin.addEventListener('click', () => {
   featuredTopicAdminModal.style.display = 'none';
