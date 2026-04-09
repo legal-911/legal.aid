@@ -1419,7 +1419,7 @@ generatedItems.push({
       await checkMaintenanceMode();
     });
 
-    async function loadFeaturedTopic() {
+async function loadFeaturedTopic() {
   try {
     const snapshot = await getDocs(query(
       collection(db, "featuredTopic"),
@@ -2822,9 +2822,6 @@ async function initApp() {
 }
 
 async function seedHomeContentIfEmpty() {
-
-  collection(db, "featuredTopic")
-
   const newsSnap = await getDocs(collection(db, "homeNews"));
   if (newsSnap.empty) {
     await addDoc(collection(db, "homeNews"), {
@@ -2845,9 +2842,13 @@ async function seedHomeContentIfEmpty() {
   const featuredSnap = await getDocs(collection(db, "featuredTopic"));
   if (featuredSnap.empty) {
     await addDoc(collection(db, "featuredTopic"), {
-      label: "Важлива тема",
+      badge: "Важлива тема",
       title: "Права людини у повсякденних ситуаціях",
       text: "Дізнайтеся про право на мовчання, перевірку документів, огляд речей, права при спілкуванні з поліцією та інші важливі юридичні питання.",
+      image: "",
+      link: "",
+      order: 1,
+      isActive: true,
       createdAt: serverTimestamp()
     });
   }
@@ -2923,10 +2924,10 @@ async function renderFeaturedTopicsAdminList() {
     activateBtn.onclick = async () => {
       const allSnap = await getDocs(collection(db, "featuredTopic"));
       for (const docItem of allSnap.docs) {
-        await updateDoc(doc(db, "featuredTopics", docItem.id), { isActive: false });
+        await updateDoc(doc(db, "featuredTopic", docItem.id), { isActive: false });
       }
 
-      await updateDoc(doc(db, "featuredTopics", item.id), { isActive: true });
+      await updateDoc(doc(db, "featuredTopic", item.id), { isActive: true });
 
       showToast('Тему активовано', 'success');
       await loadFeaturedTopic();
@@ -2937,7 +2938,7 @@ async function renderFeaturedTopicsAdminList() {
     const deleteBtn = document.createElement('button');
     deleteBtn.textContent = 'Видалити';
     deleteBtn.onclick = async () => {
-      await deleteDoc(doc(db, "featuredTopics", item.id));
+      await deleteDoc(doc(db, "featuredTopic", item.id));
       showToast('Тему видалено', 'success');
       await loadFeaturedTopic();
       renderArticles();
@@ -3096,7 +3097,7 @@ saveFeaturedTopicBtn.addEventListener('click', async () => {
     if (isActive) {
       const allSnap = await getDocs(collection(db, "featuredTopic"));
       for (const docItem of allSnap.docs) {
-        await updateDoc(doc(db, "featuredTopics", docItem.id), { isActive: false });
+        await updateDoc(doc(db, "featuredTopic", docItem.id), { isActive: false });
       }
     }
 
@@ -3112,8 +3113,16 @@ saveFeaturedTopicBtn.addEventListener('click', async () => {
     };
 
     if (editingFeaturedTopicId) {
-      await updateDoc(doc(db, "featuredTopic", editingFeaturedTopicId), payload);
-      showToast('Тему оновлено', 'success');
+      const ref = doc(db, "featuredTopic", editingFeaturedTopicId);
+      const snap = await getDoc(ref);
+
+      if (snap.exists()) {
+        await updateDoc(ref, payload);
+        showToast('Тему оновлено', 'success');
+      } else {
+        await addDoc(collection(db, "featuredTopic"), payload);
+        showToast('Тему не знайдено, створено нову', 'warning');
+      }
     } else {
       await addDoc(collection(db, "featuredTopic"), payload);
       showToast('Тему додано', 'success');
