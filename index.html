@@ -738,6 +738,11 @@ html, body {
   border: 1px solid #dbeafe;
 }
 
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
     </style>
     </head>
     <body>
@@ -780,7 +785,29 @@ html, body {
 
   </nav>
 
-    <div class="articles" id="articles"></div>
+<div class="articles" id="articles" style="display:none;"></div>
+
+<div id="appLoader" style="
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  min-height:60vh;
+  color:#004080;
+  font-family:'Roboto', sans-serif;
+">
+  <div style="
+    width:42px;
+    height:42px;
+    border:4px solid #cfe0ff;
+    border-top:4px solid #004080;
+    border-radius:50%;
+    animation:spin 0.8s linear infinite;
+    margin-bottom:14px;
+  "></div>
+  <div style="font-size:22px; font-weight:700;">Завантаження...</div>
+</div>
+
     <div id="maintenanceScreen" style="display:none; padding:40px; text-align:center;">
       <h2>Сайт тимчасово недоступний</h2>
       <p>⚠Проводяться технічні роботи. Спробуйте пізніше⚠</p>
@@ -1489,6 +1516,7 @@ function toggleDetailsBlock(detailsDiv, button) {
 }
 
   async function renderArticles() {
+    if (!appReady) return;
     articlesDiv.innerHTML = "";
     const query = searchInput.value.trim().toLowerCase();
 
@@ -2743,30 +2771,32 @@ replyModal.addEventListener('click', (e) => {
 });
 
 
-async function initApp(){
-  fillSearchSectionOptions();
-  updateAdminUI();
+async function initApp() {
+  const appLoader = document.getElementById('appLoader');
 
-  await seedArticlesIfEmpty();
-  await seedHomeContentIfEmpty();
+  try {
+    fillSearchSectionOptions();
 
-  await loadHomeNews();
-  await loadFeaturedTopic();
-  await loadArticles();
+    await seedArticlesIfEmpty();
+    await seedHomeContentIfEmpty();
 
-  await checkMaintenanceMode();
-}
+    await loadHomeNews();
+    await loadFeaturedTopic();
+    await loadArticles();
+    await checkMaintenanceMode();
 
-  async function loadHomeNews() {
-  const snapshot = await getDocs(query(
-    collection(db, "homeNews"),
-    orderBy("createdAt", "desc")
-  ));
+    appReady = true;
+    updateAdminUI();
 
-  homeNews = [];
-  snapshot.forEach(docItem => {
-    homeNews.push({ id: docItem.id, ...docItem.data() });
-  });
+    if (appLoader) appLoader.style.display = 'none';
+    articlesDiv.style.display = 'block';
+  } catch (error) {
+    console.error('Помилка запуску сайту:', error);
+
+    if (appLoader) {
+      appLoader.textContent = 'Помилка завантаження сайту';
+    }
+  }
 }
 
 async function seedHomeContentIfEmpty() {
