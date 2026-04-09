@@ -3112,7 +3112,7 @@ saveFeaturedTopicBtn.addEventListener('click', async () => {
     };
 
     if (editingFeaturedTopicId) {
-      await updateDoc(doc(db, "featuredTopics", editingFeaturedTopicId), payload);
+      await updateDoc(doc(db, "featuredTopic", editingFeaturedTopicId), payload);
       showToast('Тему оновлено', 'success');
     } else {
       await addDoc(collection(db, "featuredTopic"), payload);
