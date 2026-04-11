@@ -1783,222 +1783,109 @@ function toggleDetailsBlock(detailsDiv, button) {
 
 async function renderArticles() {
   if (!appReady) return;
+
   articlesDiv.innerHTML = "";
-  const query = searchInput.value.trim().toLowerCase();
+  const query = (searchInput?.value || "").trim().toLowerCase();
 
-  if (!query) {
+  if (currentSection === null && !query) {
     renderHomePage();
-
-    if (currentSection === null) {
-      return;
-    }
+    return;
   }
 
+  if (currentSection !== null && !query) {
+    renderHomePageSectionOnly();
+    return;
+  }
+
+  if (currentSection === null && query) {
+    articlesDiv.innerHTML = `
+      <div class="section-header">
+        <h2>Пошук...</h2>
+        <p>Шукаю по всіх законах... Це може зайняти деякий час<br>*Не оновлюйте сторінку*</p>
+      </div>
+    `;
+
+    const prefilteredArticles = articles.map((a, index) => ({
+      ...a,
+      originalIndex: index
+    }));
+
+    const filteredGlobalArticles = await rankArticlesWithAI(query, prefilteredArticles);
+
+    articlesDiv.innerHTML = `
+      <div class="section-header">
+        <h2>Результати пошуку</h2>
+        <p>По запиту: "${escapeHtml(query)}"</p>
+      </div>
+    `;
+
+    if (filteredGlobalArticles.length === 0) {
       articlesDiv.innerHTML = `
         <div class="section-header">
-          <h2>Пошук...</h2>
-          <p>Шукаю по всіх законах... Це може зайняти деякий час
-            <br>*Не оновлюйте сторінку*</br> 
-            </p>
+          <h2>Нічого не знайдено</h2>
+          <p>Спробуйте інше ключове слово</p>
         </div>
       `;
-
-      const prefilteredArticles = articles.map((a, index) => ({
-        ...a,
-        originalIndex: index
-      }));
-
-      const filteredGlobalArticles = await rankArticlesWithAI(query, prefilteredArticles);
-
-      articlesDiv.innerHTML = "";
-
-  articlesDiv.innerHTML = `
-    <div class="section-header">
-      <h2>Результати пошуку</h2>
-      <p>По запиту: "${escapeHtml(query)}"</p>
-    </div>
-  `;
-
-      if (filteredGlobalArticles.length === 0) {
-        articlesDiv.innerHTML = `
-          <div class="section-header">
-            <h2>Нічого не знайдено</h2>
-            <p>Спробуйте інше ключове слово</p>
-          </div>
-        `;
-        return;
-
-      filteredGlobalArticles.forEach((a) => {
-        const index = a.originalIndex;
-        const div = document.createElement("div");
-        div.className = "article";
-
-        div.innerHTML = `
-          <h2>${escapeHtml(a.law.replace(/-/g, '.'))}</h2>
-          <p><b>${escapeHtml(a.section || "Без назви закону")}</b></p>
-          <p>${escapeHtml(a.short || "")}</p>
-        `;
-
-        const detailsDiv = document.createElement("div");
-        detailsDiv.className = "details";
-
-        detailsDiv.innerHTML = `
-          <div style="line-height:1.6;">
-            ${formatText(a.details)}
-            ${a.link ? `<a href="${a.link}" target="_blank" style="display:block; margin-top:10px; color:#004080;">Посилання</a>` : ""}
-          </div>
-        `;
-
-        div.appendChild(detailsDiv);
-
-const moreBtn = document.createElement("button");
-moreBtn.textContent = "Докладніше";
-moreBtn.onclick = () => toggleDetailsBlock(detailsDiv, moreBtn);
-div.appendChild(moreBtn);
-
-        const openLawBtn = document.createElement("button");
-        openLawBtn.textContent = "Відкрити закон";
-        openLawBtn.onclick = () => {
-          currentSection = a.section;
-          renderArticles();
-        };
-        div.appendChild(openLawBtn);
-
-        if (isAdmin) {
-          const editBtn = document.createElement("button");
-          editBtn.textContent = "Редагувати";
-          editBtn.onclick = () => openEditModal(index);
-
-          const delBtn = document.createElement("button");
-          delBtn.textContent = "Видалити";
-          delBtn.onclick = () => openDeleteModal(index);
-
-          div.appendChild(editBtn);
-          div.appendChild(delBtn);
-        }
-
-        articlesDiv.appendChild(div);
-      });
-
       return;
     }
 
-  const backDiv = document.createElement("div");
-  backDiv.className = "section-header";
-  backDiv.innerHTML = `
-    <h2>${escapeHtml(currentSection)}</h2>
-    <p>
-      ${query
-        ? `Результати пошуку в ${escapeHtml(currentSection)}`
-        : "Список статей розділу"
+    filteredGlobalArticles.forEach((a) => {
+      const index = a.originalIndex;
+      const div = document.createElement("div");
+      div.className = "article";
+
+      div.innerHTML = `
+        <h2>${escapeHtml((a.law || '').replace(/-/g, '.'))}</h2>
+        <p><b>${escapeHtml(a.section || "Без назви закону")}</b></p>
+        <p>${escapeHtml(a.short || "")}</p>
+      `;
+
+      const detailsDiv = document.createElement("div");
+      detailsDiv.className = "details";
+      detailsDiv.innerHTML = `
+        <div style="line-height:1.6;">
+          ${formatText(a.details)}
+          ${a.link ? `<a href="${a.link}" target="_blank" style="display:block; margin-top:10px; color:#004080;">Посилання</a>` : ""}
+        </div>
+      `;
+      div.appendChild(detailsDiv);
+
+      const moreBtn = document.createElement("button");
+      moreBtn.textContent = "Докладніше";
+      moreBtn.onclick = () => toggleDetailsBlock(detailsDiv, moreBtn);
+      div.appendChild(moreBtn);
+
+      const openLawBtn = document.createElement("button");
+      openLawBtn.textContent = "Відкрити закон";
+      openLawBtn.onclick = () => {
+        currentSection = a.section;
+        searchInput.value = "";
+        renderArticles();
+        window.scrollTo(0, 0);
+      };
+      div.appendChild(openLawBtn);
+
+      if (isAdmin) {
+        const editBtn = document.createElement("button");
+        editBtn.textContent = "Редагувати";
+        editBtn.onclick = () => openEditModal(index);
+
+        const delBtn = document.createElement("button");
+        delBtn.textContent = "Видалити";
+        delBtn.onclick = () => openDeleteModal(index);
+
+        div.appendChild(editBtn);
+        div.appendChild(delBtn);
       }
-    </p>
-  `;
 
-  const backBtn = document.createElement("button");
-  backBtn.textContent = "Назад до розділів";
-  backBtn.onclick = () => {
-    currentSection = null;
-    renderArticles();
+      articlesDiv.appendChild(div);
+    });
 
-    setTimeout(() => {
-      window.scrollTo(0, savedScroll);
-    }, 50);
-  };
-
-  backDiv.appendChild(backBtn);
-  articlesDiv.appendChild(backDiv);
-
-    let filteredArticles = articles
-      .map((a, index) => ({ ...a, originalIndex: index }))
-      .filter(a => a.section === currentSection);
-
-if (query) {
-  const sectionCandidates = filteredArticles.map((a, index) => ({
-    ...a,
-    originalIndex: a.originalIndex ?? index
-  }));
-
-  filteredArticles = await rankArticlesWithAI(query, sectionCandidates);
-
-  if (filteredArticles.length === 0) {
-    filteredArticles = fallbackRankArticles(query, sectionCandidates);
+    return;
   }
-} else {
-  filteredArticles = filteredArticles.sort((a, b) => {
-    const aNum = getArticleNumber(a.law);
-    const bNum = getArticleNumber(b.law);
 
-    if (aNum.main !== bNum.main) {
-      return aNum.main - bNum.main;
-    }
-
-    return aNum.sub - bNum.sub;
-  });
+  renderSectionSearchResults(query);
 }
-
-filteredArticles.forEach((a) => {
-  const index = a.originalIndex;
-  const div = document.createElement("div");
-  div.className = "article";
-
-  let shortText = (a.short || '').trim();
-
-  if (!shortText) {
-    shortText = (a.details || '')
-      .replace(/\*(.*?)\*/g, '$1')
-      .replace(/\*\*(.*?)\*\*/g, '$1')
-      .split('\n')
-      .map(line => line.trim())
-      .find(line => line.length > 0) || 'Короткий опис відсутній';
-  }
-
-  div.innerHTML = `
-    <h2>${escapeHtml((a.law || '').replace(/-/g, '.'))}</h2>
-    <p>${escapeHtml(shortText)}</p>
-  `;
-
-  const detailsDiv = document.createElement("div");
-  detailsDiv.className = "details";
-  detailsDiv.innerHTML = `
-    <div style="line-height:1.6; white-space:pre-line;">
-      ${formatText(a.details)}
-      ${a.link ? `<a href="${a.link}" target="_blank" style="display:block; margin-top:10px; color:#004080; font-weight:500;">Посилання на статтю</a>` : ""}
-    </div>
-  `;
-
-  div.appendChild(detailsDiv);
-
-  const moreBtn = document.createElement("button");
-  moreBtn.textContent = "Докладніше";
-  moreBtn.onclick = () => toggleDetailsBlock(detailsDiv, moreBtn);
-  div.appendChild(moreBtn);
-
-  if (isAdmin) {
-    const editBtn = document.createElement("button");
-    editBtn.textContent = "Редагувати";
-    editBtn.onclick = () => openEditModal(index);
-
-    const delBtn = document.createElement("button");
-    delBtn.textContent = "Видалити";
-    delBtn.onclick = () => openDeleteModal(index);
-
-    div.appendChild(editBtn);
-    div.appendChild(delBtn);
-  }
-
-  articlesDiv.appendChild(div);
-});
-    }
-
-homeBtn.addEventListener('click', () => {
-  currentSection = null;
-  searchInput.value = '';
-  renderArticles();
-  window.scrollTo(0, 0);
-nav.classList.remove('show');
-  refreshLawFloatingBarImmediately();
-});
 
   function openEditModal(index){
       editIndex=index;
