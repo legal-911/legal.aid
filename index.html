@@ -1034,6 +1034,11 @@ html, body {
   }
 }
 
+.section-header,
+.article {
+  scroll-margin-top: 76px;
+}
+
     </style>
     </head>
     <body>
@@ -2963,6 +2968,181 @@ async function renderFeaturedTopicsAdminList() {
   });
 }
 
+function renderHomePageSectionOnly() {
+  const backDiv = document.createElement("div");
+  backDiv.className = "section-header";
+  backDiv.innerHTML = `
+    <h2>${escapeHtml(currentSection)}</h2>
+    <p>Список статей розділу</p>
+  `;
+
+  const backBtn = document.createElement("button");
+  backBtn.textContent = "Назад до розділів";
+  backBtn.onclick = () => {
+    currentSection = null;
+    renderArticles();
+
+    setTimeout(() => {
+      window.scrollTo(0, savedScroll);
+    }, 50);
+  };
+
+  backDiv.appendChild(backBtn);
+  articlesDiv.appendChild(backDiv);
+
+  let filteredArticles = articles
+    .map((a, index) => ({ ...a, originalIndex: index }))
+    .filter(a => a.section === currentSection)
+    .sort((a, b) => {
+      const aNum = getArticleNumber(a.law);
+      const bNum = getArticleNumber(b.law);
+
+      if (aNum.main !== bNum.main) return aNum.main - bNum.main;
+      return aNum.sub - bNum.sub;
+    });
+
+  filteredArticles.forEach((a) => {
+    const index = a.originalIndex;
+    const div = document.createElement("div");
+    div.className = "article";
+
+    let shortText = (a.short || '').trim();
+    if (!shortText) {
+      shortText = (a.details || '')
+        .replace(/\*(.*?)\*/g, '$1')
+        .replace(/\*\*(.*?)\*\*/g, '$1')
+        .split('\n')
+        .map(line => line.trim())
+        .find(line => line.length > 0) || 'Короткий опис відсутній';
+    }
+
+    div.innerHTML = `
+      <h2>${escapeHtml((a.law || '').replace(/-/g, '.'))}</h2>
+      <p>${escapeHtml(shortText)}</p>
+    `;
+
+    const detailsDiv = document.createElement("div");
+    detailsDiv.className = "details";
+    detailsDiv.innerHTML = `
+      <div style="line-height:1.6; white-space:pre-line;">
+        ${formatText(a.details)}
+        ${a.link ? `<a href="${a.link}" target="_blank" style="display:block; margin-top:10px; color:#004080; font-weight:500;">Посилання на статтю</a>` : ""}
+      </div>
+    `;
+    div.appendChild(detailsDiv);
+
+    const moreBtn = document.createElement("button");
+    moreBtn.textContent = "Докладніше";
+    moreBtn.onclick = () => toggleDetailsBlock(detailsDiv, moreBtn);
+    div.appendChild(moreBtn);
+
+    if (isAdmin) {
+      const editBtn = document.createElement("button");
+      editBtn.textContent = "Редагувати";
+      editBtn.onclick = () => openEditModal(index);
+
+      const delBtn = document.createElement("button");
+      delBtn.textContent = "Видалити";
+      delBtn.onclick = () => openDeleteModal(index);
+
+      div.appendChild(editBtn);
+      div.appendChild(delBtn);
+    }
+
+    articlesDiv.appendChild(div);
+  });
+}
+
+async function renderSectionSearchResults(query) {
+  const backDiv = document.createElement("div");
+  backDiv.className = "section-header";
+  backDiv.innerHTML = `
+    <h2>${escapeHtml(currentSection)}</h2>
+    <p>Результати пошуку в ${escapeHtml(currentSection)}</p>
+  `;
+
+  const backBtn = document.createElement("button");
+  backBtn.textContent = "Назад до розділів";
+  backBtn.onclick = () => {
+    currentSection = null;
+    renderArticles();
+
+    setTimeout(() => {
+      window.scrollTo(0, savedScroll);
+    }, 50);
+  };
+
+  backDiv.appendChild(backBtn);
+  articlesDiv.appendChild(backDiv);
+
+  let filteredArticles = articles
+    .map((a, index) => ({ ...a, originalIndex: index }))
+    .filter(a => a.section === currentSection);
+
+  const sectionCandidates = filteredArticles.map((a, index) => ({
+    ...a,
+    originalIndex: a.originalIndex ?? index
+  }));
+
+  filteredArticles = await rankArticlesWithAI(query, sectionCandidates);
+
+  if (filteredArticles.length === 0) {
+    filteredArticles = fallbackRankArticles(query, sectionCandidates);
+  }
+
+  if (filteredArticles.length === 0) {
+    const emptyDiv = document.createElement("div");
+    emptyDiv.className = "section-header";
+    emptyDiv.innerHTML = `
+      <h2>Нічого не знайдено</h2>
+      <p>Спробуйте інший запит у цьому розділі</p>
+    `;
+    articlesDiv.appendChild(emptyDiv);
+    return;
+  }
+
+  filteredArticles.forEach((a) => {
+    const index = a.originalIndex;
+    const div = document.createElement("div");
+    div.className = "article";
+
+    div.innerHTML = `
+      <h2>${escapeHtml((a.law || '').replace(/-/g, '.'))}</h2>
+      <p>${escapeHtml((a.short || '').trim() || 'Короткий опис відсутній')}</p>
+    `;
+
+    const detailsDiv = document.createElement("div");
+    detailsDiv.className = "details";
+    detailsDiv.innerHTML = `
+      <div style="line-height:1.6; white-space:pre-line;">
+        ${formatText(a.details)}
+        ${a.link ? `<a href="${a.link}" target="_blank" style="display:block; margin-top:10px; color:#004080; font-weight:500;">Посилання на статтю</a>` : ""}
+      </div>
+    `;
+    div.appendChild(detailsDiv);
+
+    const moreBtn = document.createElement("button");
+    moreBtn.textContent = "Докладніше";
+    moreBtn.onclick = () => toggleDetailsBlock(detailsDiv, moreBtn);
+    div.appendChild(moreBtn);
+
+    if (isAdmin) {
+      const editBtn = document.createElement("button");
+      editBtn.textContent = "Редагувати";
+      editBtn.onclick = () => openEditModal(index);
+
+      const delBtn = document.createElement("button");
+      delBtn.textContent = "Видалити";
+      delBtn.onclick = () => openDeleteModal(index);
+
+      div.appendChild(editBtn);
+      div.appendChild(delBtn);
+    }
+
+    articlesDiv.appendChild(div);
+  });
+}
+
 function renderHomePage() {
 const featured = featuredTopics[featuredTopicIndex] || {
   badge: "Важлива тема",
@@ -2971,8 +3151,6 @@ const featured = featuredTopics[featuredTopicIndex] || {
   image: "",
   link: ""
 };
-
-
 
 const hero = document.createElement("div");
 hero.className = "portal-hero";
